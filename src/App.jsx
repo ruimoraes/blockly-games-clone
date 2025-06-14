@@ -1,105 +1,265 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-
-// Dados dos labirintos
-const MAZE_LEVELS = [
-  {
-    level: 1,
-    maxBlocks: Infinity,
-    map: [
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 2, 1, 3, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0]
-    ]
-  }
-];
+import { useMazeGame } from './hooks/useMazeGame';
 
 function App() {
-  const [gameState, setGameState] = useState('idle');
-  const [playerPosition, setPlayerPosition] = useState({ x: 2, y: 4, direction: 1 });
-  const [currentLevel] = useState(1);
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [workspace, setWorkspace] = useState(null);
+  const [blocklyLoaded, setBlocklyLoaded] = useState(false);
+  const [showFallback, setShowFallback] = useState(false);
+  const blocklyDiv = useRef(null);
+  
+  const {
+    gameState,
+    playerPosition,
+    currentLevel,
+    mazeData,
+    isExecuting,
+    executeCode,
+    resetGame,
+    moveForward,
+    turnLeft,
+    turnRight
+  } = useMazeGame();
 
-  // Dados do labirinto simples
-  const mazeData = MAZE_LEVELS[currentLevel - 1].map;
+  // Carregar Blockly dinamicamente com timeout
+  useEffect(() => {
+    const loadBlockly = async () => {
+      try {
+        // Timeout para fallback
+        const timeoutId = setTimeout(() => {
+          if (!blocklyLoaded) {
+            console.log('Blockly timeout - usando fallback');
+            setShowFallback(true);
+          }
+        }, 10000); // 10 segundos
 
-  const moveForward = () => {
-    console.log('Moving forward...');
-    let newX = playerPosition.x;
-    let newY = playerPosition.y;
+        // Importar Blockly dinamicamente
+        const Blockly = await import('blockly');
+        await import('blockly/blocks');
+        
+        clearTimeout(timeoutId);
+        
+        // Definir blocos customizados
+        Blockly.Blocks['maze_move_forward'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField("🚶 mover frente");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(160);
+            this.setTooltip("Move o personagem uma posição para frente");
+          }
+        };
 
-    // Calcular nova posição baseada na direção
-    switch (playerPosition.direction) {
-      case 0: // Norte
-        newY = playerPosition.y - 1;
-        break;
-      case 1: // Leste
-        newX = playerPosition.x + 1;
-        break;
-      case 2: // Sul
-        newY = playerPosition.y + 1;
-        break;
-      case 3: // Oeste
-        newX = playerPosition.x - 1;
-        break;
-    }
+        Blockly.Blocks['maze_turn_left'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField("↺ virar à esquerda");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(20);
+            this.setTooltip("Vira o personagem 90° para a esquerda");
+          }
+        };
 
-    // Verificar se a posição é válida
-    if (newY >= 0 && newY < mazeData.length && 
-        newX >= 0 && newX < mazeData[0].length &&
-        mazeData[newY][newX] !== 0) {
-      
-      setPlayerPosition(prev => ({ ...prev, x: newX, y: newY }));
-      
-      // Verificar se chegou ao objetivo
-      if (mazeData[newY][newX] === 3) {
-        setGameState('success');
+        Blockly.Blocks['maze_turn_right'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField("↻ virar à direita");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(20);
+            this.setTooltip("Vira o personagem 90° para a direita");
+          }
+        };
+
+        Blockly.Blocks['maze_repeat'] = {
+          init: function() {
+            this.appendValueInput("TIMES")
+                .setCheck("Number")
+                .appendField("🔄 repetir");
+            this.appendStatementInput("DO")
+                .setCheck(null)
+                .appendField("vezes");
+            this.setPreviousStatement(true, null);
+            this.setNextStatement(true, null);
+            this.setColour(120);
+            this.setTooltip("Repete as ações internas um número específico de vezes");
+          }
+        };
+
+        Blockly.Blocks['maze_number'] = {
+          init: function() {
+            this.appendDummyInput()
+                .appendField(new Blockly.FieldNumber(1, 1, 10), "NUM");
+            this.setOutput(true, "Number");
+            this.setColour(230);
+            this.setTooltip("Um número de 1 a 10");
+          }
+        };
+
+        // Geradores de código
+        Blockly.JavaScript['maze_move_forward'] = function(block) {
+          return 'await moveForward();\n';
+        };
+
+        Blockly.JavaScript['maze_turn_left'] = function(block) {
+          return 'await turnLeft();\n';
+        };
+
+        Blockly.JavaScript['maze_turn_right'] = function(block) {
+          return 'await turnRight();\n';
+        };
+
+        Blockly.JavaScript['maze_repeat'] = function(block) {
+          const times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '1';
+          const statements = Blockly.JavaScript.statementToCode(block, 'DO');
+          return `for (let i = 0; i < ${times}; i++) {\n${statements}}\n`;
+        };
+
+        Blockly.JavaScript['maze_number'] = function(block) {
+          const number = block.getFieldValue('NUM');
+          return [number, Blockly.JavaScript.ORDER_ATOMIC];
+        };
+
+        // Configuração da toolbox
+        const toolboxConfig = {
+          "kind": "categoryToolbox",
+          "contents": [
+            {
+              "kind": "category",
+              "name": "🚶 Movimento",
+              "colour": "160",
+              "contents": [
+                {
+                  "kind": "block",
+                  "type": "maze_move_forward"
+                },
+                {
+                  "kind": "block",
+                  "type": "maze_turn_left"
+                },
+                {
+                  "kind": "block",
+                  "type": "maze_turn_right"
+                }
+              ]
+            },
+            {
+              "kind": "category",
+              "name": "🔄 Repetição",
+              "colour": "120",
+              "contents": [
+                {
+                  "kind": "block",
+                  "type": "maze_repeat",
+                  "inputs": {
+                    "TIMES": {
+                      "shadow": {
+                        "type": "maze_number",
+                        "fields": {
+                          "NUM": 3
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "category",
+              "name": "🔢 Números",
+              "colour": "230",
+              "contents": [
+                {
+                  "kind": "block",
+                  "type": "maze_number"
+                }
+              ]
+            }
+          ]
+        };
+
+        if (blocklyDiv.current && !workspace) {
+          // Criar workspace
+          const newWorkspace = Blockly.inject(blocklyDiv.current, {
+            toolbox: toolboxConfig,
+            grid: {
+              spacing: 20,
+              length: 3,
+              colour: '#ccc',
+              snap: true
+            },
+            zoom: {
+              controls: true,
+              wheel: true,
+              startScale: 1.0,
+              maxScale: 3,
+              minScale: 0.3,
+              scaleSpeed: 1.2
+            },
+            trashcan: true,
+            scrollbars: true,
+            sounds: false,
+            media: 'https://unpkg.com/blockly/media/',
+            renderer: 'geras',
+            theme: Blockly.Themes.Classic
+          });
+
+          setWorkspace(newWorkspace);
+
+          // Listener para mudanças
+          newWorkspace.addChangeListener(() => {
+            const code = Blockly.JavaScript.workspaceToCode(newWorkspace);
+            setGeneratedCode(code);
+          });
+
+          // Redimensionar
+          const handleResize = () => {
+            if (newWorkspace) {
+              Blockly.svgResize(newWorkspace);
+            }
+          };
+
+          window.addEventListener('resize', handleResize);
+          setBlocklyLoaded(true);
+
+          // Cleanup
+          return () => {
+            window.removeEventListener('resize', handleResize);
+            if (newWorkspace) {
+              newWorkspace.dispose();
+            }
+          };
+        }
+      } catch (error) {
+        console.error('Erro ao carregar Blockly:', error);
+        setShowFallback(true);
       }
+    };
+
+    loadBlockly();
+  }, [workspace]);
+
+  // Função para executar o código gerado
+  const handleRunCode = () => {
+    if (generatedCode.trim()) {
+      executeCode(generatedCode);
     } else {
-      setGameState('failure');
+      alert('Adicione alguns blocos ao workspace antes de executar!');
     }
   };
 
-  const turnLeft = () => {
-    console.log('Turning left...');
-    setPlayerPosition(prev => ({
-      ...prev,
-      direction: (prev.direction + 3) % 4
-    }));
+  // Função para limpar workspace
+  const handleClearWorkspace = () => {
+    if (workspace) {
+      workspace.clear();
+    }
   };
 
-  const turnRight = () => {
-    console.log('Turning right...');
-    setPlayerPosition(prev => ({
-      ...prev,
-      direction: (prev.direction + 1) % 4
-    }));
-  };
-
-  const handleReset = () => {
-    setPlayerPosition({ x: 2, y: 4, direction: 1 });
-    setGameState('idle');
-  };
-
-  const handleRun = () => {
-    // Simular execução de código
-    setGameState('running');
-    
-    // Exemplo: mover para frente duas vezes
-    setTimeout(() => {
-      moveForward();
-      setTimeout(() => {
-        moveForward();
-        setGameState('idle');
-      }, 500);
-    }, 500);
-  };
-
-  // Renderizar labirinto com responsividade
+  // Renderizar labirinto
   const renderMaze = () => {
     const SQUARE_SIZE = typeof window !== 'undefined' && window.innerWidth < 576 ? 40 : 50;
     const rows = mazeData.length;
@@ -215,6 +375,106 @@ function App() {
     }
   };
 
+  // Renderizar editor de blocos ou fallback
+  const renderBlockEditor = () => {
+    if (showFallback) {
+      return (
+        <div className="card h-100">
+          <div className="card-header d-flex justify-content-between align-items-center">
+            <h5 className="mb-0">Controles Manuais</h5>
+            <span className="badge bg-info">Modo Fallback</span>
+          </div>
+          <div className="card-body d-flex flex-column justify-content-center align-items-center">
+            <div className="text-center mb-4">
+              <h6>Use os botões para controlar o personagem:</h6>
+            </div>
+            <div className="d-grid gap-3" style={{ width: '100%', maxWidth: '300px' }}>
+              <button 
+                className="btn btn-primary btn-lg"
+                onClick={moveForward}
+                disabled={isExecuting}
+              >
+                🚶 Mover Frente
+              </button>
+              <div className="row g-2">
+                <div className="col-6">
+                  <button 
+                    className="btn btn-warning w-100"
+                    onClick={turnLeft}
+                    disabled={isExecuting}
+                  >
+                    ↺ Esquerda
+                  </button>
+                </div>
+                <div className="col-6">
+                  <button 
+                    className="btn btn-warning w-100"
+                    onClick={turnRight}
+                    disabled={isExecuting}
+                  >
+                    ↻ Direita
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="card-footer">
+            <small className="text-muted">
+              Controles manuais - O Blockly será carregado em breve
+            </small>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="card h-100">
+        <div className="card-header d-flex justify-content-between align-items-center">
+          <h5 className="mb-0">Editor de Blocos</h5>
+          <div className="d-flex gap-2">
+            {!blocklyLoaded && (
+              <span className="badge bg-warning">Carregando Blockly...</span>
+            )}
+            {blocklyLoaded && (
+              <span className="badge bg-success">Blockly Carregado!</span>
+            )}
+            <button 
+              className="btn btn-sm btn-outline-secondary"
+              onClick={handleClearWorkspace}
+              disabled={isExecuting || !blocklyLoaded}
+            >
+              Limpar
+            </button>
+          </div>
+        </div>
+        <div className="card-body p-0">
+          <div 
+            ref={blocklyDiv}
+            style={{ height: '450px', width: '100%' }}
+          />
+          {!blocklyLoaded && (
+            <div className="d-flex justify-content-center align-items-center h-100">
+              <div className="text-center">
+                <div className="spinner-border text-primary mb-3" role="status">
+                  <span className="visually-hidden">Carregando...</span>
+                </div>
+                <p className="text-muted">Carregando editor de blocos...</p>
+                <small className="text-muted">
+                  Se demorar muito, controles manuais aparecerão automaticamente
+                </small>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="card-footer">
+          <small className="text-muted">
+            Arraste blocos da caixa de ferramentas para programar o personagem
+          </small>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="container-fluid">
       <header className="bg-primary text-white py-2 py-md-3 mb-3 mb-md-4">
@@ -222,11 +482,11 @@ function App() {
           <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
             <div>
               <h1 className="h4 h3-md mb-0">Blockly Games - Clone</h1>
-              <p className="mb-0 small">Jogo do Labirinto - Nível 1</p>
+              <p className="mb-0 small">Jogo do Labirinto - Nível {currentLevel}</p>
             </div>
             <div className="d-flex align-items-center gap-2">
               <span className="badge bg-light text-primary px-3 py-2">
-                <span className="d-none d-sm-inline">Nível </span>1/10
+                <span className="d-none d-sm-inline">Nível </span>{currentLevel}/10
               </span>
             </div>
           </div>
@@ -235,52 +495,28 @@ function App() {
       
       <main className="container">
         <div className="row g-3">
-          {/* Editor de Blocos */}
+          {/* Editor de Blocos ou Controles Manuais */}
           <div className="col-12 col-lg-6 order-2 order-lg-1">
-            <div className="card h-100">
-              <div className="card-header">
-                <h5 className="mb-0">Editor de Blocos</h5>
-              </div>
-              <div className="card-body">
-                <div style={{ 
-                  height: typeof window !== 'undefined' && window.innerWidth < 768 ? '300px' : '400px', 
-                  backgroundColor: '#f8f9fa', 
-                  border: '1px solid #dee2e6', 
-                  borderRadius: '0.375rem' 
-                }}>
-                  <div className="d-flex flex-column h-100 justify-content-center align-items-center">
-                    <p className="text-muted mb-3 text-center">Workspace Blockly será carregado aqui</p>
-                    <div className="d-flex flex-wrap gap-2 justify-content-center">
-                      <button className="btn btn-sm btn-outline-primary" onClick={moveForward}>
-                        <span className="d-none d-sm-inline">Mover </span>Frente
-                      </button>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={turnLeft}>
-                        <span className="d-none d-sm-inline">Virar </span>↺
-                      </button>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={turnRight}>
-                        <span className="d-none d-sm-inline">Virar </span>↻
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {renderBlockEditor()}
           </div>
           
           {/* Labirinto */}
           <div className="col-12 col-lg-6 order-1 order-lg-2">
             <div className="card h-100">
               <div className="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
-                <h5 className="mb-0">Labirinto - Nível 1</h5>
+                <h5 className="mb-0">Labirinto - Nível {currentLevel}</h5>
                 <div>
                   {gameState === 'success' && (
-                    <span className="badge bg-success">Sucesso!</span>
+                    <span className="badge bg-success">🎉 Sucesso!</span>
                   )}
                   {gameState === 'failure' && (
-                    <span className="badge bg-danger">Falhou!</span>
+                    <span className="badge bg-danger">❌ Falhou!</span>
                   )}
                   {gameState === 'running' && (
-                    <span className="badge bg-primary">Executando...</span>
+                    <span className="badge bg-primary">⚡ Executando...</span>
+                  )}
+                  {gameState === 'idle' && (
+                    <span className="badge bg-secondary">⏸️ Aguardando</span>
                   )}
                 </div>
               </div>
@@ -306,42 +542,58 @@ function App() {
           </div>
         </div>
         
+        {/* Controles */}
         <div className="row mt-3 mt-md-4">
           <div className="col-12">
             <div className="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
+              {!showFallback && (
+                <button 
+                  className="btn btn-success btn-lg"
+                  onClick={handleRunCode}
+                  disabled={isExecuting || !blocklyLoaded}
+                  style={{ minWidth: '150px' }}
+                >
+                  {isExecuting ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Executando...
+                    </>
+                  ) : (
+                    <>
+                      <span className="d-none d-sm-inline">▶ </span>Executar Código
+                    </>
+                  )}
+                </button>
+              )}
               <button 
-                className="btn btn-success"
-                onClick={handleRun}
-                disabled={gameState === 'running'}
-                style={{ minWidth: '120px' }}
+                className="btn btn-outline-secondary btn-lg"
+                onClick={resetGame}
+                disabled={isExecuting}
+                style={{ minWidth: '150px' }}
               >
-                {gameState === 'running' ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    Executando...
-                  </>
-                ) : (
-                  <>
-                    <span className="d-none d-sm-inline">▶ </span>Executar
-                  </>
-                )}
-              </button>
-              <button 
-                className="btn btn-outline-secondary"
-                onClick={handleReset}
-                style={{ minWidth: '120px' }}
-              >
-                <span className="d-none d-sm-inline">↻ </span>Resetar
-              </button>
-              <button 
-                className="btn btn-outline-primary"
-                style={{ minWidth: '120px' }}
-              >
-                <span className="d-none d-sm-inline">⚙ </span>Configurações
+                <span className="d-none d-sm-inline">↻ </span>Resetar Jogo
               </button>
             </div>
           </div>
         </div>
+
+        {/* Debug: Código Gerado */}
+        {generatedCode && !showFallback && (
+          <div className="row mt-4">
+            <div className="col-12">
+              <div className="card">
+                <div className="card-header">
+                  <h6 className="mb-0">Código JavaScript Gerado</h6>
+                </div>
+                <div className="card-body">
+                  <pre className="bg-light p-3 rounded" style={{ fontSize: '0.85rem', maxHeight: '200px', overflow: 'auto' }}>
+                    <code>{generatedCode || '// Nenhum código gerado ainda'}</code>
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       
       <footer className="bg-light py-3 mt-5">

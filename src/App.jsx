@@ -194,7 +194,7 @@ function App() {
             },
             zoom: {
               controls: true,
-              wheel: true,
+              wheel: false, // Desabilita zoom com scroll do mouse
               startScale: 1.0,
               maxScale: 3,
               minScale: 0.3,
@@ -248,6 +248,18 @@ function App() {
     };
 
     loadBlockly();
+  }, []);
+
+  // Cleanup do workspace quando o componente for desmontado
+  useEffect(() => {
+    return () => {
+      if (workspace) {
+        console.log('Limpando workspace...');
+        workspace.dispose();
+        setWorkspace(null);
+        setBlocklyLoaded(false);
+      }
+    };
   }, [workspace]);
 
   // Função para executar o código gerado
@@ -423,10 +435,10 @@ function App() {
                   </button>
                 </div>
               </div>
-              <div className="card-body p-0">
+              <div className="card-body p-0" style={{ height: '400px' }}>
                 <div 
                   ref={blocklyDiv}
-                  style={{ height: '450px', width: '100%' }}
+                  style={{ height: '100%', width: '100%' }}
                 />
                 {!blocklyLoaded && (
                   <div className="position-absolute top-50 start-50 translate-middle text-center">

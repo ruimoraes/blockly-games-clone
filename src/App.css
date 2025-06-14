@@ -237,3 +237,106 @@
   to { transform: rotate(360deg); }
 }
 
+
+/* Correções específicas para o Blockly */
+
+/* Esconder barras de rolagem da toolbox quando não necessárias */
+.blocklyToolboxDiv .blocklyScrollbarVertical {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.blocklyToolboxDiv:hover .blocklyScrollbarVertical {
+  opacity: 1;
+}
+
+/* Melhorar aparência da toolbox */
+.blocklyToolboxDiv {
+  border-right: 1px solid var(--border) !important;
+  background-color: var(--muted) !important;
+}
+
+/* Estilizar categorias da toolbox */
+.blocklyTreeRow {
+  padding: 8px 12px !important;
+  margin: 2px 0 !important;
+  border-radius: var(--radius-sm) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.blocklyTreeRow:hover {
+  background-color: var(--accent) !important;
+}
+
+.blocklyTreeRowSelected {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+/* Melhorar aparência do workspace */
+.blocklyMainBackground {
+  stroke: var(--border) !important;
+  fill: var(--background) !important;
+}
+
+/* Estilizar controles de zoom */
+.blocklyZoom {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.blocklyZoom:hover {
+  opacity: 1;
+}
+
+/* Estilizar lixeira */
+.blocklyTrash {
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.blocklyTrash:hover {
+  opacity: 1;
+}
+
+/* Garantir que o workspace não ultrapasse o container */
+.blocklyDiv {
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+/* Melhorar aparência dos blocos */
+.blocklyBlockCanvas .blocklyPath {
+  stroke-width: 2px !important;
+}
+
+/* Estilizar flyout (área de blocos expandida) */
+.blocklyFlyout {
+  border-left: 1px solid var(--border) !important;
+  background-color: var(--card) !important;
+}
+
+/* Esconder scrollbars do flyout quando não necessárias */
+.blocklyFlyout .blocklyScrollbarVertical,
+.blocklyFlyout .blocklyScrollbarHorizontal {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.blocklyFlyout:hover .blocklyScrollbarVertical,
+.blocklyFlyout:hover .blocklyScrollbarHorizontal {
+  opacity: 1;
+}
+
+/* Melhorar responsividade em telas pequenas */
+@media (max-width: 768px) {
+  .blocklyToolboxDiv {
+    width: 100px !important;
+  }
+  
+  .blocklyTreeLabel {
+    font-size: 12px !important;
+  }
+}
+

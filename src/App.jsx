@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { useMazeGame } from './hooks/useMazeGame';
@@ -7,6 +7,8 @@ function App() {
   const [generatedCode, setGeneratedCode] = useState('');
   const [workspace, setWorkspace] = useState(null);
   const [blocklyLoaded, setBlocklyLoaded] = useState(false);
+  const [activeTab, setActiveTab] = useState('workspace'); // 'workspace' ou 'game'
+  const [isMobile, setIsMobile] = useState(false);
   const blocklyDiv = useRef(null);
   
   const {
@@ -19,11 +21,36 @@ function App() {
     resetGame
   } = useMazeGame();
 
+  // Detectar se é mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   // Carregar Blockly
   useEffect(() => {
+    let isMounted = true;
+    let workspaceInstance = null;
+    
     const loadBlockly = async () => {
       try {
         console.log('Iniciando carregamento do Blockly...');
+        
+        if (!isMounted || !blocklyDiv.current || workspace) {
+          console.log('Cancelando carregamento - componente desmontado ou workspace já existe');
+          return;
+        }
+
+        // Limpar qualquer conteúdo existente no div
+        if (blocklyDiv.current.firstChild) {
+          blocklyDiv.current.innerHTML = '';
+        }
         
         // Importar Blockly e blocos
         const Blockly = await import('blockly');
@@ -209,6 +236,13 @@ function App() {
           });
 
           console.log('Workspace criado:', newWorkspace);
+          workspaceInstance = newWorkspace;
+          
+          if (!isMounted) {
+            newWorkspace.dispose();
+            return;
+          }
+          
           setWorkspace(newWorkspace);
 
           // Listener para mudanças no workspace
@@ -248,19 +282,17 @@ function App() {
     };
 
     loadBlockly();
-  }, []);
-
-  // Cleanup do workspace quando o componente for desmontado
-  useEffect(() => {
+    
+    // Cleanup function
     return () => {
-      if (workspace) {
-        console.log('Limpando workspace...');
-        workspace.dispose();
-        setWorkspace(null);
-        setBlocklyLoaded(false);
+      isMounted = false;
+      if (workspaceInstance) {
+        console.log('Limpando workspace na desmontagem...');
+        workspaceInstance.dispose();
+        workspaceInstance = null;
       }
     };
-  }, [workspace]);
+  }, []);
 
   // Função para executar o código gerado
   const handleRunCode = () => {
@@ -414,90 +446,204 @@ function App() {
       </header>
       
       <main className="container">
-        <div className="row g-3">
-          {/* Editor de Blocos Blockly */}
-          <div className="col-12 col-lg-6 order-2 order-lg-1">
-            <div className="card h-100">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">Editor de Blocos Blockly</h5>
-                <div className="d-flex gap-2">
-                  {blocklyLoaded ? (
-                    <span className="badge bg-success">✓ Blockly Carregado</span>
-                  ) : (
-                    <span className="badge bg-warning">⏳ Carregando...</span>
-                  )}
-                  <button 
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={handleClearWorkspace}
-                    disabled={isExecuting || !blocklyLoaded}
-                  >
-                    🗑️ Limpar
-                  </button>
-                </div>
-              </div>
-              <div className="card-body p-0" style={{ height: '400px' }}>
-                <div 
-                  ref={blocklyDiv}
-                  style={{ height: '100%', width: '100%' }}
-                />
-                {!blocklyLoaded && (
-                  <div className="position-absolute top-50 start-50 translate-middle text-center">
-                    <div className="spinner-border text-primary mb-3" role="status">
-                      <span className="visually-hidden">Carregando...</span>
+        {isMobile ? (
+          // Layout Mobile com Abas
+          <div className="mobile-layout">
+            {/* Navegação por Abas */}
+            <div className="nav nav-tabs mb-3" role="tablist">
+              <button 
+                className={`nav-link ${activeTab === 'workspace' ? 'active' : ''}`}
+                onClick={() => setActiveTab('workspace')}
+                type="button"
+              >
+                🧩 Editor de Blocos
+              </button>
+              <button 
+                className={`nav-link ${activeTab === 'game' ? 'active' : ''}`}
+                onClick={() => setActiveTab('game')}
+                type="button"
+              >
+                🎮 Labirinto
+              </button>
+            </div>
+
+            {/* Conteúdo das Abas */}
+            <div className="tab-content">
+              {/* Aba do Workspace */}
+              {activeTab === 'workspace' && (
+                <div className="tab-pane fade show active">
+                  <div className="card">
+                    <div className="card-header d-flex justify-content-between align-items-center">
+                      <h5 className="mb-0">Editor de Blocos Blockly</h5>
+                      <div className="d-flex gap-2">
+                        {blocklyLoaded ? (
+                          <span className="badge bg-success">✓ Carregado</span>
+                        ) : (
+                          <span className="badge bg-warning">⏳ Carregando...</span>
+                        )}
+                        <button 
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={handleClearWorkspace}
+                          disabled={isExecuting || !blocklyLoaded}
+                        >
+                          🗑️ Limpar
+                        </button>
+                      </div>
                     </div>
-                    <p className="text-muted">Carregando Blockly...</p>
+                    <div className="card-body p-0" style={{ height: '400px' }}>
+                      <div 
+                        ref={blocklyDiv}
+                        style={{ height: '100%', width: '100%' }}
+                      />
+                      {!blocklyLoaded && (
+                        <div className="position-absolute top-50 start-50 translate-middle text-center">
+                          <div className="spinner-border text-primary mb-3" role="status">
+                            <span className="visually-hidden">Carregando...</span>
+                          </div>
+                          <p className="text-muted">Carregando Blockly...</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="card-footer">
+                      <small className="text-muted">
+                        Arraste blocos da caixa de ferramentas para programar o personagem
+                      </small>
+                    </div>
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Aba do Jogo */}
+              {activeTab === 'game' && (
+                <div className="tab-pane fade show active">
+                  <div className="card">
+                    <div className="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                      <h5 className="mb-0">Labirinto - Nível {currentLevel}</h5>
+                      <div>
+                        {gameState === 'success' && (
+                          <span className="badge bg-success">🎉 Sucesso!</span>
+                        )}
+                        {gameState === 'failure' && (
+                          <span className="badge bg-danger">❌ Falhou!</span>
+                        )}
+                        {gameState === 'running' && (
+                          <span className="badge bg-primary">⚡ Executando...</span>
+                        )}
+                        {gameState === 'idle' && (
+                          <span className="badge bg-secondary">⏸️ Aguardando</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="card-body d-flex justify-content-center align-items-center p-2 p-sm-3">
+                      <div style={{ 
+                        maxWidth: '100%', 
+                        overflow: 'auto',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                      }}>
+                        {renderMaze()}
+                      </div>
+                    </div>
+                    <div className="card-footer text-center">
+                      <small className="text-muted">
+                        <span className="d-block d-sm-inline">Posição: ({playerPosition.x}, {playerPosition.y})</span>
+                        <span className="d-none d-sm-inline"> | </span>
+                        <span className="d-block d-sm-inline">Direção: {['Norte', 'Leste', 'Sul', 'Oeste'][playerPosition.direction]}</span>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          // Layout Desktop (duas colunas)
+          <div className="row g-3">
+            {/* Editor de Blocos Blockly */}
+            <div className="col-12 col-lg-6 order-2 order-lg-1">
+              <div className="card h-100">
+                <div className="card-header d-flex justify-content-between align-items-center">
+                  <h5 className="mb-0">Editor de Blocos Blockly</h5>
+                  <div className="d-flex gap-2">
+                    {blocklyLoaded ? (
+                      <span className="badge bg-success">✓ Blockly Carregado</span>
+                    ) : (
+                      <span className="badge bg-warning">⏳ Carregando...</span>
+                    )}
+                    <button 
+                      className="btn btn-sm btn-outline-secondary"
+                      onClick={handleClearWorkspace}
+                      disabled={isExecuting || !blocklyLoaded}
+                    >
+                      🗑️ Limpar
+                    </button>
+                  </div>
+                </div>
+                <div className="card-body p-0" style={{ height: '400px' }}>
+                  <div 
+                    ref={blocklyDiv}
+                    style={{ height: '100%', width: '100%' }}
+                  />
+                  {!blocklyLoaded && (
+                    <div className="position-absolute top-50 start-50 translate-middle text-center">
+                      <div className="spinner-border text-primary mb-3" role="status">
+                        <span className="visually-hidden">Carregando...</span>
+                      </div>
+                      <p className="text-muted">Carregando Blockly...</p>
+                    </div>
+                  )}
+                </div>
+                <div className="card-footer">
+                  <small className="text-muted">
+                    Arraste blocos da caixa de ferramentas para programar o personagem
+                  </small>
+                </div>
               </div>
-              <div className="card-footer">
-                <small className="text-muted">
-                  Arraste blocos da caixa de ferramentas para programar o personagem
-                </small>
+            </div>
+            
+            {/* Labirinto */}
+            <div className="col-12 col-lg-6 order-1 order-lg-2">
+              <div className="card h-100">
+                <div className="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                  <h5 className="mb-0">Labirinto - Nível {currentLevel}</h5>
+                  <div>
+                    {gameState === 'success' && (
+                      <span className="badge bg-success">🎉 Sucesso!</span>
+                    )}
+                    {gameState === 'failure' && (
+                      <span className="badge bg-danger">❌ Falhou!</span>
+                    )}
+                    {gameState === 'running' && (
+                      <span className="badge bg-primary">⚡ Executando...</span>
+                    )}
+                    {gameState === 'idle' && (
+                      <span className="badge bg-secondary">⏸️ Aguardando</span>
+                    )}
+                  </div>
+                </div>
+                <div className="card-body d-flex justify-content-center align-items-center p-2 p-sm-3">
+                  <div style={{ 
+                    maxWidth: '100%', 
+                    overflow: 'auto',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    {renderMaze()}
+                  </div>
+                </div>
+                <div className="card-footer text-center">
+                  <small className="text-muted">
+                    <span className="d-block d-sm-inline">Posição: ({playerPosition.x}, {playerPosition.y})</span>
+                    <span className="d-none d-sm-inline"> | </span>
+                    <span className="d-block d-sm-inline">Direção: {['Norte', 'Leste', 'Sul', 'Oeste'][playerPosition.direction]}</span>
+                  </small>
+                </div>
               </div>
             </div>
           </div>
-          
-          {/* Labirinto */}
-          <div className="col-12 col-lg-6 order-1 order-lg-2">
-            <div className="card h-100">
-              <div className="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
-                <h5 className="mb-0">Labirinto - Nível {currentLevel}</h5>
-                <div>
-                  {gameState === 'success' && (
-                    <span className="badge bg-success">🎉 Sucesso!</span>
-                  )}
-                  {gameState === 'failure' && (
-                    <span className="badge bg-danger">❌ Falhou!</span>
-                  )}
-                  {gameState === 'running' && (
-                    <span className="badge bg-primary">⚡ Executando...</span>
-                  )}
-                  {gameState === 'idle' && (
-                    <span className="badge bg-secondary">⏸️ Aguardando</span>
-                  )}
-                </div>
-              </div>
-              <div className="card-body d-flex justify-content-center align-items-center p-2 p-sm-3">
-                <div style={{ 
-                  maxWidth: '100%', 
-                  overflow: 'auto',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  {renderMaze()}
-                </div>
-              </div>
-              <div className="card-footer text-center">
-                <small className="text-muted">
-                  <span className="d-block d-sm-inline">Posição: ({playerPosition.x}, {playerPosition.y})</span>
-                  <span className="d-none d-sm-inline"> | </span>
-                  <span className="d-block d-sm-inline">Direção: {['Norte', 'Leste', 'Sul', 'Oeste'][playerPosition.direction]}</span>
-                </small>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
         
         {/* Controles */}
         <div className="row mt-3 mt-md-4">

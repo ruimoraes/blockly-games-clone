@@ -7,7 +7,6 @@ function App() {
   const [generatedCode, setGeneratedCode] = useState('');
   const [workspace, setWorkspace] = useState(null);
   const [blocklyLoaded, setBlocklyLoaded] = useState(false);
-  const [showFallback, setShowFallback] = useState(false);
   const blocklyDiv = useRef(null);
   
   const {
@@ -17,30 +16,22 @@ function App() {
     mazeData,
     isExecuting,
     executeCode,
-    resetGame,
-    moveForward,
-    turnLeft,
-    turnRight
+    resetGame
   } = useMazeGame();
 
-  // Carregar Blockly dinamicamente com timeout
+  // Carregar Blockly
   useEffect(() => {
     const loadBlockly = async () => {
       try {
-        // Timeout para fallback
-        const timeoutId = setTimeout(() => {
-          if (!blocklyLoaded) {
-            console.log('Blockly timeout - usando fallback');
-            setShowFallback(true);
-          }
-        }, 10000); // 10 segundos
-
-        // Importar Blockly dinamicamente
+        console.log('Iniciando carregamento do Blockly...');
+        
+        // Importar Blockly e blocos
         const Blockly = await import('blockly');
-        await import('blockly/blocks');
+        const BlocklyBlocks = await import('blockly/blocks');
+        const BlocklyJavaScript = await import('blockly/javascript');
         
-        clearTimeout(timeoutId);
-        
+        console.log('Blockly importado com sucesso');
+
         // Definir blocos customizados
         Blockly.Blocks['maze_move_forward'] = {
           init: function() {
@@ -50,6 +41,7 @@ function App() {
             this.setNextStatement(true, null);
             this.setColour(160);
             this.setTooltip("Move o personagem uma posição para frente");
+            this.setHelpUrl("");
           }
         };
 
@@ -61,6 +53,7 @@ function App() {
             this.setNextStatement(true, null);
             this.setColour(20);
             this.setTooltip("Vira o personagem 90° para a esquerda");
+            this.setHelpUrl("");
           }
         };
 
@@ -72,6 +65,7 @@ function App() {
             this.setNextStatement(true, null);
             this.setColour(20);
             this.setTooltip("Vira o personagem 90° para a direita");
+            this.setHelpUrl("");
           }
         };
 
@@ -87,6 +81,7 @@ function App() {
             this.setNextStatement(true, null);
             this.setColour(120);
             this.setTooltip("Repete as ações internas um número específico de vezes");
+            this.setHelpUrl("");
           }
         };
 
@@ -97,32 +92,35 @@ function App() {
             this.setOutput(true, "Number");
             this.setColour(230);
             this.setTooltip("Um número de 1 a 10");
+            this.setHelpUrl("");
           }
         };
 
-        // Geradores de código
-        Blockly.JavaScript['maze_move_forward'] = function(block) {
+        // Geradores de código JavaScript
+        BlocklyJavaScript.javascriptGenerator.forBlock['maze_move_forward'] = function(block, generator) {
           return 'await moveForward();\n';
         };
 
-        Blockly.JavaScript['maze_turn_left'] = function(block) {
+        BlocklyJavaScript.javascriptGenerator.forBlock['maze_turn_left'] = function(block, generator) {
           return 'await turnLeft();\n';
         };
 
-        Blockly.JavaScript['maze_turn_right'] = function(block) {
+        BlocklyJavaScript.javascriptGenerator.forBlock['maze_turn_right'] = function(block, generator) {
           return 'await turnRight();\n';
         };
 
-        Blockly.JavaScript['maze_repeat'] = function(block) {
-          const times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '1';
-          const statements = Blockly.JavaScript.statementToCode(block, 'DO');
+        BlocklyJavaScript.javascriptGenerator.forBlock['maze_repeat'] = function(block, generator) {
+          const times = generator.valueToCode(block, 'TIMES', BlocklyJavaScript.javascriptGenerator.ORDER_ATOMIC) || '1';
+          const statements = generator.statementToCode(block, 'DO');
           return `for (let i = 0; i < ${times}; i++) {\n${statements}}\n`;
         };
 
-        Blockly.JavaScript['maze_number'] = function(block) {
+        BlocklyJavaScript.javascriptGenerator.forBlock['maze_number'] = function(block, generator) {
           const number = block.getFieldValue('NUM');
-          return [number, Blockly.JavaScript.ORDER_ATOMIC];
+          return [number, BlocklyJavaScript.javascriptGenerator.ORDER_ATOMIC];
         };
+
+        console.log('Blocos customizados definidos');
 
         // Configuração da toolbox
         const toolboxConfig = {
@@ -183,6 +181,8 @@ function App() {
         };
 
         if (blocklyDiv.current && !workspace) {
+          console.log('Criando workspace Blockly...');
+          
           // Criar workspace
           const newWorkspace = Blockly.inject(blocklyDiv.current, {
             toolbox: toolboxConfig,
@@ -208,15 +208,21 @@ function App() {
             theme: Blockly.Themes.Classic
           });
 
+          console.log('Workspace criado:', newWorkspace);
           setWorkspace(newWorkspace);
 
-          // Listener para mudanças
+          // Listener para mudanças no workspace
           newWorkspace.addChangeListener(() => {
-            const code = Blockly.JavaScript.workspaceToCode(newWorkspace);
-            setGeneratedCode(code);
+            try {
+              const code = BlocklyJavaScript.javascriptGenerator.workspaceToCode(newWorkspace);
+              console.log('Código gerado:', code);
+              setGeneratedCode(code);
+            } catch (error) {
+              console.error('Erro ao gerar código:', error);
+            }
           });
 
-          // Redimensionar
+          // Redimensionar workspace
           const handleResize = () => {
             if (newWorkspace) {
               Blockly.svgResize(newWorkspace);
@@ -225,6 +231,7 @@ function App() {
 
           window.addEventListener('resize', handleResize);
           setBlocklyLoaded(true);
+          console.log('Blockly carregado com sucesso!');
 
           // Cleanup
           return () => {
@@ -236,7 +243,7 @@ function App() {
         }
       } catch (error) {
         console.error('Erro ao carregar Blockly:', error);
-        setShowFallback(true);
+        setBlocklyLoaded(false);
       }
     };
 
@@ -246,6 +253,7 @@ function App() {
   // Função para executar o código gerado
   const handleRunCode = () => {
     if (generatedCode.trim()) {
+      console.log('Executando código:', generatedCode);
       executeCode(generatedCode);
     } else {
       alert('Adicione alguns blocos ao workspace antes de executar!');
@@ -375,106 +383,6 @@ function App() {
     }
   };
 
-  // Renderizar editor de blocos ou fallback
-  const renderBlockEditor = () => {
-    if (showFallback) {
-      return (
-        <div className="card h-100">
-          <div className="card-header d-flex justify-content-between align-items-center">
-            <h5 className="mb-0">Controles Manuais</h5>
-            <span className="badge bg-info">Modo Fallback</span>
-          </div>
-          <div className="card-body d-flex flex-column justify-content-center align-items-center">
-            <div className="text-center mb-4">
-              <h6>Use os botões para controlar o personagem:</h6>
-            </div>
-            <div className="d-grid gap-3" style={{ width: '100%', maxWidth: '300px' }}>
-              <button 
-                className="btn btn-primary btn-lg"
-                onClick={moveForward}
-                disabled={isExecuting}
-              >
-                🚶 Mover Frente
-              </button>
-              <div className="row g-2">
-                <div className="col-6">
-                  <button 
-                    className="btn btn-warning w-100"
-                    onClick={turnLeft}
-                    disabled={isExecuting}
-                  >
-                    ↺ Esquerda
-                  </button>
-                </div>
-                <div className="col-6">
-                  <button 
-                    className="btn btn-warning w-100"
-                    onClick={turnRight}
-                    disabled={isExecuting}
-                  >
-                    ↻ Direita
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="card-footer">
-            <small className="text-muted">
-              Controles manuais - O Blockly será carregado em breve
-            </small>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="card h-100">
-        <div className="card-header d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Editor de Blocos</h5>
-          <div className="d-flex gap-2">
-            {!blocklyLoaded && (
-              <span className="badge bg-warning">Carregando Blockly...</span>
-            )}
-            {blocklyLoaded && (
-              <span className="badge bg-success">Blockly Carregado!</span>
-            )}
-            <button 
-              className="btn btn-sm btn-outline-secondary"
-              onClick={handleClearWorkspace}
-              disabled={isExecuting || !blocklyLoaded}
-            >
-              Limpar
-            </button>
-          </div>
-        </div>
-        <div className="card-body p-0">
-          <div 
-            ref={blocklyDiv}
-            style={{ height: '450px', width: '100%' }}
-          />
-          {!blocklyLoaded && (
-            <div className="d-flex justify-content-center align-items-center h-100">
-              <div className="text-center">
-                <div className="spinner-border text-primary mb-3" role="status">
-                  <span className="visually-hidden">Carregando...</span>
-                </div>
-                <p className="text-muted">Carregando editor de blocos...</p>
-                <small className="text-muted">
-                  Se demorar muito, controles manuais aparecerão automaticamente
-                </small>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="card-footer">
-          <small className="text-muted">
-            Arraste blocos da caixa de ferramentas para programar o personagem
-          </small>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="container-fluid">
       <header className="bg-primary text-white py-2 py-md-3 mb-3 mb-md-4">
@@ -495,9 +403,46 @@ function App() {
       
       <main className="container">
         <div className="row g-3">
-          {/* Editor de Blocos ou Controles Manuais */}
+          {/* Editor de Blocos Blockly */}
           <div className="col-12 col-lg-6 order-2 order-lg-1">
-            {renderBlockEditor()}
+            <div className="card h-100">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <h5 className="mb-0">Editor de Blocos Blockly</h5>
+                <div className="d-flex gap-2">
+                  {blocklyLoaded ? (
+                    <span className="badge bg-success">✓ Blockly Carregado</span>
+                  ) : (
+                    <span className="badge bg-warning">⏳ Carregando...</span>
+                  )}
+                  <button 
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={handleClearWorkspace}
+                    disabled={isExecuting || !blocklyLoaded}
+                  >
+                    🗑️ Limpar
+                  </button>
+                </div>
+              </div>
+              <div className="card-body p-0">
+                <div 
+                  ref={blocklyDiv}
+                  style={{ height: '450px', width: '100%' }}
+                />
+                {!blocklyLoaded && (
+                  <div className="position-absolute top-50 start-50 translate-middle text-center">
+                    <div className="spinner-border text-primary mb-3" role="status">
+                      <span className="visually-hidden">Carregando...</span>
+                    </div>
+                    <p className="text-muted">Carregando Blockly...</p>
+                  </div>
+                )}
+              </div>
+              <div className="card-footer">
+                <small className="text-muted">
+                  Arraste blocos da caixa de ferramentas para programar o personagem
+                </small>
+              </div>
+            </div>
           </div>
           
           {/* Labirinto */}
@@ -546,44 +491,42 @@ function App() {
         <div className="row mt-3 mt-md-4">
           <div className="col-12">
             <div className="d-flex flex-column flex-sm-row gap-2 justify-content-center align-items-center">
-              {!showFallback && (
-                <button 
-                  className="btn btn-success btn-lg"
-                  onClick={handleRunCode}
-                  disabled={isExecuting || !blocklyLoaded}
-                  style={{ minWidth: '150px' }}
-                >
-                  {isExecuting ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Executando...
-                    </>
-                  ) : (
-                    <>
-                      <span className="d-none d-sm-inline">▶ </span>Executar Código
-                    </>
-                  )}
-                </button>
-              )}
+              <button 
+                className="btn btn-success btn-lg"
+                onClick={handleRunCode}
+                disabled={isExecuting || !blocklyLoaded || !generatedCode.trim()}
+                style={{ minWidth: '150px' }}
+              >
+                {isExecuting ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Executando...
+                  </>
+                ) : (
+                  <>
+                    ▶️ Executar Programa
+                  </>
+                )}
+              </button>
               <button 
                 className="btn btn-outline-secondary btn-lg"
                 onClick={resetGame}
                 disabled={isExecuting}
                 style={{ minWidth: '150px' }}
               >
-                <span className="d-none d-sm-inline">↻ </span>Resetar Jogo
+                🔄 Resetar Jogo
               </button>
             </div>
           </div>
         </div>
 
         {/* Debug: Código Gerado */}
-        {generatedCode && !showFallback && (
+        {generatedCode && (
           <div className="row mt-4">
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h6 className="mb-0">Código JavaScript Gerado</h6>
+                  <h6 className="mb-0">📝 Código JavaScript Gerado</h6>
                 </div>
                 <div className="card-body">
                   <pre className="bg-light p-3 rounded" style={{ fontSize: '0.85rem', maxHeight: '200px', overflow: 'auto' }}>
@@ -599,7 +542,7 @@ function App() {
       <footer className="bg-light py-3 mt-5">
         <div className="container text-center">
           <small className="text-muted">
-            Clone do Blockly Games - Desenvolvido com React e Bootstrap
+            Clone do Blockly Games - Desenvolvido com React, Bootstrap e Blockly
           </small>
         </div>
       </footer>

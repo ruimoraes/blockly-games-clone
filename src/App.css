@@ -240,20 +240,61 @@
 
 /* Correções específicas para o Blockly */
 
-/* Esconder barras de rolagem da toolbox quando não necessárias */
-.blocklyToolboxDiv .blocklyScrollbarVertical {
-  opacity: 0;
-  transition: opacity 0.3s ease;
+/* CORREÇÃO DEFINITIVA: Esconder barras de rolagem da toolbox */
+.blocklyToolboxDiv .blocklyScrollbarVertical,
+.blocklyToolboxDiv .blocklyScrollbarHorizontal,
+.blocklyFlyout .blocklyScrollbarVertical,
+.blocklyFlyout .blocklyScrollbarHorizontal,
+.blocklyScrollbarVertical,
+.blocklyScrollbarHorizontal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
-.blocklyToolboxDiv:hover .blocklyScrollbarVertical {
-  opacity: 1;
+/* Forçar ocultação de todas as scrollbars do Blockly */
+.blocklyDiv .blocklyScrollbarVertical,
+.blocklyDiv .blocklyScrollbarHorizontal,
+.blocklyWorkspace .blocklyScrollbarVertical,
+.blocklyWorkspace .blocklyScrollbarHorizontal {
+  display: none !important;
+}
+
+/* Permitir scroll interno sem mostrar barras */
+.blocklyToolboxDiv,
+.blocklyFlyout {
+  overflow: hidden !important;
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE/Edge */
+}
+
+/* Webkit browsers (Chrome, Safari) */
+.blocklyToolboxDiv::-webkit-scrollbar,
+.blocklyFlyout::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Garantir que o workspace seja renderizado corretamente */
+.blocklyDiv {
+  height: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Forçar visibilidade do workspace */
+.blocklyDiv svg {
+  display: block !important;
+  visibility: visible !important;
 }
 
 /* Melhorar aparência da toolbox */
 .blocklyToolboxDiv {
   border-right: 1px solid var(--border) !important;
   background-color: var(--muted) !important;
+  min-width: 150px !important;
 }
 
 /* Estilizar categorias da toolbox */
@@ -299,13 +340,6 @@
   opacity: 1;
 }
 
-/* Garantir que o workspace não ultrapasse o container */
-.blocklyDiv {
-  height: 100% !important;
-  width: 100% !important;
-  overflow: hidden !important;
-}
-
 /* Melhorar aparência dos blocos */
 .blocklyBlockCanvas .blocklyPath {
   stroke-width: 2px !important;
@@ -317,27 +351,37 @@
   background-color: var(--card) !important;
 }
 
-/* Esconder scrollbars do flyout quando não necessárias */
-.blocklyFlyout .blocklyScrollbarVertical,
-.blocklyFlyout .blocklyScrollbarHorizontal {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.blocklyFlyout:hover .blocklyScrollbarVertical,
-.blocklyFlyout:hover .blocklyScrollbarHorizontal {
-  opacity: 1;
-}
-
 /* Melhorar responsividade em telas pequenas */
 @media (max-width: 768px) {
   .blocklyToolboxDiv {
-    width: 100px !important;
+    width: 120px !important;
+    min-width: 120px !important;
   }
   
   .blocklyTreeLabel {
     font-size: 12px !important;
   }
+  
+  /* Garantir que o workspace ocupe todo o espaço disponível em mobile */
+  .mobile-layout .blocklyDiv {
+    height: 400px !important;
+    width: 100% !important;
+  }
+}
+
+/* Forçar renderização correta em diferentes modos */
+.desktop-layout .blocklyDiv,
+.mobile-layout .blocklyDiv {
+  display: block !important;
+  visibility: visible !important;
+  position: relative !important;
+}
+
+/* Garantir que o SVG do Blockly seja sempre visível */
+.blocklyDiv > svg {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 

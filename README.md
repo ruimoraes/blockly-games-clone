@@ -37,7 +37,7 @@ O jogo inclui:
 
 ```bash
 # Clone o repositório
-git clone https://github.com/SEU_USUARIO/blockly-games-clone.git
+git clone https://github.com/ruimoraes/blockly-games-clone.git
 
 # Entre no diretório
 cd blockly-games-clone
@@ -178,9 +178,9 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 📞 Contato
 
-Seu Nome - [@seu_twitter](https://twitter.com/seu_twitter) - seu.email@exemplo.com
+Rui Moraes - [@ruimoraes](https://github.com/ruimoraes) - ruimoraes@github.com
 
-Link do Projeto: [https://github.com/SEU_USUARIO/blockly-games-clone](https://github.com/SEU_USUARIO/blockly-games-clone)
+Link do Projeto: [https://github.com/ruimoraes/blockly-games-clone](https://github.com/ruimoraes/blockly-games-clone)
 
 ---
 

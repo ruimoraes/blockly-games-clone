@@ -13,16 +13,16 @@
     "visual-programming",
     "educational-game"
   ],
-  "author": "Seu Nome <seu.email@exemplo.com>",
+  "author": "Rui Moraes <ruimoraes@github.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SEU_USUARIO/blockly-games-clone.git"
+    "url": "https://github.com/ruimoraes/blockly-games-clone.git"
   },
   "bugs": {
-    "url": "https://github.com/SEU_USUARIO/blockly-games-clone/issues"
+    "url": "https://github.com/ruimoraes/blockly-games-clone/issues"
   },
-  "homepage": "https://github.com/SEU_USUARIO/blockly-games-clone#readme",
+  "homepage": "https://github.com/ruimoraes/blockly-games-clone#readme",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

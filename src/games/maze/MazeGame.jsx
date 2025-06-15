@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../App.css';
 import { useMazeGame } from './hooks/useMazeGame';
-import PhaseSelector from './components/PhaseSelector';
+import PhaseSelector from '../../components/common/PhaseSelector';
 
 function MazeGame() {
   const [generatedCode, setGeneratedCode] = useState('');
@@ -23,6 +23,7 @@ function MazeGame() {
     isExecuting,
     unlockedPhases,
     completedPhases,
+    gameConfig,
     executeCode,
     resetGame,
     handlePhaseChange,
@@ -772,6 +773,7 @@ function MazeGame() {
           setShowPhaseSelector(false);
         }}
         getPhaseData={getPhaseData}
+        gameConfig={gameConfig}
         isVisible={showPhaseSelector}
         onClose={() => setShowPhaseSelector(false)}
       />

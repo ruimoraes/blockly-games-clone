@@ -9,6 +9,7 @@ const PhaseSelector = ({
   totalPhases, 
   onPhaseSelect, 
   getPhaseData,
+  gameConfig,
   isVisible = false,
   onClose 
 }) => {
@@ -51,7 +52,7 @@ const PhaseSelector = ({
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h3 className="mb-0">
             <Star className="me-2" size={24} />
-            Selecionar Fase
+            Selecionar Fase - {gameConfig.gameName}
           </h3>
           <Button variant="outline-secondary" size="sm" onClick={onClose}>
             ✕

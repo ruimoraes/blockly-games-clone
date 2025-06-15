@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useGamePhases } from './useGamePhases';
+import { useGamePhases } from '../../../hooks/useGamePhases';
+import { MAZE_GAME_CONFIG } from '../../../config/gameConfigs';
 
 export const useMazeGame = () => {
   const [gameState, setGameState] = useState('idle');
@@ -7,7 +8,7 @@ export const useMazeGame = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionSpeed] = useState(500); // ms entre ações
 
-  // Usar o hook de fases
+  // Usar o hook genérico de fases com a configuração do Maze
   const {
     currentPhase,
     getCurrentPhaseData,
@@ -19,8 +20,10 @@ export const useMazeGame = () => {
     changePhase,
     unlockedPhases,
     completedPhases,
-    totalPhases
-  } = useGamePhases();
+    totalPhases,
+    getPhaseData,
+    gameConfig
+  } = useGamePhases(MAZE_GAME_CONFIG);
 
   // Obter dados da fase atual
   const currentPhaseData = getCurrentPhaseData();
@@ -223,12 +226,13 @@ export const useMazeGame = () => {
     isExecuting,
     mazeData,
     
-    // Dados da fase
+    // Dados da fase (usando sistema genérico)
     currentPhase,
     currentPhaseData,
     totalPhases,
     unlockedPhases,
     completedPhases,
+    gameConfig,
     
     // Ações do jogo
     executeCode,
@@ -240,16 +244,16 @@ export const useMazeGame = () => {
     isPathLeft,
     isPathRight,
     
-    // Ações de fase
+    // Ações de fase (usando sistema genérico)
     handlePhaseChange,
     handleNextPhase,
     handlePreviousPhase,
     completePhase,
+    getPhaseData,
     
-    // Verificações de fase
+    // Verificações de fase (usando sistema genérico)
     isPhaseUnlocked,
     isPhaseCompleted
   };
 };
-
 

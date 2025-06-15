@@ -22,6 +22,24 @@ const HomePage = () => {
         'Conceitos de loops e sequências',
         'Interface intuitiva'
       ]
+    },
+    {
+      id: 'puzzle',
+      title: 'Quebra-Cabeça',
+      description: 'Domine conceitos de variáveis e propriedades configurando características de diferentes animais.',
+      difficulty: 'Iniciante',
+      levels: 5,
+      players: 'Novo!',
+      estimatedTime: '20 min',
+      image: '🧩',
+      color: 'success',
+      path: '/games/puzzle',
+      features: [
+        'Conceitos de variáveis',
+        '5 fases educativas',
+        'Propriedades de objetos',
+        'Animais interativos'
+      ]
     }
   ];
 

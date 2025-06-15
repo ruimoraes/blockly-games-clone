@@ -1,30 +1,36 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useGamePhases } from './useGamePhases';
 
 export const useMazeGame = () => {
   const [gameState, setGameState] = useState('idle');
   const [playerPosition, setPlayerPosition] = useState({ x: 2, y: 4, direction: 1 });
-  const [currentLevel] = useState(1);
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionSpeed] = useState(500); // ms entre ações
 
-  // Dados do labirinto
-  const MAZE_LEVELS = [
-    {
-      level: 1,
-      maxBlocks: Infinity,
-      map: [
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 2, 1, 3, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0]
-      ]
-    }
-  ];
+  // Usar o hook de fases
+  const {
+    currentPhase,
+    getCurrentPhaseData,
+    completePhase,
+    goToNextPhase,
+    goToPreviousPhase,
+    isPhaseUnlocked,
+    isPhaseCompleted,
+    changePhase,
+    unlockedPhases,
+    completedPhases,
+    totalPhases
+  } = useGamePhases();
 
-  const mazeData = MAZE_LEVELS[currentLevel - 1].map;
+  // Obter dados da fase atual
+  const currentPhaseData = getCurrentPhaseData();
+  const mazeData = currentPhaseData.map;
+
+  // Inicializar posição do jogador baseada na fase atual
+  const initializePlayerPosition = useCallback(() => {
+    const phaseData = getCurrentPhaseData();
+    setPlayerPosition(phaseData.startPosition);
+  }, [getCurrentPhaseData]);
 
   // Função para verificar se uma posição é válida
   const isValidPosition = useCallback((x, y) => {
@@ -66,7 +72,10 @@ export const useMazeGame = () => {
           
           // Verificar se chegou ao objetivo
           if (mazeData[newPos.y][newPos.x] === 3) {
-            setTimeout(() => setGameState('success'), 100);
+            setTimeout(() => {
+              setGameState('success');
+              completePhase(currentPhase);
+            }, 100);
           }
           
           setTimeout(resolve, executionSpeed);
@@ -80,7 +89,7 @@ export const useMazeGame = () => {
         }
       });
     });
-  }, [getNewPosition, isValidPosition, mazeData, executionSpeed]);
+  }, [getNewPosition, isValidPosition, mazeData, executionSpeed, completePhase, currentPhase]);
 
   const turnLeft = useCallback(() => {
     return new Promise((resolve) => {
@@ -156,17 +165,72 @@ export const useMazeGame = () => {
 
   // Função para resetar o jogo
   const resetGame = useCallback(() => {
-    setPlayerPosition({ x: 2, y: 4, direction: 1 });
+    initializePlayerPosition();
     setGameState('idle');
     setIsExecuting(false);
-  }, []);
+  }, [initializePlayerPosition]);
+
+  // Função para mudar de fase
+  const handlePhaseChange = useCallback((newPhase) => {
+    if (changePhase(newPhase)) {
+      // Resetar estado do jogo ao mudar de fase
+      setGameState('idle');
+      setIsExecuting(false);
+      // A posição será atualizada automaticamente quando getCurrentPhaseData() for chamado
+      setTimeout(() => {
+        initializePlayerPosition();
+      }, 0);
+      return true;
+    }
+    return false;
+  }, [changePhase, initializePlayerPosition]);
+
+  // Função para ir para próxima fase
+  const handleNextPhase = useCallback(() => {
+    if (goToNextPhase()) {
+      setGameState('idle');
+      setIsExecuting(false);
+      setTimeout(() => {
+        initializePlayerPosition();
+      }, 0);
+      return true;
+    }
+    return false;
+  }, [goToNextPhase, initializePlayerPosition]);
+
+  // Função para ir para fase anterior
+  const handlePreviousPhase = useCallback(() => {
+    if (goToPreviousPhase()) {
+      setGameState('idle');
+      setIsExecuting(false);
+      setTimeout(() => {
+        initializePlayerPosition();
+      }, 0);
+      return true;
+    }
+    return false;
+  }, [goToPreviousPhase, initializePlayerPosition]);
+
+  // Inicializar posição quando a fase atual mudar
+  useEffect(() => {
+    initializePlayerPosition();
+  }, [currentPhase, initializePlayerPosition]);
 
   return {
+    // Estado do jogo
     gameState,
     playerPosition,
-    currentLevel,
-    mazeData,
     isExecuting,
+    mazeData,
+    
+    // Dados da fase
+    currentPhase,
+    currentPhaseData,
+    totalPhases,
+    unlockedPhases,
+    completedPhases,
+    
+    // Ações do jogo
     executeCode,
     resetGame,
     moveForward,
@@ -174,7 +238,18 @@ export const useMazeGame = () => {
     turnRight,
     isPathAhead,
     isPathLeft,
-    isPathRight
+    isPathRight,
+    
+    // Ações de fase
+    handlePhaseChange,
+    handleNextPhase,
+    handlePreviousPhase,
+    completePhase,
+    
+    // Verificações de fase
+    isPhaseUnlocked,
+    isPhaseCompleted
   };
 };
+
 

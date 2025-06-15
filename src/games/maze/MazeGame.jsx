@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../App.css';
 import { useMazeGame } from './hooks/useMazeGame';
+import PhaseSelector from './components/PhaseSelector';
 
 function MazeGame() {
   const [generatedCode, setGeneratedCode] = useState('');
@@ -9,16 +10,27 @@ function MazeGame() {
   const [blocklyLoaded, setBlocklyLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState('workspace'); // 'workspace' ou 'game'
   const [isMobile, setIsMobile] = useState(false);
+  const [showPhaseSelector, setShowPhaseSelector] = useState(false);
   const blocklyDiv = useRef(null);
   
   const {
     gameState,
     playerPosition,
-    currentLevel,
+    currentPhase,
+    currentPhaseData,
+    totalPhases,
     mazeData,
     isExecuting,
+    unlockedPhases,
+    completedPhases,
     executeCode,
-    resetGame
+    resetGame,
+    handlePhaseChange,
+    handleNextPhase,
+    handlePreviousPhase,
+    isPhaseUnlocked,
+    isPhaseCompleted,
+    getPhaseData
   } = useMazeGame();
 
   // Detectar se é mobile
@@ -434,11 +446,18 @@ function MazeGame() {
           <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
             <div>
               <h1 className="h4 h3-md mb-0">Blockly Games - Clone</h1>
-              <p className="mb-0 small">Jogo do Labirinto - Nível {currentLevel}</p>
+              <p className="mb-0 small">{currentPhaseData.name} - Fase {currentPhase}</p>
             </div>
             <div className="d-flex align-items-center gap-2">
+              <button 
+                className="btn btn-outline-light btn-sm"
+                onClick={() => setShowPhaseSelector(true)}
+                disabled={isExecuting}
+              >
+                📋 Fases
+              </button>
               <span className="badge bg-light text-primary px-3 py-2">
-                <span className="d-none d-sm-inline">Nível </span>{currentLevel}/10
+                <span className="d-none d-sm-inline">Fase </span>{currentPhase}/{totalPhases}
               </span>
             </div>
           </div>
@@ -606,7 +625,7 @@ function MazeGame() {
             <div className="col-12 col-lg-6 order-1 order-lg-2">
               <div className="card h-100">
                 <div className="card-header d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
-                  <h5 className="mb-0">Labirinto - Nível {currentLevel}</h5>
+                  <h5 className="mb-0">Labirinto - Fase {currentPhase}</h5>
                   <div>
                     {gameState === 'success' && (
                       <span className="badge bg-success">🎉 Sucesso!</span>
@@ -678,6 +697,43 @@ function MazeGame() {
           </div>
         </div>
 
+        {/* Navegação entre Fases */}
+        <div className="row mt-3">
+          <div className="col-12">
+            <div className="d-flex justify-content-between align-items-center">
+              <button 
+                className="btn btn-outline-primary"
+                onClick={handlePreviousPhase}
+                disabled={isExecuting || currentPhase === 1}
+              >
+                ← Fase Anterior
+              </button>
+              
+              <div className="text-center">
+                <div className="mb-1">
+                  <strong>{currentPhaseData.name}</strong>
+                </div>
+                <small className="text-muted">{currentPhaseData.description}</small>
+                {currentPhaseData.maxBlocks !== Infinity && (
+                  <div className="mt-1">
+                    <small className="badge bg-warning text-dark">
+                      Máximo: {currentPhaseData.maxBlocks} blocos
+                    </small>
+                  </div>
+                )}
+              </div>
+              
+              <button 
+                className="btn btn-outline-primary"
+                onClick={handleNextPhase}
+                disabled={isExecuting || !isPhaseUnlocked(currentPhase + 1)}
+              >
+                Próxima Fase →
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Debug: Código Gerado */}
         {generatedCode && (
           <div className="row mt-4">
@@ -704,6 +760,21 @@ function MazeGame() {
           </small>
         </div>
       </footer>
+
+      {/* Seletor de Fases */}
+      <PhaseSelector
+        currentPhase={currentPhase}
+        unlockedPhases={unlockedPhases}
+        completedPhases={completedPhases}
+        totalPhases={totalPhases}
+        onPhaseSelect={(phase) => {
+          handlePhaseChange(phase);
+          setShowPhaseSelector(false);
+        }}
+        getPhaseData={getPhaseData}
+        isVisible={showPhaseSelector}
+        onClose={() => setShowPhaseSelector(false)}
+      />
     </div>
   );
 }

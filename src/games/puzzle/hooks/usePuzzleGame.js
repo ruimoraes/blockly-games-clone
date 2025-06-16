@@ -1,147 +1,211 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useGamePhases } from '../../../hooks/useGamePhases';
 import { PUZZLE_GAME_CONFIG } from '../../../config/puzzleGameConfig';
+import { checkPuzzleSolution, ANIMALS_DATA } from '../blocks/puzzleBlocks';
 
 export const usePuzzleGame = () => {
-  const [configuredAnimals, setConfiguredAnimals] = useState([]);
-  const [selectedAnimal, setSelectedAnimal] = useState(null);
-  const [showConfigModal, setShowConfigModal] = useState(false);
+  // Usar sistema genérico de fases
+  const {
+    currentPhase,
+    gameState,
+    nextPhase,
+    previousPhase,
+    resetPhase,
+    completePhase,
+    gameConfig
+  } = useGamePhases(PUZZLE_GAME_CONFIG);
 
-  // Usar o hook genérico de fases
-  const gamePhases = useGamePhases(PUZZLE_GAME_CONFIG);
-  const { 
-    currentPhase, 
-    getCurrentPhaseData, 
-    completePhase, 
-    isPhaseCompleted 
-  } = gamePhases;
+  // Estado específico do puzzle
+  const [animalStates, setAnimalStates] = useState([]);
+  const [workspace, setWorkspace] = useState(null);
+  const [isComplete, setIsComplete] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
-  // Obter dados da fase atual
-  const currentPhaseData = getCurrentPhaseData();
-  const animals = currentPhaseData?.animals || [];
-  const targetTraits = currentPhaseData?.targetTraits || [];
-
-  // Carregar configurações salvas da fase atual
+  // Inicializar estados dos animais baseado na fase atual
   useEffect(() => {
-    const savedConfigs = localStorage.getItem(`puzzle-phase-${currentPhase}-configs`);
-    if (savedConfigs) {
-      try {
-        setConfiguredAnimals(JSON.parse(savedConfigs));
-      } catch (error) {
-        console.error('Erro ao carregar configurações:', error);
-        setConfiguredAnimals([]);
+    const currentPhaseData = gameConfig.phases[currentPhase - 1];
+    if (currentPhaseData) {
+      const requiredAnimals = currentPhaseData.requiredAnimals || 1;
+      const initialStates = Array(requiredAnimals).fill(null).map(() => ({
+        animalId: '0',
+        isCorrect: false,
+        hasImage: false,
+        hasLegs: false,
+        hasTraits: false
+      }));
+      setAnimalStates(initialStates);
+      setIsComplete(false);
+    }
+  }, [currentPhase, gameConfig]);
+
+  // Verificar solução do puzzle
+  const checkSolution = useCallback(() => {
+    if (!workspace) return false;
+
+    const animalBlocks = workspace.getBlocksByType('puzzle_animal');
+    const newStates = [...animalStates];
+    let correctCount = 0;
+
+    // Verificar cada bloco de animal
+    animalBlocks.forEach((block, index) => {
+      if (index < newStates.length) {
+        const animalId = block.getFieldValue('ANIMAL_ID');
+        const isCorrect = block.isCorrect();
+        
+        newStates[index] = {
+          animalId,
+          isCorrect,
+          hasImage: !!block.getInputTargetBlock('PICTURE'),
+          hasLegs: !!block.getInputTargetBlock('LEGS'),
+          hasTraits: !!block.getInputTargetBlock('TRAITS')
+        };
+
+        if (isCorrect) correctCount++;
       }
-    } else {
-      setConfiguredAnimals([]);
-    }
-  }, [currentPhase]);
-
-  // Salvar configurações no localStorage
-  const saveConfigurations = useCallback((configs) => {
-    localStorage.setItem(`puzzle-phase-${currentPhase}-configs`, JSON.stringify(configs));
-    setConfiguredAnimals(configs);
-  }, [currentPhase]);
-
-  // Configurar um animal
-  const configureAnimal = useCallback((animalName, config) => {
-    const newConfigs = configuredAnimals.filter(c => c.name !== animalName);
-    newConfigs.push({
-      name: animalName,
-      ...config
     });
-    saveConfigurations(newConfigs);
-  }, [configuredAnimals, saveConfigurations]);
 
-  // Abrir modal de configuração
-  const openConfigModal = useCallback((animal) => {
-    setSelectedAnimal(animal);
-    setShowConfigModal(true);
+    // Verificar se há blocos de animal suficientes
+    const currentPhaseData = gameConfig.phases[currentPhase - 1];
+    const requiredAnimals = currentPhaseData?.requiredAnimals || 1;
+    
+    if (animalBlocks.length < requiredAnimals) {
+      // Preencher estados faltantes
+      for (let i = animalBlocks.length; i < requiredAnimals; i++) {
+        if (i < newStates.length) {
+          newStates[i] = {
+            animalId: '0',
+            isCorrect: false,
+            hasImage: false,
+            hasLegs: false,
+            hasTraits: false
+          };
+        }
+      }
+    }
+
+    setAnimalStates(newStates);
+
+    // Verificar se o puzzle está completo
+    const isPhaseComplete = correctCount >= requiredAnimals;
+    setIsComplete(isPhaseComplete);
+
+    if (isPhaseComplete && !gameState.phases[currentPhase - 1]?.completed) {
+      completePhase();
+    }
+
+    return isPhaseComplete;
+  }, [workspace, animalStates, currentPhase, gameConfig, gameState, completePhase]);
+
+  // Resetar puzzle
+  const resetPuzzle = useCallback(() => {
+    if (workspace) {
+      workspace.clear();
+    }
+    
+    const currentPhaseData = gameConfig.phases[currentPhase - 1];
+    const requiredAnimals = currentPhaseData?.requiredAnimals || 1;
+    const initialStates = Array(requiredAnimals).fill(null).map(() => ({
+      animalId: '0',
+      isCorrect: false,
+      hasImage: false,
+      hasLegs: false,
+      hasTraits: false
+    }));
+    
+    setAnimalStates(initialStates);
+    setIsComplete(false);
+    setShowHint(false);
+    resetPhase();
+  }, [workspace, currentPhase, gameConfig, resetPhase]);
+
+  // Mostrar dica
+  const toggleHint = useCallback(() => {
+    setShowHint(prev => !prev);
   }, []);
 
-  // Fechar modal de configuração
-  const closeConfigModal = useCallback(() => {
-    setSelectedAnimal(null);
-    setShowConfigModal(false);
-  }, []);
+  // Obter dica para a fase atual
+  const getCurrentHint = useCallback(() => {
+    const currentPhaseData = gameConfig.phases[currentPhase - 1];
+    if (!currentPhaseData) return '';
 
-  // Verificar se a fase está completa
-  const checkPhaseCompletion = useCallback(() => {
-    if (!animals.length) return false;
-    
-    return animals.every(animal => {
-      const config = configuredAnimals.find(c => c.name === animal.name);
-      return config && 
-             config.picture && 
-             config.legs !== undefined && 
-             config.traits.length > 0;
-    });
-  }, [animals, configuredAnimals]);
+    const hints = [
+      'Arraste um bloco "Animal" da categoria "Animais" para o workspace.',
+      'Conecte um bloco "Imagem" ao campo "imagem" do animal.',
+      'Conecte um bloco "Pernas" ao campo "pernas" do animal.',
+      'Conecte um bloco "Características" ao campo "características" do animal.',
+      'Verifique se todas as propriedades estão corretas para o animal selecionado.'
+    ];
 
-  // Verificar se todas as configurações estão corretas
-  const checkCorrectConfiguration = useCallback(() => {
-    if (!animals.length) return false;
-    
-    return animals.every(animal => {
-      const config = configuredAnimals.find(c => c.name === animal.name);
-      if (!config) return false;
-      
-      return config.picture === animal.picture &&
-             config.legs === animal.legs &&
-             JSON.stringify(config.traits.sort()) === JSON.stringify(animal.traits.sort());
-    });
-  }, [animals, configuredAnimals]);
+    return currentPhaseData.hint || hints[Math.min(currentPhase - 1, hints.length - 1)];
+  }, [currentPhase, gameConfig]);
 
-  // Completar fase automaticamente quando todas as configurações estão corretas
-  useEffect(() => {
-    if (checkPhaseCompletion() && checkCorrectConfiguration() && !isPhaseCompleted(currentPhase)) {
-      completePhase(currentPhase);
+  // Listener para mudanças no workspace
+  const handleWorkspaceChange = useCallback((newWorkspace, event) => {
+    if (newWorkspace && newWorkspace !== workspace) {
+      setWorkspace(newWorkspace);
     }
-  }, [checkPhaseCompletion, checkCorrectConfiguration, currentPhase, completePhase, isPhaseCompleted]);
 
-  // Resetar configurações da fase atual
-  const resetPhase = useCallback(() => {
-    localStorage.removeItem(`puzzle-phase-${currentPhase}-configs`);
-    setConfiguredAnimals([]);
-  }, [currentPhase]);
+    // Verificar solução automaticamente em mudanças relevantes
+    if (event && (
+      event.type === Blockly.Events.BLOCK_CHANGE ||
+      event.type === Blockly.Events.BLOCK_MOVE ||
+      event.type === Blockly.Events.BLOCK_DELETE
+    )) {
+      // Usar timeout para permitir que o DOM se atualize
+      setTimeout(() => {
+        checkSolution();
+      }, 100);
+    }
+  }, [workspace, checkSolution]);
 
-  // Obter configuração atual de um animal
-  const getAnimalConfig = useCallback((animalName) => {
-    return configuredAnimals.find(config => config.name === animalName);
-  }, [configuredAnimals]);
+  // Avançar para próxima fase
+  const goToNextPhase = useCallback(() => {
+    if (isComplete) {
+      nextPhase();
+      setShowHint(false);
+    }
+  }, [isComplete, nextPhase]);
 
-  // Calcular progresso da fase
-  const getPhaseProgress = useCallback(() => {
-    if (!animals.length) return 0;
-    const configuredCount = animals.filter(animal => {
-      const config = getAnimalConfig(animal.name);
-      return config && config.picture && config.legs !== undefined && config.traits.length > 0;
-    }).length;
-    return (configuredCount / animals.length) * 100;
-  }, [animals, getAnimalConfig]);
+  // Voltar para fase anterior
+  const goToPreviousPhase = useCallback(() => {
+    previousPhase();
+    setShowHint(false);
+  }, [previousPhase]);
+
+  // Calcular estatísticas
+  const correctCount = animalStates.filter(state => state.isCorrect).length;
+  const totalAnimals = animalStates.length;
+  const currentPhaseData = gameConfig.phases[currentPhase - 1];
 
   return {
     // Estado do jogo
-    configuredAnimals,
-    selectedAnimal,
-    showConfigModal,
-    animals,
-    targetTraits,
-    currentPhaseData,
+    gameState,
+    currentPhase,
+    gameConfig,
+    
+    // Estado do puzzle
+    animalStates,
+    isComplete,
+    correctCount,
+    totalAnimals,
+    
+    // Dicas
+    showHint,
+    currentHint: getCurrentHint(),
     
     // Ações
-    configureAnimal,
-    openConfigModal,
-    closeConfigModal,
-    resetPhase,
-    getAnimalConfig,
+    checkSolution,
+    resetPuzzle,
+    toggleHint,
+    handleWorkspaceChange,
+    goToNextPhase,
+    goToPreviousPhase,
     
-    // Verificações
-    checkPhaseCompletion,
-    checkCorrectConfiguration,
-    getPhaseProgress,
+    // Dados da fase atual
+    currentPhaseData,
     
-    // Hook de fases (spread para expor todas as funcionalidades)
-    ...gamePhases
+    // Dados dos animais
+    animalsData: ANIMALS_DATA
   };
 };
 

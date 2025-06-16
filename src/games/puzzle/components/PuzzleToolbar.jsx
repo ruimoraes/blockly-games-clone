@@ -56,7 +56,7 @@ const PuzzleToolbar = ({
         </button>
       </div>
       
-      <style jsx>{`
+      <style>{`
         .puzzle-toolbar {
           background: white;
           padding: 16px 20px;

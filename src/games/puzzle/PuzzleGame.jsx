@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { usePuzzleGame } from './hooks/usePuzzleGame';
 import BlocklyEditor from './components/BlocklyEditor';
 import PuzzleDisplay from './components/PuzzleDisplay';
 import PuzzleToolbar from './components/PuzzleToolbar';
-import { PhaseSelector } from '../../components/common/PhaseSelector';
+import PhaseSelector from '../../components/common/PhaseSelector';
 
 // Importar e registrar os blocos personalizados
 import './blocks/puzzleBlocks';
@@ -36,13 +36,6 @@ const PuzzleGame = () => {
     // Dados da fase atual
     currentPhaseData
   } = usePuzzleGame();
-
-  // Verificar solução automaticamente quando o estado muda
-  useEffect(() => {
-    if (animalStates.length > 0) {
-      checkSolution();
-    }
-  }, [animalStates, checkSolution]);
 
   if (!currentPhaseData) {
     return (
@@ -173,7 +166,7 @@ const PuzzleGame = () => {
         </button>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .puzzle-game {
           min-height: 100vh;
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

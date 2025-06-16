@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import * as Blockly from 'blockly';
 import { useGamePhases } from '../../../hooks/useGamePhases';
 import { PUZZLE_GAME_CONFIG } from '../../../config/puzzleGameConfig';
 import { checkPuzzleSolution, ANIMALS_DATA } from '../blocks/puzzleBlocks';
@@ -8,10 +9,11 @@ export const usePuzzleGame = () => {
   const {
     currentPhase,
     gameState,
-    nextPhase,
-    previousPhase,
-    resetPhase,
+    goToNextPhase,
+    goToPreviousPhase,
+    resetProgress,
     completePhase,
+    completedPhases, // adicionado
     gameConfig
   } = useGamePhases(PUZZLE_GAME_CONFIG);
 
@@ -89,8 +91,8 @@ export const usePuzzleGame = () => {
     const isPhaseComplete = correctCount >= requiredAnimals;
     setIsComplete(isPhaseComplete);
 
-    if (isPhaseComplete && !gameState.phases[currentPhase - 1]?.completed) {
-      completePhase();
+    if (isPhaseComplete && !completedPhases.includes(currentPhase)) {
+      completePhase(currentPhase);
     }
 
     return isPhaseComplete;
@@ -115,8 +117,8 @@ export const usePuzzleGame = () => {
     setAnimalStates(initialStates);
     setIsComplete(false);
     setShowHint(false);
-    resetPhase();
-  }, [workspace, currentPhase, gameConfig, resetPhase]);
+    resetProgress();
+  }, [workspace, currentPhase, gameConfig, resetProgress]);
 
   // Mostrar dica
   const toggleHint = useCallback(() => {
@@ -159,18 +161,18 @@ export const usePuzzleGame = () => {
   }, [workspace, checkSolution]);
 
   // Avançar para próxima fase
-  const goToNextPhase = useCallback(() => {
+  const goToNextPhaseHandler = useCallback(() => {
     if (isComplete) {
-      nextPhase();
+      goToNextPhase();
       setShowHint(false);
     }
-  }, [isComplete, nextPhase]);
+  }, [isComplete, goToNextPhase]);
 
   // Voltar para fase anterior
-  const goToPreviousPhase = useCallback(() => {
-    previousPhase();
+  const goToPreviousPhaseHandler = useCallback(() => {
+    goToPreviousPhase();
     setShowHint(false);
-  }, [previousPhase]);
+  }, [goToPreviousPhase]);
 
   // Calcular estatísticas
   const correctCount = animalStates.filter(state => state.isCorrect).length;
@@ -198,8 +200,8 @@ export const usePuzzleGame = () => {
     resetPuzzle,
     toggleHint,
     handleWorkspaceChange,
-    goToNextPhase,
-    goToPreviousPhase,
+    goToNextPhase: goToNextPhaseHandler,
+    goToPreviousPhase: goToPreviousPhaseHandler,
     
     // Dados da fase atual
     currentPhaseData,

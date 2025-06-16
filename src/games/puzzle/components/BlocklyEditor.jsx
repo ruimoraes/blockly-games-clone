@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import * as Blockly from 'blockly';
 import { PUZZLE_TOOLBOX } from '../blocks/puzzleBlocks';
 
-const BlocklyEditor = ({ onWorkspaceChange, initialBlocks }) => {
+const BlocklyEditor = forwardRef(({ onWorkspaceChange, initialBlocks }, ref) => {
   const blocklyDiv = useRef(null);
   const workspace = useRef(null);
 
@@ -78,7 +78,7 @@ const BlocklyEditor = ({ onWorkspaceChange, initialBlocks }) => {
   };
 
   // Expor métodos para o componente pai
-  React.useImperativeHandle(React.forwardRef(() => null), () => ({
+  useImperativeHandle(ref, () => ({
     getWorkspace,
     getBlocksXml,
     clearWorkspace
@@ -95,7 +95,7 @@ const BlocklyEditor = ({ onWorkspaceChange, initialBlocks }) => {
       }}
     />
   );
-};
+});
 
 export default BlocklyEditor;
 

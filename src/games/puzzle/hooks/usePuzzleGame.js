@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import * as Blockly from 'blockly';
 import { useGamePhases } from '../../../hooks/useGamePhases';
-import { PUZZLE_GAME_CONFIG } from '../../../config/puzzleGameConfig';
+import { PUZZLE_GAME_CONFIG } from '../config/puzzleGameConfig';
 import { checkPuzzleSolution, ANIMALS_DATA } from '../blocks/puzzleBlocks';
 
 export const usePuzzleGame = () => {

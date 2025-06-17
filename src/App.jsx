@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import MazePage from './pages/MazePage';
 import PuzzlePage from './pages/PuzzlePage';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (

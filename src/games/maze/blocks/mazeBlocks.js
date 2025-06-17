@@ -1,8 +1,8 @@
-import * as Blockly from 'blockly';
-import 'blockly/blocks';
+// Esta versão do arquivo não precisa importar Blockly,
+// pois ele será passado como parâmetro para as funções
 
 // Definir blocos customizados para o jogo Maze
-export const defineBlocks = () => {
+export const defineBlocks = (Blockly) => {
   // Bloco: Mover Frente
   Blockly.Blocks['maze_move_forward'] = {
     init: function() {
@@ -161,70 +161,60 @@ export const defineBlocks = () => {
 };
 
 // Definir geradores de código JavaScript
-export const defineGenerators = () => {
+export const defineGenerators = (javascriptGenerator) => {
   // Gerador: Mover Frente
-  Blockly.JavaScript['maze_move_forward'] = function(block) {
+  javascriptGenerator.forBlock['maze_move_forward'] = function(block) {
     return 'await moveForward();\n';
   };
-
   // Gerador: Virar à Esquerda
-  Blockly.JavaScript['maze_turn_left'] = function(block) {
+  javascriptGenerator.forBlock['maze_turn_left'] = function(block) {
     return 'await turnLeft();\n';
   };
-
   // Gerador: Virar à Direita
-  Blockly.JavaScript['maze_turn_right'] = function(block) {
+  javascriptGenerator.forBlock['maze_turn_right'] = function(block) {
     return 'await turnRight();\n';
+  };  // Gerador: Repetir
+  javascriptGenerator.forBlock['maze_repeat'] = function(block) {
+    const times = javascriptGenerator.valueToCode(block, 'TIMES', javascriptGenerator.ORDER_ATOMIC) || '1';
+    const statements = javascriptGenerator.statementToCode(block, 'DO');
+    const code = `for (let i = 0; i < ${times}; i++) {\n${statements}}\n`;
+    return code;
   };
-
-  // Gerador: Repetir
-  Blockly.JavaScript['maze_repeat'] = function(block) {
-    const times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '1';
-    const statements = Blockly.JavaScript.statementToCode(block, 'DO');
-    return `for (let i = 0; i < ${times}; i++) {\n${statements}}\n`;
-  };
-
   // Gerador: Número
-  Blockly.JavaScript['maze_number'] = function(block) {
+  javascriptGenerator.forBlock['maze_number'] = function(block) {
     const number = block.getFieldValue('NUM');
-    return [number, Blockly.JavaScript.ORDER_ATOMIC];
+    return [number, javascriptGenerator.ORDER_ATOMIC];
   };
-
   // Gerador: Se caminho à frente
-  Blockly.JavaScript['maze_if_path_ahead'] = function(block) {
-    const statements = Blockly.JavaScript.statementToCode(block, 'DO');
+  javascriptGenerator.forBlock['maze_if_path_ahead'] = function(block) {
+    const statements = javascriptGenerator.statementToCode(block, 'DO');
     return `if (isPathAhead()) {\n${statements}}\n`;
   };
-
   // Gerador: Se caminho à esquerda
-  Blockly.JavaScript['maze_if_path_left'] = function(block) {
-    const statements = Blockly.JavaScript.statementToCode(block, 'DO');
+  javascriptGenerator.forBlock['maze_if_path_left'] = function(block) {
+    const statements = javascriptGenerator.statementToCode(block, 'DO');
     return `if (isPathLeft()) {\n${statements}}\n`;
   };
-
   // Gerador: Se caminho à direita
-  Blockly.JavaScript['maze_if_path_right'] = function(block) {
-    const statements = Blockly.JavaScript.statementToCode(block, 'DO');
+  javascriptGenerator.forBlock['maze_if_path_right'] = function(block) {
+    const statements = javascriptGenerator.statementToCode(block, 'DO');
     return `if (isPathRight()) {\n${statements}}\n`;
   };
-
   // Gerador: Enquanto caminho à frente
-  Blockly.JavaScript['maze_while_path_ahead'] = function(block) {
-    const statements = Blockly.JavaScript.statementToCode(block, 'DO');
+  javascriptGenerator.forBlock['maze_while_path_ahead'] = function(block) {
+    const statements = javascriptGenerator.statementToCode(block, 'DO');
     return `while (isPathAhead()) {\n${statements}}\n`;
   };
-
   // Gerador: Se/Senão
-  Blockly.JavaScript['maze_if_else'] = function(block) {
-    const condition = Blockly.JavaScript.valueToCode(block, 'IF0', Blockly.JavaScript.ORDER_NONE) || 'false';
-    const doStatements = Blockly.JavaScript.statementToCode(block, 'DO0');
-    const elseStatements = Blockly.JavaScript.statementToCode(block, 'ELSE');
+  javascriptGenerator.forBlock['maze_if_else'] = function(block) {
+    const condition = javascriptGenerator.valueToCode(block, 'IF0', javascriptGenerator.ORDER_NONE) || 'false';
+    const doStatements = javascriptGenerator.statementToCode(block, 'DO0');
+    const elseStatements = javascriptGenerator.statementToCode(block, 'ELSE');
     return `if (${condition}) {\n${doStatements}} else {\n${elseStatements}}\n`;
   };
-
   // Gerador: Há caminho
-  Blockly.JavaScript['maze_path_ahead'] = function(block) {
-    return ['isPathAhead()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+  javascriptGenerator.forBlock['maze_path_ahead'] = function(block) {
+    return ['isPathAhead()', javascriptGenerator.ORDER_FUNCTION_CALL];
   };
 };
 

@@ -1,6 +1,5 @@
-import { MAZE_GAME_CONFIG } from './gameConfigs';
-import { PUZZLE_GAME_CONFIG } from './puzzleGameConfig';
-import { PUZZLE_GAME_CONFIG as PUZZLE_EXAMPLE, PAINT_GAME_CONFIG } from './gameConfigHelpers';
+import { MAZE_GAME_CONFIG } from '../games/maze/config/mazeConfig';
+import { PUZZLE_GAME_CONFIG } from '../games/puzzle/config/puzzleGameConfig';
 
 // Registry de todos os jogos disponíveis
 export const GAME_REGISTRY = {

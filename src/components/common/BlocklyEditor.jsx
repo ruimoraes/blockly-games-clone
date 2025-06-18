@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import * as Blockly from 'blockly';
+import { javascriptGenerator } from 'blockly/javascript';
 
 /**
  * Componente genérico de Editor Blockly para jogos
@@ -87,10 +88,9 @@ const BlocklyEditor = forwardRef(({
         if (onWorkspaceChange) {
           onWorkspaceChange(workspace.current);
         }
-        
-        if (onCodeChange) {
+          if (onCodeChange) {
           try {
-            const code = Blockly.JavaScript.workspaceToCode(workspace.current);
+            const code = javascriptGenerator.workspaceToCode(workspace.current);
             onCodeChange(code);
           } catch (error) {
             console.warn('Erro ao gerar código:', error);
@@ -110,10 +110,9 @@ const BlocklyEditor = forwardRef(({
 
   // Métodos expostos via ref
   useImperativeHandle(ref, () => ({
-    getWorkspace: () => workspace.current,
-    getCode: () => {
+    getWorkspace: () => workspace.current,    getCode: () => {
       if (workspace.current) {
-        return Blockly.JavaScript.workspaceToCode(workspace.current);
+        return javascriptGenerator.workspaceToCode(workspace.current);
       }
       return '';
     },

@@ -22,7 +22,8 @@
   border: none;
   margin-right: 0;
   border-radius: 0;
-  color: rgba(255, 255, 255, 0.8);
+  color: white;
+  font-weight: bold;
   background-color: transparent;
   transition: all 0.3s ease;
 }
@@ -30,6 +31,7 @@
 .maze-game .nav-link:hover {
   color: white;
   background-color: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
 }
 
 .maze-game .nav-link.active {

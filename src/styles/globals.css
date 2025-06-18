@@ -145,6 +145,22 @@ body {
   --bs-btn-disabled-border-color: var(--brand-primary);
 }
 
+.btn-outline-brand-primary {
+  --bs-btn-color: var(--brand-primary);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-primary);
+  --bs-btn-hover-border-color: var(--brand-primary);
+  --bs-btn-focus-shadow-rgb: 237, 27, 47;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-primary);
+  --bs-btn-active-border-color: var(--brand-primary);
+  --bs-btn-disabled-color: var(--brand-primary);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--brand-primary);
+}
+
 .btn-brand-accent,
 .btn-outline-brand-accent {
   --bs-btn-color: #fff;
@@ -733,8 +749,7 @@ body {
     height: 400px !important;
     width: 100% !important;
   }
-  
-  /* Mobile tabs styling */
+    /* Mobile tabs styling */
   .mobile-layout .nav-tabs {
     border-bottom: 2px solid var(--border);
     margin-bottom: 1rem;
@@ -765,6 +780,33 @@ body {
     background-color: var(--background);
     border-bottom-color: var(--brand-primary);
     font-weight: 600;
+  }
+
+  /* Estilos específicos para jogos com fundo brand-primary */
+  .base-game .mobile-layout .nav-tabs {
+    border-bottom: 2px solid var(--brand-primary);
+    background-color: var(--brand-primary);
+    padding: 0;
+    margin: 0;
+  }
+
+  .base-game .mobile-layout .nav-link {
+    color: white;
+    font-weight: bold;
+    background-color: transparent;
+  }
+
+  .base-game .mobile-layout .nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+  }
+
+  .base-game .mobile-layout .nav-link.active {
+    color: var(--brand-primary);
+    background-color: white;
+    border-bottom-color: var(--brand-primary);
+    font-weight: bold;
   }
 
   .mobile-layout .tab-content {

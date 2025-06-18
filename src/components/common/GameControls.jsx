@@ -73,9 +73,7 @@ const GameControls = ({
             {button.text}
           </Button>
         ))}
-      </ButtonGroup>
-
-      {/* Status indicators */}
+      </ButtonGroup>      {/* Status indicators */}
       <div className="d-flex align-items-center gap-2">
         {!isBlocklyLoaded && (
           <span className="badge bg-warning">
@@ -87,12 +85,6 @@ const GameControls = ({
         {isBlocklyLoaded && !hasCode && (
           <span className="badge bg-info">
             💡 Arraste blocos para criar seu código
-          </span>
-        )}
-        
-        {isBlocklyLoaded && hasCode && !isExecuting && (
-          <span className="badge bg-success">
-            ✓ Código pronto para execução
           </span>
         )}
       </div>

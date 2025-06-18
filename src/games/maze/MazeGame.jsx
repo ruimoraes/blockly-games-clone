@@ -91,29 +91,10 @@ function MazeGame() {
         playerPosition={playerPosition}
         gameState={gameState}
       />
-    </GameArea>
-  );
+    </GameArea>  );
 
-  // Componentes adicionais (código gerado para debug)
+  // Componentes adicionais - removido código gerado para simplificar interface
   const additionalComponents = [];
-  
-  if (generatedCode?.trim()) {
-    additionalComponents.push({
-      content: (
-        <div className="card">
-          <div className="card-header">
-            <h6 className="mb-0">📝 Código JavaScript Gerado</h6>
-          </div>
-          <div className="card-body">
-            <pre className="bg-light p-3 rounded code-preview">
-              <code>{generatedCode}</code>
-            </pre>
-          </div>
-        </div>
-      ),
-      colProps: { xs: 12 }
-    });
-  }
 
   return (
     <BaseGame

@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import * as Blockly from 'blockly/core';
+import { javascriptGenerator } from 'blockly/javascript';
+import { getToolboxConfig } from '../blocks/mazeBlocks';
 
 export function useBlockly(props = {}) {
-  const { blocklyDiv, onCodeChange } = props;
+  const { onCodeChange } = props;
+  const blocklyDiv = useRef(null);
   const [workspace, setWorkspace] = useState(null);
   const [blocklyLoaded, setBlocklyLoaded] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
@@ -15,16 +19,10 @@ export function useBlockly(props = {}) {
 
       try {
         console.log('Iniciando carregamento do Blockly...');
-        const Blockly = await import('blockly');
-        const BlocklyJavaScript = await import('blockly/javascript');
-        const { defineBlocks, defineGenerators, getToolboxConfig } = await import('../blocks/mazeBlocks.js');
-
-        console.log('Módulos importados, registrando blocos...');
-        defineBlocks(Blockly);
-        defineGenerators(BlocklyJavaScript.javascriptGenerator);
+        
         const toolboxConfig = getToolboxConfig();
         
-        console.log('Blocos e geradores registrados');
+        console.log('Configuração da toolbox obtida');
         console.log('Criando workspace...');
 
         // Criar workspace
@@ -94,7 +92,8 @@ export function useBlockly(props = {}) {
         workspaceInstance.dispose();
       }
     };
-  }, [blocklyDiv, onCodeChange, workspace]);
+  }, [onCodeChange, workspace]);
+
   const clearWorkspace = () => {
     if (workspace) {
       // Limpar workspace
@@ -115,6 +114,7 @@ export function useBlockly(props = {}) {
   };
 
   return {
+    blocklyDiv,
     workspace,
     blocklyLoaded,
     generatedCode,

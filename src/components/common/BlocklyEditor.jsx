@@ -36,7 +36,7 @@ const BlocklyEditor = forwardRef(({
     trashcan: true,
     zoom: {
       controls: true,
-      wheel: true,
+      wheel: false,
       startScale: 1.0,
       maxScale: 3,
       minScale: 0.3,
@@ -50,9 +50,7 @@ const BlocklyEditor = forwardRef(({
     },
     theme: Blockly.Themes.Modern,
     ...options
-  };
-
-  // Inicializar Blockly
+  };  // Inicializar Blockly
   useEffect(() => {
     if (blocklyDiv.current && !workspace.current) {
       workspace.current = Blockly.inject(blocklyDiv.current, defaultOptions);
@@ -84,11 +82,12 @@ const BlocklyEditor = forwardRef(({
       }
 
       // Listener para mudanças no workspace
-      workspace.current.addChangeListener(() => {
+      workspace.current.addChangeListener((event) => {
         if (onWorkspaceChange) {
           onWorkspaceChange(workspace.current);
         }
-          if (onCodeChange) {
+        
+        if (onCodeChange) {
           try {
             const code = javascriptGenerator.workspaceToCode(workspace.current);
             onCodeChange(code);
@@ -106,7 +105,7 @@ const BlocklyEditor = forwardRef(({
         workspace.current = null;
       }
     };
-  }, [toolbox, onCodeChange, onWorkspaceChange]);
+  }, [toolbox]);
 
   // Métodos expostos via ref
   useImperativeHandle(ref, () => ({
@@ -203,4 +202,5 @@ BlocklyEditor.propTypes = {
   title: PropTypes.string
 };
 
-export default BlocklyEditor;
+// Memoizar o componente para evitar re-renderizações desnecessárias
+export default React.memo(BlocklyEditor);

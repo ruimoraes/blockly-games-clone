@@ -1,4 +1,4 @@
-// Central registry for all games in the Blockly Games Clone application
+// Central registry for all games in the Blockly NT application
 // This registry enables dynamic discovery and loading of games
 
 import { MAZE_GAME_CONFIG } from '../games/maze/config/mazeConfig';

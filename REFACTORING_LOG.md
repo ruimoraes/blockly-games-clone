@@ -1,4 +1,4 @@
-# 📋 Log de Refatoração - Blockly Games Clone
+# 📋 Log de Refatoração - Blockly NT
 
 ## 🎯 Objetivo
 Refatorar a aplicação para criar uma arquitetura modular e reutilizável, começando com a abstração da base do jogo Maze.

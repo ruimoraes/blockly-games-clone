@@ -176,12 +176,6 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 - [React](https://reactjs.org/) - Framework utilizado
 - [Bootstrap](https://getbootstrap.com/) - Framework CSS
 
-## 📞 Contato
-
-Rui Moraes - [@ruimoraes](https://github.com/ruimoraes) - ruimoraes@github.com
-
-Link do Projeto: [https://github.com/ruimoraes/blockly-games-clone](https://github.com/ruimoraes/blockly-games-clone)
-
 ---
 
 ⭐ Se este projeto te ajudou, considere dar uma estrela no repositório!

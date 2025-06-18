@@ -174,13 +174,12 @@ const BaseGame = ({
               {activeTab === 'game' && gameAreaComponent}
             </div>
           </div>
-        ) : (
-          // Layout Desktop (duas colunas)
+        ) : (          // Layout Desktop (duas colunas)
           <Row className="g-4">
-            <Col lg={6} className="order-2 order-lg-1">
+            <Col key="editor-col" lg={6} className="order-2 order-lg-1">
               {editorComponent}
             </Col>
-            <Col lg={6} className="order-1 order-lg-2">
+            <Col key="game-area-col" lg={6} className="order-1 order-lg-2">
               {gameAreaComponent}
             </Col>
           </Row>

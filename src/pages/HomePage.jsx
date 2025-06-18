@@ -12,21 +12,21 @@ function HomePage() {
   // Get games based on filters
   const getFilteredGames = () => {
     let games = gameRegistryUtils.getActiveGames();
-    
+
     if (searchQuery) {
       games = gameRegistryUtils.searchGames(searchQuery);
     }
-    
+
     if (selectedCategory) {
       games = games.filter(game => game.category === selectedCategory);
     }
-    
+
     if (selectedDifficulty) {
       games = games.filter(game => game.difficulty === selectedDifficulty);
     }
-    
+
     return games;
-  };  const games = getFilteredGames();
+  }; const games = getFilteredGames();
   const categories = Object.keys(GAME_CATEGORIES); // Usar as chaves em vez dos valores
   const difficulties = Object.keys(DIFFICULTY_LEVELS); // Usar as chaves em vez dos valores
 
@@ -91,12 +91,12 @@ function HomePage() {
       <Container className="py-4">
         <Row className="justify-content-center mb-4">
           <Col lg={8}>
-            <Card className="border-0 shadow-sm" style={{ 
+            <Card className="border-0 shadow-sm" style={{
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)'
             }}>              <Card.Body className="p-4">
                 <Row>
-                  <Col key="search" md={6} className="mb-3 mb-md-0">
+                  <Col md={6} className="mb-3 mb-md-0">
                     <InputGroup>
                       <InputGroup.Text>
                         <Search size={16} />
@@ -109,7 +109,7 @@ function HomePage() {
                       />
                     </InputGroup>
                   </Col>
-                  <Col key="category" md={3} className="mb-3 mb-md-0">
+                  <Col md={3} className="mb-3 mb-md-0">
                     <Form.Select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
@@ -122,7 +122,7 @@ function HomePage() {
                       ))}
                     </Form.Select>
                   </Col>
-                  <Col key="difficulty" md={3}>
+                  <Col md={3}>
                     <Form.Select
                       value={selectedDifficulty}
                       onChange={(e) => setSelectedDifficulty(e.target.value)}
@@ -154,7 +154,7 @@ function HomePage() {
         {games.length === 0 ? (
           <Row className="justify-content-center">
             <Col lg={6}>
-              <Card className="text-center border-0 shadow-sm" style={{ 
+              <Card className="text-center border-0 shadow-sm" style={{
                 background: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(10px)'
               }}>
@@ -163,8 +163,8 @@ function HomePage() {
                   <p className="text-muted mb-3">
                     Não há jogos que correspondam aos filtros selecionados.
                   </p>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     onClick={() => {
                       setSearchQuery('');
                       setSelectedCategory('');
@@ -186,13 +186,14 @@ function HomePage() {
                   backdropFilter: 'blur(10px)',
                   transition: 'all 0.3s ease'
                 }}>
-                  <Card.Body className="p-4">                    <Row className="align-items-center">
-                      <Col key="game-icon" md={2} className="text-center mb-3 mb-md-0">
-                        <div 
+                  <Card.Body className="p-4">
+                    <Row className="align-items-center">
+                      <Col md={2} className="text-center mb-3 mb-md-0">
+                        <div
                           className="rounded-circle d-inline-flex align-items-center justify-content-center"
-                          style={{ 
-                            width: '80px', 
-                            height: '80px', 
+                          style={{
+                            width: '80px',
+                            height: '80px',
                             fontSize: '2.5rem',
                             background: `var(--bs-${game.theme?.primaryColor || 'primary'})`,
                             color: 'white'
@@ -201,8 +202,9 @@ function HomePage() {
                           {game.icon || getCategoryIcon(game.category)}
                         </div>
                       </Col>
-                      
-                      <Col key="game-content" md={7}>                        <div className="mb-3">
+
+                      <Col md={7}>
+                        <div className="mb-3">
                           <div className="d-flex align-items-center gap-2 mb-2">
                             <h3 className="mb-0">{game.name}</h3>
                             <Badge bg={getDifficultyColor(game.difficulty)}>
@@ -213,7 +215,7 @@ function HomePage() {
                             )}
                           </div>
                           <p className="text-muted mb-3">{game.description}</p>
-                          
+
                           <div className="d-flex gap-3 text-sm text-muted mb-3">
                             <div className="d-flex align-items-center gap-1">
                               <Play size={14} />
@@ -230,10 +232,9 @@ function HomePage() {
                           </div>
 
                           <div className="mb-3">
-                            <h6 className="text-muted mb-2">Características:</h6>
-                            <div className="d-flex flex-wrap gap-1">
+                            <h6 className="text-muted mb-2">Características:</h6>                            <div className="d-flex flex-wrap gap-1">
                               {(game.concepts || game.features || []).map((feature, index) => (
-                                <Badge key={index} bg="light" text="dark" className="px-2 py-1">
+                                <Badge bg="light" text="dark" className="px-2 py-1">
                                   {feature}
                                 </Badge>
                               ))}
@@ -241,13 +242,14 @@ function HomePage() {
                           </div>
                         </div>
                       </Col>
-                        <Col key="game-actions" md={3} className="text-center">
+
+                      <Col md={3} className="text-center">
                         <Link to={game.route || game.path} className="text-decoration-none">
-                          <Button 
+                          <Button
                             variant={game.theme?.primaryColor || 'primary'}
-                            size="lg" 
+                            size="lg"
                             className="w-100 shadow-sm"
-                            style={{ 
+                            style={{
                               transition: 'all 0.3s ease',
                               transform: 'translateY(0)'
                             }}
@@ -265,7 +267,7 @@ function HomePage() {
                             {game.enabled ? 'Jogar Agora' : 'Em Breve'}
                           </Button>
                         </Link>
-                        
+
                         <div className="mt-3">
                           <small className="text-muted">
                             {game.enabled ? 'Comece do nível 1' : 'Em desenvolvimento'}
@@ -284,19 +286,20 @@ function HomePage() {
         {games.length > 0 && (
           <Row className="justify-content-center mt-5">
             <Col lg={8}>
-              <Card className="border-0 shadow-sm" style={{ 
+              <Card className="border-0 shadow-sm" style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(10px)'
               }}>                <Card.Body className="py-4">
                   <Row className="text-center text-white">
-                    <Col key="active-games" md={4}>
+                    <Col md={4}>
                       <h3 className="fw-bold">{gameRegistryUtils.getActiveGames().length}</h3>
                       <p className="mb-0">Jogos Ativos</p>
                     </Col>
-                    <Col key="categories" md={4}>
+                    <Col md={4}>
                       <h3 className="fw-bold">{categories.length}</h3>
                       <p className="mb-0">Categorias</p>
-                    </Col>                    <Col key="total-levels" md={4}>
+                    </Col>
+                    <Col md={4}>
                       <h3 className="fw-bold">
                         {gameRegistryUtils.getActiveGames().reduce((total, game) => total + (game.metadata?.totalPhases || game.levels || 0), 0)}
                       </h3>
@@ -308,22 +311,6 @@ function HomePage() {
             </Col>
           </Row>
         )}
-
-        {/* Coming Soon Section */}
-        <div className="text-center mt-5">
-          <Card className="border-0 shadow-sm" style={{ 
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)'
-          }}>
-            <Card.Body className="py-4">
-              <h4 className="text-white mb-3">🚀 Mais jogos em breve!</h4>
-              <p className="text-white-50 mb-0">
-                Estamos trabalhando em novos jogos educacionais para expandir sua experiência de aprendizado.
-                Sistema de plugins em desenvolvimento para facilitar a adição de novos jogos.
-              </p>
-            </Card.Body>
-          </Card>
-        </div>
       </Container>
 
       {/* Footer */}

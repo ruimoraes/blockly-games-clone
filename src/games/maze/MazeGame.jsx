@@ -1,15 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import BaseGame from '../../components/common/BaseGame';
 import BlocklyEditor from '../../components/common/BlocklyEditor';
+import GameArea from '../../components/common/GameArea';
 import { useMazeGame } from './hooks/useMazeGame';
-import { getToolboxConfig } from './blocks/mazeBlocks';
-import GameArea from './components/GameArea';
+import { defineBlocks, defineGenerators, getToolboxConfig } from './blocks/mazeBlocks';
+import MazeRenderer from './components/MazeRenderer';
 import './MazeGame.css';
+
+// Garante que os blocos e geradores sejam definidos apenas uma vez
+// quando o módulo do jogo for carregado.
+defineBlocks();
+defineGenerators();
 
 function MazeGame() {
   // Estado local para mobile e código gerado
   const [isMobile, setIsMobile] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
+
+  // Estabilizar a função de callback para evitar re-renderizações
+  const handleCodeChange = useCallback((code) => {
+    setGeneratedCode(code);
+  }, []);
+
+  // Memorizar a configuração da toolbox para evitar recriações
+  const toolboxConfig = useMemo(() => {
+    return getToolboxConfig();
+  }, []);
 
   // Hook do jogo com base genérica
   const {
@@ -47,24 +63,35 @@ function MazeGame() {
     checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-  // Componentes específicos do jogo
+  }, []);  // Componentes específicos do jogo
   const editorComponent = (
     <BlocklyEditor
-      toolbox={getToolboxConfig()}
-      onCodeChange={setGeneratedCode}
+      toolbox={toolboxConfig}
+      onCodeChange={handleCodeChange}
       isExecuting={isExecuting}
       title="Editor de Blocos - Labirinto"
     />
   );
-
   const gameAreaComponent = (
     <GameArea
       gameState={gameState}
-      playerPosition={playerPosition}
-      mazeData={mazeData}
+      title="Labirinto"
       phaseNumber={currentPhase}
-    />
+      className="maze-game-area"
+      footerInfo={
+        <>
+          <span className="d-block d-sm-inline">Posição: ({playerPosition.x}, {playerPosition.y})</span>
+          <span className="d-none d-sm-inline"> | </span>
+          <span className="d-block d-sm-inline">Direção: {['Norte', 'Leste', 'Sul', 'Oeste'][playerPosition.direction]}</span>
+        </>
+      }
+    >
+      <MazeRenderer
+        mazeData={mazeData}
+        playerPosition={playerPosition}
+        gameState={gameState}
+      />
+    </GameArea>
   );
 
   // Componentes adicionais (código gerado para debug)

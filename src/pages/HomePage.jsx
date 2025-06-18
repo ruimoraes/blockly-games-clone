@@ -94,10 +94,9 @@ function HomePage() {
             <Card className="border-0 shadow-sm" style={{ 
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(10px)'
-            }}>
-              <Card.Body className="p-4">
+            }}>              <Card.Body className="p-4">
                 <Row>
-                  <Col md={6} className="mb-3 mb-md-0">
+                  <Col key="search" md={6} className="mb-3 mb-md-0">
                     <InputGroup>
                       <InputGroup.Text>
                         <Search size={16} />
@@ -110,7 +109,7 @@ function HomePage() {
                       />
                     </InputGroup>
                   </Col>
-                  <Col md={3} className="mb-3 mb-md-0">
+                  <Col key="category" md={3} className="mb-3 mb-md-0">
                     <Form.Select
                       value={selectedCategory}
                       onChange={(e) => setSelectedCategory(e.target.value)}
@@ -123,7 +122,7 @@ function HomePage() {
                       ))}
                     </Form.Select>
                   </Col>
-                  <Col md={3}>
+                  <Col key="difficulty" md={3}>
                     <Form.Select
                       value={selectedDifficulty}
                       onChange={(e) => setSelectedDifficulty(e.target.value)}
@@ -187,9 +186,8 @@ function HomePage() {
                   backdropFilter: 'blur(10px)',
                   transition: 'all 0.3s ease'
                 }}>
-                  <Card.Body className="p-4">
-                    <Row className="align-items-center">
-                      <Col md={2} className="text-center mb-3 mb-md-0">
+                  <Card.Body className="p-4">                    <Row className="align-items-center">
+                      <Col key="game-icon" md={2} className="text-center mb-3 mb-md-0">
                         <div 
                           className="rounded-circle d-inline-flex align-items-center justify-content-center"
                           style={{ 
@@ -204,10 +202,9 @@ function HomePage() {
                         </div>
                       </Col>
                       
-                      <Col md={7}>
-                        <div className="mb-3">
+                      <Col key="game-content" md={7}>                        <div className="mb-3">
                           <div className="d-flex align-items-center gap-2 mb-2">
-                            <h3 className="mb-0">{game.title}</h3>
+                            <h3 className="mb-0">{game.name}</h3>
                             <Badge bg={getDifficultyColor(game.difficulty)}>
                               {game.difficulty}
                             </Badge>
@@ -220,7 +217,7 @@ function HomePage() {
                           <div className="d-flex gap-3 text-sm text-muted mb-3">
                             <div className="d-flex align-items-center gap-1">
                               <Play size={14} />
-                              <span>{game.levels} níveis</span>
+                              <span>{game.metadata?.totalPhases || game.levels || 0} níveis</span>
                             </div>
                             <div className="d-flex align-items-center gap-1">
                               <Users size={14} />
@@ -235,7 +232,7 @@ function HomePage() {
                           <div className="mb-3">
                             <h6 className="text-muted mb-2">Características:</h6>
                             <div className="d-flex flex-wrap gap-1">
-                              {game.features?.map((feature, index) => (
+                              {(game.concepts || game.features || []).map((feature, index) => (
                                 <Badge key={index} bg="light" text="dark" className="px-2 py-1">
                                   {feature}
                                 </Badge>
@@ -244,9 +241,8 @@ function HomePage() {
                           </div>
                         </div>
                       </Col>
-                      
-                      <Col md={3} className="text-center">
-                        <Link to={game.path} className="text-decoration-none">
+                        <Col key="game-actions" md={3} className="text-center">
+                        <Link to={game.route || game.path} className="text-decoration-none">
                           <Button 
                             variant={game.theme?.primaryColor || 'primary'}
                             size="lg" 
@@ -291,20 +287,18 @@ function HomePage() {
               <Card className="border-0 shadow-sm" style={{ 
                 background: 'rgba(255, 255, 255, 0.1)',
                 backdropFilter: 'blur(10px)'
-              }}>
-                <Card.Body className="py-4">
+              }}>                <Card.Body className="py-4">
                   <Row className="text-center text-white">
-                    <Col md={4}>
+                    <Col key="active-games" md={4}>
                       <h3 className="fw-bold">{gameRegistryUtils.getActiveGames().length}</h3>
                       <p className="mb-0">Jogos Ativos</p>
                     </Col>
-                    <Col md={4}>
+                    <Col key="categories" md={4}>
                       <h3 className="fw-bold">{categories.length}</h3>
                       <p className="mb-0">Categorias</p>
-                    </Col>
-                    <Col md={4}>
+                    </Col>                    <Col key="total-levels" md={4}>
                       <h3 className="fw-bold">
-                        {gameRegistryUtils.getActiveGames().reduce((total, game) => total + (game.levels || 0), 0)}
+                        {gameRegistryUtils.getActiveGames().reduce((total, game) => total + (game.metadata?.totalPhases || game.levels || 0), 0)}
                       </h3>
                       <p className="mb-0">Total de Níveis</p>
                     </Col>

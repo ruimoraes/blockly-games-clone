@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import BaseGame from '../../components/common/BaseGame';
+import BlocklyEditor from '../../components/common/BlocklyEditor';
 import { usePuzzleGame } from './hooks/usePuzzleGame';
-import BlocklyEditor from './components/BlocklyEditor';
 import PuzzleDisplay from './components/PuzzleDisplay';
 import PuzzleToolbar from './components/PuzzleToolbar';
+import { PUZZLE_TOOLBOX } from './blocks/puzzleBlocks';
 import './PuzzleGame.css';
 
 // Importar e registrar os blocos personalizados
@@ -72,8 +73,10 @@ function PuzzleGame() {
       </div>
       
       <BlocklyEditor
+        toolbox={PUZZLE_TOOLBOX}
         onWorkspaceChange={handleWorkspaceChange}
         initialBlocks={null}
+        title="Editor de Blocos do Puzzle"
       />
     </div>
   );

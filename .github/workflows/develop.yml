@@ -1,0 +1,101 @@
+name: Develop CI - Build and PR to Main
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and Test on Develop
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linting
+        run: pnpm lint
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: develop-build-artifacts
+          path: dist/
+          retention-days: 30
+
+  create-pr-to-main:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' && github.ref_name == 'develop'
+    name: Create PR to Main
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Check if PR already exists
+        id: check-pr
+        run: |
+          PR_EXISTS=$(gh pr list --base main --head develop --json number --jq length)
+          echo "pr_exists=$PR_EXISTS" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get latest commits for PR description
+        id: commits
+        run: |
+          COMMITS=$(git log main..develop --oneline --max-count=10 | sed 's/^/- /')
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request to main
+        if: steps.check-pr.outputs.pr_exists == '0'
+        run: |
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "🚀 Release: develop → main" \
+            --body "Automated pull request for release to main branch.
+            
+            **Source branch:** \`develop\`
+            **Target branch:** \`main\`
+            **Build status:** ✅ Passed
+            
+            ## Recent Changes:
+            ${{ steps.commits.outputs.commits }}
+            
+            This PR was automatically created after a successful build on the develop branch.
+            Please review and merge when ready for release." \
+            --label "automated,release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

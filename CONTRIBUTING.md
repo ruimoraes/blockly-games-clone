@@ -49,29 +49,58 @@ Para sugerir uma nova funcionalidade:
 
 #### Processo de Desenvolvimento
 
-1. Crie uma branch para sua funcionalidade:
+> ⚠️ **Importante**: Este projeto usa um processo automatizado de CI/CD. Leia sobre o fluxo completo em [`.github/CI_CD_README.md`](.github/CI_CD_README.md)
+
+1. **Configure o ambiente**:
    ```bash
+   # Clone e instale dependências com pnpm
+   git clone https://github.com/SEU_USUARIO/blockly-games-clone.git
+   cd blockly-games-clone
+   pnpm install
+   ```
+
+2. **Crie uma branch** a partir de `develop`:
+   ```bash
+   git checkout develop
+   git pull origin develop
    git checkout -b feature/nome-da-funcionalidade
    ```
 
-2. Faça suas alterações seguindo as diretrizes de código
-
-3. Teste suas alterações:
+3. **Desenvolva e teste localmente**:
    ```bash
-   npm run dev
+   # Desenvolvimento
+   pnpm dev
+   
+   # Teste o build
+   pnpm build
+   
+   # Execute linting
+   pnpm lint
    ```
 
-4. Commit suas alterações:
+4. **Commit e push**:
    ```bash
+   git add .
    git commit -m "feat: adiciona nova funcionalidade"
-   ```
-
-5. Push para sua branch:
-   ```bash
    git push origin feature/nome-da-funcionalidade
    ```
 
-6. Abra um Pull Request
+5. **Processo automático**:
+   - ✅ GitHub Action executa build automaticamente
+   - ✅ Se bem-sucedido, cria PR para `develop` automaticamente
+   - ✅ Você receberá notificação do PR criado
+
+6. **Revisar e aprovar**:
+   - Revise o PR criado automaticamente
+   - Aguarde aprovação de um maintainer
+   - Merge será feito para `develop`
+
+#### 🔒 Proteções de Branch
+
+- **`main`** e **`develop`** são branches protegidas
+- ❌ Commits diretos não são permitidos
+- ✅ Apenas via Pull Request com aprovação
+- ✅ Build deve passar antes do merge
 
 #### Diretrizes de Código
 
@@ -102,6 +131,22 @@ docs: atualiza README com novas instruções
 ```
 
 ### Áreas que Precisam de Ajuda
+
+> 📖 **Antes de contribuir**: Leia sobre nosso processo de CI/CD automatizado em [`.github/CI_CD_README.md`](.github/CI_CD_README.md)
+
+#### 🔄 Fluxo de CI/CD
+
+Este projeto implementa um fluxo automatizado:
+
+1. **Feature Branch** → Build automático → PR automático para `develop`
+2. **Develop** → Build automático → PR automático para `main`
+3. **Main** → Deploy para produção
+
+**Benefícios:**
+- ✅ Builds validados automaticamente
+- ✅ PRs criados automaticamente após builds bem-sucedidos
+- ✅ Processo padronizado e confiável
+- ✅ Integração contínua garantida
 
 Estamos especialmente interessados em contribuições nas seguintes áreas:
 

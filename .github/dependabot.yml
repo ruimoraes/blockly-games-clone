@@ -1,0 +1,44 @@
+version: 2
+updates:
+  # Atualizar dependências npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "ruimoraes"
+    assignees:
+      - "ruimoraes"
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "automated"
+    ignore:
+      # Ignorar major updates que podem quebrar
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Atualizar GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "ruimoraes"
+    assignees:
+      - "ruimoraes"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "github-actions"
+      - "automated"

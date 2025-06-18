@@ -72,19 +72,16 @@ function HomePage() {
           <p className="text-white-75 lead-responsive">
             {games.length} jogo{games.length !== 1 ? 's' : ''} encontrado{games.length !== 1 ? 's' : ''}
           </p>
-        </div>
-
-        {games.length === 0 ? (
+        </div>        {games.length === 0 ? (
           <Row className="justify-content-center">
             <Col lg={6}>
-              <ResponsiveCard variant="glass" className="text-center">
+              <ResponsiveCard variant="solid" className="text-center">
                 <ResponsiveCard.Body className="py-5">
                   <h4 className="mb-3">Nenhum jogo encontrado</h4>
                   <p className="text-muted mb-3">
                     Não há jogos que correspondam aos filtros selecionados.
-                  </p>
-                  <Button
-                    variant="primary"
+                  </p>                  <Button
+                    variant="brand-primary"
                     className="hover-lift"
                     onClick={() => {
                       setSearchQuery('');

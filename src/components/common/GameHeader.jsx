@@ -23,9 +23,8 @@ const GameHeader = ({
   showBackButton = true,
   className = '',
   children
-}) => {
-  return (
-    <Navbar bg="dark" variant="dark" className={`shadow-sm ${className}`}>
+}) => {  return (
+    <Navbar style={{ backgroundColor: 'var(--brand-primary)' }} variant="dark" className={`shadow-sm ${className}`}>
       <Container fluid>
         {/* Lado esquerdo - Título e informações */}
         <div className="d-flex align-items-center gap-3">

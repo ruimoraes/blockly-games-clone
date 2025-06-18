@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
  */
 const ResponsiveCard = ({ 
   children, 
-  variant = 'glass',
+  variant = 'solid',
   hover = true,
   animation = false,
   className = '',

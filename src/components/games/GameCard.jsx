@@ -8,11 +8,10 @@ import PropTypes from 'prop-types';
 /**
  * GameCard - Componente responsivo para exibir informações de jogos
  */
-const GameCard = ({ game }) => {
-  const getDifficultyColor = (difficulty) => {
+const GameCard = ({ game }) => {  const getDifficultyColor = (difficulty) => {
     const colors = {
-      beginner: 'success',
-      iniciante: 'success',
+      beginner: 'brand-accent',
+      iniciante: 'brand-accent',
       intermediate: 'warning',
       intermediário: 'warning',
       advanced: 'danger',
@@ -30,13 +29,11 @@ const GameCard = ({ game }) => {
     };
     return icons[category] || '🎮';
   };
-
   const getThemeColor = (game) => {
-    return game.theme?.primaryColor || 'primary';
+    return game.theme?.primaryColor || 'brand-primary';
   };
-
   return (
-    <ResponsiveCard variant="glass" hover={true} className="h-100">
+    <ResponsiveCard variant="solid" hover={true} className="h-100">
       <ResponsiveCard.Body className="p-3 p-md-4">
         <Row className="align-items-center g-3 g-md-4">
           {/* Game Icon */}

@@ -121,6 +121,51 @@ body {
   --ring: oklch(0.556 0 0);
 }
 
+/* ===== BOOTSTRAP CUSTOM VARIANTS ===== */
+.badge-brand-accent,
+.bg-brand-accent {
+  background-color: var(--brand-accent) !important;
+  color: white !important;
+}
+
+.btn-brand-primary,
+.btn-outline-brand-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--brand-primary);
+  --bs-btn-border-color: var(--brand-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-dark);
+  --bs-btn-hover-border-color: var(--brand-dark);
+  --bs-btn-focus-shadow-rgb: 237, 27, 47;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-dark);
+  --bs-btn-active-border-color: var(--brand-dark);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--brand-primary);
+  --bs-btn-disabled-border-color: var(--brand-primary);
+}
+
+.btn-brand-accent,
+.btn-outline-brand-accent {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--brand-accent);
+  --bs-btn-border-color: var(--brand-accent);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--brand-purple-dark);
+  --bs-btn-hover-border-color: var(--brand-purple-dark);
+  --bs-btn-focus-shadow-rgb: 182, 36, 192;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--brand-purple-dark);
+  --bs-btn-active-border-color: var(--brand-purple-dark);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--brand-accent);
+  --bs-btn-disabled-border-color: var(--brand-accent);
+}
+
+.text-brand-accent {
+  color: var(--brand-accent) !important;
+}
+
 /* ===== UTILITY CLASSES ===== */
 .glass-card {
   background: var(--glass-gradient);

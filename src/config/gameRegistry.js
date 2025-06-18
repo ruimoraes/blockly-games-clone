@@ -28,6 +28,7 @@ export const GAMES_REGISTRY = {
     route: '/games/maze',
     component: 'MazePage',
     isActive: true,
+    enabled: true, // Adicionado para compatibilidade com HomePage
     featured: true,
     ageRange: '8+',
     objectives: [
@@ -62,6 +63,7 @@ export const GAMES_REGISTRY = {
     route: '/games/puzzle',
     component: 'PuzzlePage',
     isActive: true,
+    enabled: true, // Adicionado para compatibilidade com HomePage
     featured: true,
     ageRange: '7+',
     objectives: [

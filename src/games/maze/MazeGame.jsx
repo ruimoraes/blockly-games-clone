@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import BaseGame from '../../components/common/BaseGame';
+import BlocklyEditor from '../../components/common/BlocklyEditor';
 import { useMazeGame } from './hooks/useMazeGame';
-import BlocklyEditor from './components/BlocklyEditor';
+import { getToolboxConfig } from './blocks/mazeBlocks';
 import GameArea from './components/GameArea';
 import './MazeGame.css';
 
@@ -47,13 +48,13 @@ function MazeGame() {
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
-
   // Componentes específicos do jogo
   const editorComponent = (
     <BlocklyEditor
+      toolbox={getToolboxConfig()}
       onCodeChange={setGeneratedCode}
       isExecuting={isExecuting}
-      isBlocklyLoaded={true}
+      title="Editor de Blocos - Labirinto"
     />
   );
 

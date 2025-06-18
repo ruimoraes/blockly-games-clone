@@ -1,8 +1,8 @@
-// Esta versão do arquivo não precisa importar Blockly,
-// pois ele será passado como parâmetro para as funções
+import * as Blockly from 'blockly/core';
+import { javascriptGenerator } from 'blockly/javascript';
 
 // Definir blocos customizados para o jogo Maze
-export const defineBlocks = (Blockly) => {
+export const defineBlocks = () => {
   // Bloco: Mover Frente
   Blockly.Blocks['maze_move_forward'] = {
     init: function() {
@@ -161,7 +161,7 @@ export const defineBlocks = (Blockly) => {
 };
 
 // Definir geradores de código JavaScript
-export const defineGenerators = (javascriptGenerator) => {
+export const defineGenerators = () => {
   // Gerador: Mover Frente
   javascriptGenerator.forBlock['maze_move_forward'] = function(block) {
     return 'await moveForward();\n';

@@ -1,15 +1,17 @@
 import React from 'react';
 import { Container, Badge } from 'react-bootstrap';
 import { Star, Users, Play } from 'lucide-react';
+import BlocklyNTLogo from '../ui/BlocklyNTLogo';
 import PropTypes from 'prop-types';
 
 /**
  * ResponsiveHeader - Componente de header responsivo e moderno
  */
 const ResponsiveHeader = ({ 
-  title = "Blockly Games Clone",
+  title = "Blockly NT",
   subtitle = "Aprenda programação de forma divertida com jogos educacionais",
   showBadges = true,
+  showLogo = true,
   className = ""
 }) => {
   const badges = [
@@ -21,11 +23,20 @@ const ResponsiveHeader = ({
   return (
     <header className={`py-4 py-md-5 text-white ${className}`}>
       <Container>
-        <div className="text-center">
-          {/* Title */}
-          <h1 className="display-responsive fw-bold mb-3 gradient-text-light">
-            <span className="me-3">🎮</span>
-            {title}
+        <div className="text-center">          {/* Title */}
+          <h1 className="display-responsive fw-bold mb-3 text-white">
+            {showLogo && (
+              <BlocklyNTLogo 
+                size="clamp(48px, 8vw, 80px)" 
+                color="white" 
+                className="me-3 d-inline-block"
+                style={{ 
+                  verticalAlign: 'middle',
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                }}
+              />
+            )}
+            <span className="gradient-text-light">{title}</span>
           </h1>
           
           {/* Subtitle */}
@@ -67,6 +78,7 @@ ResponsiveHeader.propTypes = {
   title: PropTypes.string,
   subtitle: PropTypes.string,
   showBadges: PropTypes.bool,
+  showLogo: PropTypes.bool,
   className: PropTypes.string
 };
 

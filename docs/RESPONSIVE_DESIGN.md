@@ -1,6 +1,6 @@
 # Sistema de Design Responsivo
 
-Este documento descreve o sistema de design responsivo implementado na aplicação Blockly Games Clone.
+Este documento descreve o sistema de design responsivo implementado na aplicação Blockly NT.
 
 ## 📱 Breakpoints
 

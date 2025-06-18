@@ -11,16 +11,23 @@ const ResponsiveLayout = ({
   className = '',
   fluid = false,
   padding = 'default'
-}) => {
-  const getBackgroundGradient = (type) => {
+}) => {  const getBackgroundGradient = (type) => {
     const gradients = {
-      primary: 'linear-gradient(135deg, #ED1B2F 0%, #ED0973 50%, #B624C0 100%)',
-      secondary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      success: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-      dark: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
-      light: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)'
+      primary: 'var(--primary-gradient)',
+      hero: 'var(--hero-gradient)',
+      secondary: 'var(--secondary-gradient)', 
+      success: 'var(--success-gradient)',
+      warning: 'var(--warning-gradient)',
+      dark: 'linear-gradient(135deg, var(--neutral-800) 0%, var(--neutral-900) 100%)',
+      light: 'linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%)'
     };
-    return gradients[type] || gradients.primary;
+    
+    // Fallback direto para o gradiente hero caso as variáveis não funcionem
+    if (type === 'hero') {
+      return gradients.hero || 'linear-gradient(135deg, #ED1B2F 0%, #ED0973 30%, #B624C0 70%, #9333EA 100%)';
+    }
+    
+    return gradients[type] || gradients.hero;
   };
 
   const getPaddingClass = (padding) => {
@@ -62,7 +69,7 @@ const ResponsiveLayout = ({
 
 ResponsiveLayout.propTypes = {
   children: PropTypes.node.isRequired,
-  backgroundGradient: PropTypes.oneOf(['primary', 'secondary', 'success', 'dark', 'light']),
+  backgroundGradient: PropTypes.oneOf(['primary', 'hero', 'secondary', 'success', 'warning', 'dark', 'light']),
   className: PropTypes.string,
   fluid: PropTypes.bool,
   padding: PropTypes.oneOf(['none', 'small', 'default', 'large'])

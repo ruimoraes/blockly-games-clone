@@ -1,8 +1,8 @@
-# 🎮 Blockly Games Clone
+# 🎮 Blockly NT
 
 Um clone educacional do Blockly Games desenvolvido em React, focando no ensino de programação através de blocos visuais.
 
-![Blockly Games Clone](https://img.shields.io/badge/React-18-blue)
+![Blockly NT](https://img.shields.io/badge/React-18-blue)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple)
 ![License](https://img.shields.io/badge/License-MIT-green)
 

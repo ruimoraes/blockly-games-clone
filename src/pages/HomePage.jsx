@@ -52,9 +52,14 @@ function HomePage() {
       ),
       label: 'Total de Níveis'
     }
-  ];
-  return (
-    <ResponsiveLayout backgroundGradient="primary">
+  ];  return (
+    <ResponsiveLayout 
+      backgroundGradient="hero"
+      style={{
+        background: 'linear-gradient(135deg, #ED1B2F 0%, #ED0973 30%, #B624C0 70%, #9333EA 100%)',
+        minHeight: '100vh'
+      }}
+    >
       {/* Header */}
       <ResponsiveHeader />
 

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
  * ResponsiveFooter - Componente de footer responsivo
  */
 const ResponsiveFooter = ({ 
-  text = "© 2025 Blockly Games Clone - Sistema de Registry Dinâmico v3.0",
+  text = "© 2025 Blockly NT - Sistema de Registry Dinâmico v3.0",
   className = ""
 }) => {
   return (

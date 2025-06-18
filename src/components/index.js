@@ -9,6 +9,7 @@ export { default as ResponsiveCard } from './ui/ResponsiveCard';
 export { default as LoadingSpinner } from './ui/LoadingSpinner';
 export { default as StatsSection } from './ui/StatsSection';
 export { default as ResponsiveSearchBar } from './ui/ResponsiveSearchBar';
+export { default as BlocklyNTLogo } from './ui/BlocklyNTLogo';
 
 // Game Components
 export { default as GameCard } from './games/GameCard';

@@ -42,12 +42,11 @@ const GameCard = ({ game }) => {
           {/* Game Icon */}
           <Col xs={12} sm={3} md={2} className="text-center">
             <div
-              className="game-icon rounded-circle d-inline-flex align-items-center justify-content-center mx-auto"
-              style={{
+              className="game-icon rounded-circle d-inline-flex align-items-center justify-content-center mx-auto"              style={{
                 width: 'clamp(60px, 15vw, 80px)',
                 height: 'clamp(60px, 15vw, 80px)',
                 fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-                background: `var(--bs-${getThemeColor(game)})`,
+                background: game.theme?.primaryColor ? `var(--bs-${game.theme.primaryColor})` : 'var(--primary-gradient)',
                 color: 'white'
               }}
             >

@@ -1,33 +1,44 @@
 import { useState, useCallback, useEffect } from 'react';
 import * as Blockly from 'blockly';
-import { useGamePhases } from '../../../hooks/useGamePhases';
+import { useBaseGame } from '../../../hooks/useBaseGame';
 import { PUZZLE_GAME_CONFIG } from '../config/puzzleGameConfig';
 import { checkPuzzleSolution, ANIMALS_DATA } from '../blocks/puzzleBlocks';
 
 export const usePuzzleGame = () => {
-  // Usar sistema genérico de fases
-  const {
-    currentPhase,
-    gameState,
-    goToNextPhase,
-    goToPreviousPhase,
-    resetProgress,
-    completePhase,
-    completedPhases, // adicionado
-    gameConfig
-  } = useGamePhases(PUZZLE_GAME_CONFIG);
-
-  // Estado específico do puzzle
+  // Estados específicos do Puzzle
   const [animalStates, setAnimalStates] = useState([]);
   const [workspace, setWorkspace] = useState(null);
   const [isComplete, setIsComplete] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [gameState, setGameState] = useState('idle');
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  // Usar hook base genérico
+  const baseGameHook = useBaseGame(PUZZLE_GAME_CONFIG);
+  
+  // Desestruturar dados do hook base
+  const {
+    currentPhase,
+    getCurrentPhaseData,
+    completePhase,
+    handlePhaseChange,
+    handleNextPhase,
+    handlePreviousPhase,
+    unlockedPhases,
+    completedPhases,
+    totalPhases,
+    getPhaseData,
+    gameConfig
+  } = baseGameHook;
+
+  // Obter dados da fase atual
+  const currentPhaseData = getCurrentPhaseData();
 
   // Inicializar estados dos animais baseado na fase atual
-  useEffect(() => {
-    const currentPhaseData = gameConfig.phases[currentPhase - 1];
-    if (currentPhaseData) {
-      const requiredAnimals = currentPhaseData.requiredAnimals || 1;
+  const initializeAnimalStates = useCallback(() => {
+    const phaseData = getCurrentPhaseData();
+    if (phaseData) {
+      const requiredAnimals = phaseData.requiredAnimals || 1;
       const initialStates = Array(requiredAnimals).fill(null).map(() => ({
         animalId: '0',
         isCorrect: false,
@@ -38,7 +49,12 @@ export const usePuzzleGame = () => {
       setAnimalStates(initialStates);
       setIsComplete(false);
     }
-  }, [currentPhase, gameConfig]);
+  }, [getCurrentPhaseData]);
+
+  // Executar inicialização quando a fase mudar
+  useEffect(() => {
+    initializeAnimalStates();
+  }, [initializeAnimalStates]);
 
   // Verificar solução do puzzle
   const checkSolution = useCallback(() => {
@@ -67,7 +83,6 @@ export const usePuzzleGame = () => {
     });
 
     // Verificar se há blocos de animal suficientes
-    const currentPhaseData = gameConfig.phases[currentPhase - 1];
     const requiredAnimals = currentPhaseData?.requiredAnimals || 1;
     
     if (animalBlocks.length < requiredAnimals) {
@@ -91,34 +106,21 @@ export const usePuzzleGame = () => {
     const isPhaseComplete = correctCount >= requiredAnimals;
     setIsComplete(isPhaseComplete);
 
-    if (isPhaseComplete && !completedPhases.includes(currentPhase)) {
+    if (isPhaseComplete) {
       completePhase(currentPhase);
     }
 
     return isPhaseComplete;
-  }, [workspace, animalStates, currentPhase, gameConfig, gameState, completePhase]);
+  }, [workspace, animalStates, currentPhaseData, completePhase, currentPhase]);
 
   // Resetar puzzle
   const resetPuzzle = useCallback(() => {
     if (workspace) {
       workspace.clear();
     }
-    
-    const currentPhaseData = gameConfig.phases[currentPhase - 1];
-    const requiredAnimals = currentPhaseData?.requiredAnimals || 1;
-    const initialStates = Array(requiredAnimals).fill(null).map(() => ({
-      animalId: '0',
-      isCorrect: false,
-      hasImage: false,
-      hasLegs: false,
-      hasTraits: false
-    }));
-    
-    setAnimalStates(initialStates);
-    setIsComplete(false);
+    initializeAnimalStates();
     setShowHint(false);
-    resetProgress();
-  }, [workspace, currentPhase, gameConfig, resetProgress]);
+  }, [workspace, initializeAnimalStates]);
 
   // Mostrar dica
   const toggleHint = useCallback(() => {
@@ -127,19 +129,9 @@ export const usePuzzleGame = () => {
 
   // Obter dica para a fase atual
   const getCurrentHint = useCallback(() => {
-    const currentPhaseData = gameConfig.phases[currentPhase - 1];
     if (!currentPhaseData) return '';
-
-    const hints = [
-      'Arraste um bloco "Animal" da categoria "Animais" para o workspace.',
-      'Conecte um bloco "Imagem" ao campo "imagem" do animal.',
-      'Conecte um bloco "Pernas" ao campo "pernas" do animal.',
-      'Conecte um bloco "Características" ao campo "características" do animal.',
-      'Verifique se todas as propriedades estão corretas para o animal selecionado.'
-    ];
-
-    return currentPhaseData.hint || hints[Math.min(currentPhase - 1, hints.length - 1)];
-  }, [currentPhase, gameConfig]);
+    return currentPhaseData.hint || 'Arraste blocos para configurar os animais.';
+  }, [currentPhaseData]);
 
   // Listener para mudanças no workspace
   const handleWorkspaceChange = useCallback((newWorkspace, event) => {
@@ -153,61 +145,60 @@ export const usePuzzleGame = () => {
       event.type === Blockly.Events.BLOCK_MOVE ||
       event.type === Blockly.Events.BLOCK_DELETE
     )) {
-      // Usar timeout para permitir que o DOM se atualize
       setTimeout(() => {
         checkSolution();
       }, 100);
     }
   }, [workspace, checkSolution]);
 
-  // Avançar para próxima fase
-  const goToNextPhaseHandler = useCallback(() => {
-    if (isComplete) {
-      goToNextPhase();
-      setShowHint(false);
-    }
-  }, [isComplete, goToNextPhase]);
-
-  // Voltar para fase anterior
-  const goToPreviousPhaseHandler = useCallback(() => {
-    goToPreviousPhase();
-    setShowHint(false);
-  }, [goToPreviousPhase]);
+  // Função executeCode para compatibilidade com BaseGame
+  const executeCode = useCallback((code) => {
+    setIsExecuting(true);
+    setGameState('running');
+    
+    setTimeout(() => {
+      const isCorrect = checkSolution();
+      setGameState(isCorrect ? 'success' : 'idle');
+      setIsExecuting(false);
+    }, 500);
+  }, [checkSolution]);
 
   // Calcular estatísticas
   const correctCount = animalStates.filter(state => state.isCorrect).length;
   const totalAnimals = animalStates.length;
-  const currentPhaseData = gameConfig.phases[currentPhase - 1];
 
   return {
-    // Estado do jogo
+    // Estados básicos (compatibilidade com BaseGame)
     gameState,
-    currentPhase,
-    gameConfig,
+    isExecuting,
     
-    // Estado do puzzle
+    // Estados específicos do puzzle
     animalStates,
     isComplete,
     correctCount,
     totalAnimals,
-    
-    // Dicas
     showHint,
     currentHint: getCurrentHint(),
     
-    // Ações
+    // Dados da fase (vem da base genérica)
+    currentPhase,
+    currentPhaseData,
+    totalPhases,
+    unlockedPhases,
+    completedPhases,
+    gameConfig,
+    
+    // Ações específicas do puzzle
     checkSolution,
     resetPuzzle,
     toggleHint,
     handleWorkspaceChange,
-    goToNextPhase: goToNextPhaseHandler,
-    goToPreviousPhase: goToPreviousPhaseHandler,
+    executeCode,
     
-    // Dados da fase atual
-    currentPhaseData,
-    
-    // Dados dos animais
-    animalsData: ANIMALS_DATA
+    // Ações de fase (vem da base genérica)
+    handlePhaseChange,
+    handleNextPhase,
+    handlePreviousPhase,
+    getPhaseData
   };
 };
-

@@ -1,121 +1,96 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import BaseGame from '../../components/common/BaseGame';
 import { usePuzzleGame } from './hooks/usePuzzleGame';
 import BlocklyEditor from './components/BlocklyEditor';
 import PuzzleDisplay from './components/PuzzleDisplay';
 import PuzzleToolbar from './components/PuzzleToolbar';
-import PhaseSelector from '../../components/common/PhaseSelector';
 import './PuzzleGame.css';
 
 // Importar e registrar os blocos personalizados
 import './blocks/puzzleBlocks';
 
-const PuzzleGame = () => {
+function PuzzleGame() {
+  // Estado local para mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Hook do jogo com base genérica
   const {
-    // Estado do jogo
+    // Estados básicos
     gameState,
-    currentPhase,
-    gameConfig,
+    isExecuting,
     
-    // Estado do puzzle
+    // Estados específicos do puzzle
     animalStates,
     isComplete,
     correctCount,
     totalAnimals,
-    
-    // Dicas
     showHint,
     currentHint,
     
-    // Ações
+    // Dados da fase (vem da base genérica)
+    currentPhase,
+    currentPhaseData,
+    totalPhases,
+    unlockedPhases,
+    completedPhases,
+    gameConfig,
+    
+    // Ações específicas do puzzle
     checkSolution,
     resetPuzzle,
     toggleHint,
     handleWorkspaceChange,
-    goToNextPhase,
-    goToPreviousPhase,
+    executeCode,
     
-    // Dados da fase atual
-    currentPhaseData
+    // Ações de fase (vem da base genérica)
+    handlePhaseChange,
+    handleNextPhase,
+    handlePreviousPhase,
+    getPhaseData
   } = usePuzzleGame();
 
-  if (!currentPhaseData) {
-    return (
-      <div className="puzzle-loading">
-        <p>Carregando jogo Puzzle...</p>
+  // Detectar mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // Componente do editor Blockly
+  const editorComponent = (
+    <div className="puzzle-editor-section">
+      <div className="editor-instructions mb-3">
+        <h6>🔧 Editor de Blocos</h6>
+        <p className="text-muted small">
+          Arraste blocos das categorias à esquerda para configurar os animais. 
+          Conecte os blocos de propriedades aos blocos de animais.
+        </p>
       </div>
-    );
-  }
+      
+      <BlocklyEditor
+        onWorkspaceChange={handleWorkspaceChange}
+        initialBlocks={null}
+      />
+    </div>
+  );
 
-  return (
-    <div className="puzzle-game">
-      {/* Header com informações da fase */}
-      <header className="puzzle-header">
-        <div className="header-content">
-          <div className="header-left">
-            <button 
-              className="back-button"
-              onClick={() => window.history.back()}
-              title="Voltar"
-            >
-              ← Voltar
-            </button>
-            <div className="game-title">
-              <h1>🧩 Quebra-Cabeça</h1>
-              <p className="subtitle">Aprenda variáveis e propriedades com Blockly</p>
-            </div>
-          </div>
-          
-          <div className="header-right">
-            <button className="home-button" onClick={() => window.location.href = '/'}>
-              🏠 Início
-            </button>
-            <PhaseSelector
-              currentPhase={currentPhase}
-              phases={gameConfig.phases}
-              gameState={gameState}
-              onPhaseSelect={(phase) => {
-                // Implementar navegação entre fases se necessário
-                console.log('Fase selecionada:', phase);
-              }}
-              gameConfig={gameConfig}
-            />
-            <div className="phase-indicator">
-              Fase {currentPhase}/5
-            </div>
-          </div>
-        </div>
-      </header>
+  // Componente da área do jogo
+  const gameAreaComponent = (
+    <div className="puzzle-display-section">
+      <PuzzleDisplay animalStates={animalStates} />
+    </div>
+  );
 
-      {/* Informações da fase atual */}
-      <div className="phase-info">
-        <div className="phase-header">
-          <h2>{currentPhaseData.title}</h2>
-          <div className="phase-badges">
-            <span className={`difficulty-badge ${currentPhaseData.difficulty.toLowerCase()}`}>
-              {currentPhaseData.difficulty}
-            </span>
-            {currentPhaseData.maxBlocks && (
-              <span className="blocks-badge">
-                Máx {currentPhaseData.maxBlocks} blocos
-              </span>
-            )}
-          </div>
-        </div>
-        
-        <div className="phase-instructions">
-          <h3>📋 Instruções da Fase</h3>
-          <p>{currentPhaseData.instructions}</p>
-        </div>
-
-        {showHint && (
-          <div className="hint-box">
-            <h3>💡 Dica</h3>
-            <p>{currentHint}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Toolbar com controles */}
+  // Componentes adicionais (toolbar e dicas)
+  const additionalComponents = [];
+  
+  // Adicionar toolbar
+  additionalComponents.push({
+    content: (
       <PuzzleToolbar
         onCheckSolution={checkSolution}
         onResetPuzzle={resetPuzzle}
@@ -124,51 +99,114 @@ const PuzzleGame = () => {
         totalAnimals={totalAnimals}
         isComplete={isComplete}
       />
+    ),
+    colProps: { xs: 12 }
+  });
 
-      {/* Display dos animais */}
-      <PuzzleDisplay animalStates={animalStates} />
-
-      {/* Editor Blockly */}
-      <div className="blockly-section">
-        <h3>🔧 Editor de Blocos</h3>
-        <p className="editor-instructions">
-          Arraste blocos das categorias à esquerda para configurar os animais. 
-          Conecte os blocos de propriedades aos blocos de animais.
-        </p>
-        <BlocklyEditor
-          onWorkspaceChange={handleWorkspaceChange}
-          initialBlocks={null}
-        />
-      </div>
-
-      {/* Controles de navegação */}
-      <div className="navigation-controls">
-        <button 
-          className="nav-button prev"
-          onClick={goToPreviousPhase}
-          disabled={currentPhase === 1}
-        >
-          ← Fase Anterior
-        </button>
-        
-        <div className="phase-progress">
-          <span>Fase {currentPhase} de {gameConfig.phases.length}</span>
-          {isComplete && (
-            <span className="complete-indicator">✓ Completa</span>
-          )}
+  // Adicionar dica se estiver visível
+  if (showHint && currentHint) {
+    additionalComponents.push({
+      content: (
+        <div className="card border-warning">
+          <div className="card-header bg-warning bg-opacity-10">
+            <h6 className="mb-0">💡 Dica</h6>
+          </div>
+          <div className="card-body">
+            <p className="mb-0">{currentHint}</p>
+          </div>
         </div>
-        
-        <button 
-          className="nav-button next"
-          onClick={goToNextPhase}
-          disabled={!isComplete || currentPhase === gameConfig.phases.length}
-        >
-          Próxima Fase →
-        </button>
-      </div>
+      ),
+      colProps: { xs: 12 }
+    });
+  }
+
+  // Controles customizados específicos do puzzle
+  const customControls = [
+    {
+      text: 'Verificar Solução',
+      onClick: checkSolution,
+      variant: 'success',
+      disabled: false,
+      tooltip: 'Verificar se os animais estão configurados corretamente'
+    },
+    {
+      text: showHint ? 'Ocultar Dica' : 'Mostrar Dica',
+      onClick: toggleHint,
+      variant: 'info',
+      disabled: false,
+      tooltip: 'Mostrar/ocultar dica para a fase atual'
+    }
+  ];
+
+  // Conteúdo customizado do header
+  const customHeaderContent = (
+    <div className="d-flex align-items-center gap-2">
+      <span className="badge bg-success">
+        {correctCount}/{totalAnimals} corretos
+      </span>
+      {isComplete && (
+        <span className="badge bg-warning">
+          ✓ Completo
+        </span>
+      )}
     </div>
   );
-};
+
+  return (
+    <BaseGame
+      // Configuração do jogo
+      gameTitle="Quebra-Cabeça"
+      gameIcon="🧩"
+      gameDescription="Aprenda variáveis e propriedades com Blockly"
+      
+      // Dados da fase
+      currentPhase={currentPhase}
+      totalPhases={totalPhases}
+      currentPhaseData={currentPhaseData}
+      
+      // Estados
+      isExecuting={isExecuting}
+      gameState={gameState}
+      generatedCode="" // Puzzle não usa código gerado visível
+      
+      // Conteúdo específico do jogo
+      editorComponent={editorComponent}
+      gameAreaComponent={gameAreaComponent}
+      additionalComponents={additionalComponents}
+      
+      // Ações
+      onRunCode={() => executeCode('')} // Executar verificação
+      onResetGame={resetPuzzle}
+      onPhaseChange={handlePhaseChange}
+      onNextPhase={handleNextPhase}
+      onPreviousPhase={handlePreviousPhase}
+      
+      // Configurações de layout
+      isMobile={isMobile}
+      enableMobileTabs={true}
+      editorTitle="Editor de Blocos"
+      gameAreaTitle="Animais"
+      
+      // Sistema de fases
+      unlockedPhases={unlockedPhases}
+      completedPhases={completedPhases}
+      getPhaseData={getPhaseData}
+      gameConfig={gameConfig}
+      
+      // Customização
+      customControls={customControls}
+      customHeaderContent={customHeaderContent}
+      
+      // Configurações do header
+      showPhaseSelectorProp={true}
+      showHomeButton={true}
+      showBackButton={true}
+      
+      // Classe CSS específica
+      className="puzzle-game-refactored"
+    />
+  );
+}
 
 export default PuzzleGame;
 

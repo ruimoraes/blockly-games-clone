@@ -1,38 +1,44 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useGamePhases } from '../../../hooks/useGamePhases';
+import { useBaseGame } from '../../../hooks/useBaseGame';
 import { MAZE_GAME_CONFIG } from '../config/mazeConfig';
 
 export const useMazeGame = () => {
+  // Estado específico do Maze
   const [gameState, setGameState] = useState('idle');
   const [playerPosition, setPlayerPosition] = useState({ x: 2, y: 4, direction: 1 });
   const [isExecuting, setIsExecuting] = useState(false);
   const [executionSpeed] = useState(500); // ms entre ações
 
-  // Usar o hook genérico de fases com a configuração do Maze
+  // Usar hook base genérico
+  const baseGameHook = useBaseGame(MAZE_GAME_CONFIG);
+  
+  // Desestruturar dados do hook base
   const {
     currentPhase,
     getCurrentPhaseData,
     completePhase,
-    goToNextPhase,
-    goToPreviousPhase,
+    handlePhaseChange,
+    handleNextPhase,
+    handlePreviousPhase,
     isPhaseUnlocked,
     isPhaseCompleted,
-    changePhase,
     unlockedPhases,
     completedPhases,
     totalPhases,
     getPhaseData,
     gameConfig
-  } = useGamePhases(MAZE_GAME_CONFIG);
+  } = baseGameHook;
 
   // Obter dados da fase atual
   const currentPhaseData = getCurrentPhaseData();
-  const mazeData = currentPhaseData.map;
+  const mazeData = currentPhaseData?.map || [];
 
   // Inicializar posição do jogador baseada na fase atual
   const initializePlayerPosition = useCallback(() => {
     const phaseData = getCurrentPhaseData();
-    setPlayerPosition(phaseData.startPosition);
+    if (phaseData?.startPosition) {
+      setPlayerPosition(phaseData.startPosition);
+    }
   }, [getCurrentPhaseData]);
 
   // Função para verificar se uma posição é válida
@@ -173,46 +179,44 @@ export const useMazeGame = () => {
     setIsExecuting(false);
   }, [initializePlayerPosition]);
 
-  // Função para mudar de fase
-  const handlePhaseChange = useCallback((newPhase) => {
-    if (changePhase(newPhase)) {
-      // Resetar estado do jogo ao mudar de fase
+  // Wrapper para mudança de fase que atualiza posição
+  const handlePhaseChangeWrapper = useCallback((newPhase) => {
+    const result = handlePhaseChange(newPhase);
+    if (result) {
       setGameState('idle');
       setIsExecuting(false);
-      // A posição será atualizada automaticamente quando getCurrentPhaseData() for chamado
       setTimeout(() => {
         initializePlayerPosition();
       }, 0);
-      return true;
     }
-    return false;
-  }, [changePhase, initializePlayerPosition]);
+    return result;
+  }, [handlePhaseChange, initializePlayerPosition]);
 
-  // Função para ir para próxima fase
-  const handleNextPhase = useCallback(() => {
-    if (goToNextPhase()) {
+  // Wrapper para próxima fase
+  const handleNextPhaseWrapper = useCallback(() => {
+    const result = handleNextPhase();
+    if (result) {
       setGameState('idle');
       setIsExecuting(false);
       setTimeout(() => {
         initializePlayerPosition();
       }, 0);
-      return true;
     }
-    return false;
-  }, [goToNextPhase, initializePlayerPosition]);
+    return result;
+  }, [handleNextPhase, initializePlayerPosition]);
 
-  // Função para ir para fase anterior
-  const handlePreviousPhase = useCallback(() => {
-    if (goToPreviousPhase()) {
+  // Wrapper para fase anterior
+  const handlePreviousPhaseWrapper = useCallback(() => {
+    const result = handlePreviousPhase();
+    if (result) {
       setGameState('idle');
       setIsExecuting(false);
       setTimeout(() => {
         initializePlayerPosition();
       }, 0);
-      return true;
     }
-    return false;
-  }, [goToPreviousPhase, initializePlayerPosition]);
+    return result;
+  }, [handlePreviousPhase, initializePlayerPosition]);
 
   // Inicializar posição quando a fase atual mudar
   useEffect(() => {
@@ -220,21 +224,13 @@ export const useMazeGame = () => {
   }, [currentPhase, initializePlayerPosition]);
 
   return {
-    // Estado do jogo
+    // Estados específicos do Maze
     gameState,
     playerPosition,
     isExecuting,
     mazeData,
     
-    // Dados da fase (usando sistema genérico)
-    currentPhase,
-    currentPhaseData,
-    totalPhases,
-    unlockedPhases,
-    completedPhases,
-    gameConfig,
-    
-    // Ações do jogo
+    // Ações específicas do Maze
     executeCode,
     resetGame,
     moveForward,
@@ -244,16 +240,19 @@ export const useMazeGame = () => {
     isPathLeft,
     isPathRight,
     
-    // Ações de fase (usando sistema genérico)
-    handlePhaseChange,
-    handleNextPhase,
-    handlePreviousPhase,
+    // Dados e ações da base (propagados do useBaseGame)
+    currentPhase,
+    currentPhaseData,
+    totalPhases,
+    unlockedPhases,
+    completedPhases,
+    gameConfig,
+    handlePhaseChange: handlePhaseChangeWrapper,
+    handleNextPhase: handleNextPhaseWrapper,
+    handlePreviousPhase: handlePreviousPhaseWrapper,
     completePhase,
     getPhaseData,
-    
-    // Verificações de fase (usando sistema genérico)
     isPhaseUnlocked,
     isPhaseCompleted
   };
 };
-

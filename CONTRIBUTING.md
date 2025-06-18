@@ -1,4 +1,4 @@
-# Contribuindo para o Blockly Games Clone
+# Contribuindo para o Blockly NT
 
 Obrigado por considerar contribuir para este projeto! 🎉
 

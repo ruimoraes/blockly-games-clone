@@ -1,7 +1,7 @@
 {
-  "name": "blockly-games-clone",
+  "name": "blockly-nt",
   "version": "1.0.0",
-  "description": "Um clone educacional do Blockly Games desenvolvido em React para ensino de programação visual",
+  "description": "Uma aplicação educacional desenvolvida em React para ensino de programação visual",
   "type": "module",
   "keywords": [
     "blockly",

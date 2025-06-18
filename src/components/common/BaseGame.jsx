@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Row, Col, Nav } from 'react-bootstrap';
 import GameHeader from './GameHeader';
+import GameInfo from './GameInfo';
 import GameControls from './GameControls';
 import PhaseSelector from './PhaseSelector';
 
@@ -111,41 +112,28 @@ const BaseGame = ({
     }
     setShowPhaseSelector(false);
   };
-
   return (
-    <div className={`base-game ${className}`}>
-      {/* Header do jogo */}
+    <div className={`base-game ${className}`} style={{ backgroundColor: 'white', minHeight: '100vh' }}>
+      {/* Header simplificado */}
       <GameHeader
+        onGoHome={handleGoHome}
+        onGoBack={handleGoBack}
+        showHomeButton={showHomeButton}
+        showBackButton={showBackButton}
+      >
+        {customHeaderContent}
+      </GameHeader>      {/* Informações do jogo */}
+      <GameInfo
         gameTitle={gameTitle}
         gameIcon={gameIcon}
         currentPhase={currentPhase}
         totalPhases={totalPhases}
         phaseName={currentPhaseData.name}
-        phaseDescription={gameDescription}
-        isExecuting={isExecuting}        onShowPhaseSelector={() => setShowPhaseSelector(true)}
-        onGoHome={handleGoHome}
-        onGoBack={handleGoBack}
+        isExecuting={isExecuting}
+        onShowPhaseSelector={() => setShowPhaseSelector(true)}
         showPhaseSelector={showPhaseSelectorProp}
-        showHomeButton={showHomeButton}
-        showBackButton={showBackButton}
-      >
-        {customHeaderContent}
-      </GameHeader>
-
-      {/* Conteúdo principal */}
+      />      {/* Conteúdo principal */}
       <Container fluid className="py-4">
-        {/* Informações da fase atual */}
-        {currentPhaseData.description && (
-          <Row className="mb-4">
-            <Col>
-              <div className="alert alert-info">
-                <h6 className="mb-2">{currentPhaseData.name}</h6>
-                <p className="mb-0">{currentPhaseData.description}</p>
-              </div>
-            </Col>
-          </Row>
-        )}
-
         {/* Layout Principal */}
         {isMobile && enableMobileTabs ? (
           // Layout Mobile com Abas

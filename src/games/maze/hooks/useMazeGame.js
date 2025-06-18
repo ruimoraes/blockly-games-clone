@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useGamePhases } from '../../../hooks/useGamePhases';
-import { MAZE_GAME_CONFIG } from '../../../config/gameConfigs';
+import { MAZE_GAME_CONFIG } from '../config/mazeConfig';
 
 export const useMazeGame = () => {
   const [gameState, setGameState] = useState('idle');

@@ -1,220 +1,124 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import * as Blockly from 'blockly';
-import { registerBlocks, toolboxConfig } from '../utils/blockDefinitions';
+import { useState, useEffect } from 'react';
 
-export function useBlockly(containerId, gameActions) {
+export function useBlockly(props = {}) {
+  const { blocklyDiv, onCodeChange } = props;
   const [workspace, setWorkspace] = useState(null);
+  const [blocklyLoaded, setBlocklyLoaded] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
-  const workspaceRef = useRef(null);
 
-  // Inicializar workspace
-  const initializeWorkspace = useCallback(() => {
-    if (!containerId) return;
+  useEffect(() => {
+    let isMounted = true;
+    let workspaceInstance = null;
 
-    // Registrar blocos customizados
-    registerBlocks();
+    const loadBlockly = async () => {
+      if (!blocklyDiv.current || workspace) return;
 
-    // Configuração do workspace
-    const workspaceConfig = {
-      toolbox: toolboxConfig,
-      grid: {
-        spacing: 20,
-        length: 3,
-        colour: '#ccc',
-        snap: true
-      },
-      trashcan: true,
-      zoom: {
-        controls: true,
-        wheel: true,
-        startScale: 1.0,
-        maxScale: 3,
-        minScale: 0.3,
-        scaleSpeed: 1.2
-      },
-      move: {
-        scrollbars: true,
-        drag: true,
-        wheel: false
-      },
-      sounds: false,
-      oneBasedIndex: false
-    };
+      try {
+        console.log('Iniciando carregamento do Blockly...');
+        const Blockly = await import('blockly');
+        const BlocklyJavaScript = await import('blockly/javascript');
+        const { defineBlocks, defineGenerators, getToolboxConfig } = await import('../blocks/mazeBlocks.js');
 
-    try {
-      const newWorkspace = Blockly.inject(containerId, workspaceConfig);
-      workspaceRef.current = newWorkspace;
-      setWorkspace(newWorkspace);
+        console.log('Módulos importados, registrando blocos...');
+        defineBlocks(Blockly);
+        defineGenerators(BlocklyJavaScript.javascriptGenerator);
+        const toolboxConfig = getToolboxConfig();
+        
+        console.log('Blocos e geradores registrados');
+        console.log('Criando workspace...');
 
-      // Listener para mudanças no workspace
-      newWorkspace.addChangeListener(() => {
-        const code = Blockly.JavaScript.workspaceToCode(newWorkspace);
-        setGeneratedCode(code);
-      });
+        // Criar workspace
+        workspaceInstance = Blockly.inject(blocklyDiv.current, {
+          toolbox: toolboxConfig,
+          grid: {
+            spacing: 20,
+            length: 3,
+            colour: '#ccc',
+            snap: true
+          },
+          zoom: {
+            controls: true,
+            wheel: false,
+            startScale: 1.0,
+            maxScale: 3,
+            minScale: 0.3,
+            scaleSpeed: 1.2
+          },
+          trashcan: true,
+          scrollbars: true,
+          sounds: false,
+          media: 'https://unpkg.com/blockly/media/',
+          renderer: 'geras',
+          theme: Blockly.Themes.Classic
+        });
 
-      return newWorkspace;
-    } catch (error) {
-      console.error('Erro ao inicializar workspace Blockly:', error);
-      return null;
-    }
-  }, [containerId]);
-
-  // Gerar código JavaScript
-  const generateCode = useCallback(() => {
-    if (!workspace) return '';
-    
-    try {
-      const code = Blockly.JavaScript.workspaceToCode(workspace);
-      setGeneratedCode(code);
-      return code;
-    } catch (error) {
-      console.error('Erro ao gerar código:', error);
-      return '';
-    }
-  }, [workspace]);
-
-  // Executar código gerado
-  const executeCode = useCallback(async () => {
-    if (!generatedCode || !gameActions) return false;
-
-    try {
-      // Criar contexto de execução com as ações do jogo
-      const executionContext = {
-        moveForward: gameActions.moveForward,
-        turnLeft: gameActions.turnLeft,
-        turnRight: gameActions.turnRight,
-        isPathForward: gameActions.isPathForward,
-        isPathLeft: gameActions.isPathLeft,
-        isPathRight: gameActions.isPathRight,
-        atGoal: gameActions.atGoal,
-        noPathForward: gameActions.noPathForward,
-        noPathLeft: gameActions.noPathLeft,
-        noPathRight: gameActions.noPathRight
-      };
-
-      // Criar função executável
-      const executableCode = `
-        (function() {
-          ${generatedCode}
-        })();
-      `;
-
-      // Executar código no contexto do jogo
-      const func = new Function(...Object.keys(executionContext), executableCode);
-      await func(...Object.values(executionContext));
-      
-      return true;
-    } catch (error) {
-      console.error('Erro na execução do código:', error);
-      return false;
-    }
-  }, [generatedCode, gameActions]);
-
-  // Limpar workspace
-  const clearWorkspace = useCallback(() => {
-    if (workspace) {
-      workspace.clear();
-      setGeneratedCode('');
-    }
-  }, [workspace]);
-
-  // Redimensionar workspace
-  const resizeWorkspace = useCallback(() => {
-    if (workspace) {
-      Blockly.svgResize(workspace);
-    }
-  }, [workspace]);
-
-  // Salvar workspace como XML
-  const saveWorkspace = useCallback(() => {
-    if (!workspace) return null;
-    
-    try {
-      const xml = Blockly.Xml.workspaceToDom(workspace);
-      return Blockly.Xml.domToText(xml);
-    } catch (error) {
-      console.error('Erro ao salvar workspace:', error);
-      return null;
-    }
-  }, [workspace]);
-
-  // Carregar workspace de XML
-  const loadWorkspace = useCallback((xmlText) => {
-    if (!workspace || !xmlText) return false;
-    
-    try {
-      const xml = Blockly.Xml.textToDom(xmlText);
-      workspace.clear();
-      Blockly.Xml.domToWorkspace(xml, workspace);
-      return true;
-    } catch (error) {
-      console.error('Erro ao carregar workspace:', error);
-      return false;
-    }
-  }, [workspace]);
-
-  // Obter estatísticas do workspace
-  const getWorkspaceStats = useCallback(() => {
-    if (!workspace) return { blockCount: 0, hasBlocks: false };
-    
-    const allBlocks = workspace.getAllBlocks();
-    return {
-      blockCount: allBlocks.length,
-      hasBlocks: allBlocks.length > 0,
-      topBlocks: workspace.getTopBlocks().length
-    };
-  }, [workspace]);
-
-  // Definir limite de blocos
-  const setBlockLimit = useCallback((limit) => {
-    if (!workspace) return;
-    
-    // Implementar limite de blocos se necessário
-    workspace.addChangeListener((event) => {
-      if (event.type === Blockly.Events.BLOCK_CREATE) {
-        const blockCount = workspace.getAllBlocks().length;
-        if (blockCount > limit) {
-          // Remover o último bloco adicionado
-          const block = workspace.getBlockById(event.blockId);
-          if (block) {
-            block.dispose();
+        // Configurar e adicionar listener para mudanças no workspace
+        const updateGeneratedCode = () => {
+          try {            if (workspaceInstance) {
+              // Usar o método atualizado para obter variáveis
+              const variableMap = workspaceInstance.getVariableMap();
+              const variables = variableMap ? variableMap.getAllVariables() : [];
+              
+              // Gerar código com o contexto das variáveis
+              const code = BlocklyJavaScript.javascriptGenerator.workspaceToCode(workspaceInstance);
+              console.log('Código gerado:', code);
+              console.log('Variáveis disponíveis:', variables);
+              
+              setGeneratedCode(code);
+              onCodeChange?.(code);
+            }
+          } catch (error) {
+            console.error('Erro ao gerar código:', error);
           }
+        };
+
+        // Atualizar código quando houver mudanças no workspace
+        workspaceInstance.addChangeListener(updateGeneratedCode);
+
+        if (isMounted) {
+          console.log('Workspace criado com sucesso');
+          setWorkspace(workspaceInstance);
+          setBlocklyLoaded(true);
         }
+      } catch (error) {
+        console.error('Erro ao carregar Blockly:', error);
+        setBlocklyLoaded(false);
       }
-    });
-  }, [workspace]);
+    };
 
-  // Cleanup ao desmontar
-  useEffect(() => {
+    loadBlockly();
+
     return () => {
-      if (workspaceRef.current) {
-        workspaceRef.current.dispose();
+      isMounted = false;
+      if (workspaceInstance) {
+        workspaceInstance.dispose();
       }
     };
-  }, []);
-
-  // Redimensionar quando a janela muda de tamanho
-  useEffect(() => {
-    const handleResize = () => {
-      resizeWorkspace();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [resizeWorkspace]);
+  }, [blocklyDiv, onCodeChange, workspace]);
+  const clearWorkspace = () => {
+    if (workspace) {
+      // Limpar workspace
+      workspace.clear();
+      
+      // Limpar variáveis usando o novo método
+      const variableMap = workspace.getVariableMap();
+      if (variableMap) {
+        const variables = variableMap.getAllVariables();
+        variables.forEach(variable => {
+          workspace.deleteVariableById(variable.getId());
+        });
+      }
+      
+      setGeneratedCode('');
+      onCodeChange?.('');
+    }
+  };
 
   return {
     workspace,
+    blocklyLoaded,
     generatedCode,
-    initializeWorkspace,
-    generateCode,
-    executeCode,
-    clearWorkspace,
-    resizeWorkspace,
-    saveWorkspace,
-    loadWorkspace,
-    getWorkspaceStats,
-    setBlockLimit
+    setGeneratedCode,
+    clearWorkspace
   };
 }
-

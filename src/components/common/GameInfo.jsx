@@ -4,7 +4,7 @@ import { Container, Row, Col, Badge, Button } from 'react-bootstrap';
 import { List, Trophy, Clock } from 'lucide-react';
 
 /**
- * Componente para exibir informações do jogo abaixo do header
+ * Componente compacto para informações essenciais do jogo
  */
 const GameInfo = ({
   gameTitle,
@@ -12,7 +12,6 @@ const GameInfo = ({
   currentPhase,
   totalPhases,
   phaseName = '',
-  phaseDescription = '',
   isExecuting = false,
   onShowPhaseSelector,
   showPhaseSelector = true,
@@ -20,23 +19,18 @@ const GameInfo = ({
 }) => {
   return (
     <div className={`bg-light border-bottom ${className}`}>
-      <Container fluid className="py-3">
+      <Container fluid className="py-2">
         <Row className="align-items-center">
-          {/* Título e ícone do jogo */}
-          <Col xs={12} md={6} className="mb-2 mb-md-0">
-            <div className="d-flex align-items-center gap-3">
-              <span style={{ fontSize: '2rem' }}>{gameIcon}</span>
-              <div>
-                <h4 className="mb-1 text-brand-primary">{gameTitle}</h4>
-                {phaseDescription && (
-                  <p className="mb-0 text-muted small">{phaseDescription}</p>
-                )}
-              </div>
+          {/* Título compacto */}
+          <Col xs={12} md={4} className="mb-2 mb-md-0">
+            <div className="d-flex align-items-center gap-2">
+              <span style={{ fontSize: '1.5rem' }}>{gameIcon}</span>
+              <h5 className="mb-0 text-brand-primary">{gameTitle}</h5>
             </div>
           </Col>
 
           {/* Informações da fase e controles */}
-          <Col xs={12} md={6}>
+          <Col xs={12} md={8}>
             <div className="d-flex align-items-center justify-content-md-end gap-3 flex-wrap">
               {/* Status de execução */}
               {isExecuting && (
@@ -91,7 +85,6 @@ GameInfo.propTypes = {
   currentPhase: PropTypes.number.isRequired,
   totalPhases: PropTypes.number.isRequired,
   phaseName: PropTypes.string,
-  phaseDescription: PropTypes.string,
   isExecuting: PropTypes.bool,
   onShowPhaseSelector: PropTypes.func,
   showPhaseSelector: PropTypes.bool,

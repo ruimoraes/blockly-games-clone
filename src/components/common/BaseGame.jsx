@@ -122,35 +122,18 @@ const BaseGame = ({
         showBackButton={showBackButton}
       >
         {customHeaderContent}
-      </GameHeader>
-
-      {/* Informações do jogo */}
+      </GameHeader>      {/* Informações do jogo */}
       <GameInfo
         gameTitle={gameTitle}
         gameIcon={gameIcon}
         currentPhase={currentPhase}
         totalPhases={totalPhases}
         phaseName={currentPhaseData.name}
-        phaseDescription={gameDescription}
         isExecuting={isExecuting}
         onShowPhaseSelector={() => setShowPhaseSelector(true)}
         showPhaseSelector={showPhaseSelectorProp}
-      />
-
-      {/* Conteúdo principal */}
+      />      {/* Conteúdo principal */}
       <Container fluid className="py-4">
-        {/* Informações da fase atual */}
-        {currentPhaseData.description && (
-          <Row className="mb-4">
-            <Col>
-              <div className="alert alert-info">
-                <h6 className="mb-2">{currentPhaseData.name}</h6>
-                <p className="mb-0">{currentPhaseData.description}</p>
-              </div>
-            </Col>
-          </Row>
-        )}
-
         {/* Layout Principal */}
         {isMobile && enableMobileTabs ? (
           // Layout Mobile com Abas

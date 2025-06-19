@@ -169,13 +169,17 @@ export const useMazeGame = () => {
     } finally {
       setIsExecuting(false);
     }
-  }, [isExecuting, gameState, moveForward, turnLeft, turnRight, isPathAhead, isPathLeft, isPathRight]);
-
-  // Função para resetar o jogo
+  }, [isExecuting, gameState, moveForward, turnLeft, turnRight, isPathAhead, isPathLeft, isPathRight]);  // Função para resetar o jogo (apenas o estado, mantendo o workspace intacto)
   const resetGame = useCallback(() => {
+    console.log('Reiniciando o jogo mas mantendo o workspace');
+    // Apenas reinicia a posição do jogador e o estado do jogo
     initializePlayerPosition();
     setGameState('idle');
     setIsExecuting(false);
+    
+    // IMPORTANTE: NÃO limpar o workspace do Blockly aqui
+    // O workspace é gerenciado pelo componente BlocklyEditor e persiste no localStorage
+    // console.log('Workspace mantido intacto durante reset do jogo');
   }, [initializePlayerPosition]);
 
   // Wrapper para mudança de fase que atualiza posição

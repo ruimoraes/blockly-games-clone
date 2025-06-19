@@ -1,14 +1,10 @@
-
-
-
-
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Row, Col, Nav } from 'react-bootstrap';
 import GameHeader from './GameHeader';
 import GameInfo from './GameInfo';
-import GameControls from './GameControls';
 import PhaseSelector from './PhaseSelector';
+import './BaseGame.css';
 
 /**
  * Componente base genérico para todos os jogos
@@ -18,62 +14,51 @@ const BaseGame = ({
   // Configuração do jogo
   gameTitle,
   gameIcon = '🎮',
-  // gameDescription = '', // Não utilizado atualmente
-  
+
   // Dados da fase
   currentPhase,
   totalPhases,
-  currentPhaseData = {},
-    // Estados
+  currentPhaseData = {},  // Estados
   isExecuting = false,
-  gameState = 'idle',
-  generatedCode = '',
-  
+  // gameState = 'idle', // TODO: implementar uso do gameState
+
   // Conteúdo específico do jogo
   editorComponent,
   gameAreaComponent,
   additionalComponents = [],
-  
-  // Ações
-  onRunCode,
-  onResetGame,
+  // Ações para navegação de fases
   onPhaseChange,
-  onNextPhase,
-  onPreviousPhase,
-  
+  onNextPhase, // eslint-disable-line no-unused-vars
+  onPreviousPhase, // eslint-disable-line no-unused-vars
   // Configurações de layout
   isMobile = false,
   enableMobileTabs = true,
-  editorTitle = 'Editor de Blocos',
-  gameAreaTitle = 'Área do Jogo',
-  
+
   // Sistema de fases
   unlockedPhases = [],
   completedPhases = [],
   getPhaseData,
   gameConfig = {},
-  
+
   // Controles customizados
-  customControls = [],
   customHeaderContent,
-  
+
   // Callbacks de navegação
   onGoHome,
   onGoBack,
-    // Configurações do header
+
+  // Configurações do header
   showPhaseSelectorProp = true,
   showHomeButton = true,
   showBackButton = true,
-  
+
   // Props adicionais
   className = '',
   children
 }) => {
   const [showPhaseSelector, setShowPhaseSelector] = useState(false);
   const [activeTab, setActiveTab] = useState('editor');
-  // Detectar se é mobile automaticamente se não especificado
-  // useEffect removido pois não estava sendo utilizado corretamente
-
+  
   // Handlers padrão
   const handleGoHome = () => {
     if (onGoHome) {
@@ -97,136 +82,101 @@ const BaseGame = ({
     }
     setShowPhaseSelector(false);
   };
+  
   return (
-    <div className={`base-game ${className}`} style={{ backgroundColor: 'white', minHeight: '100vh' }}>
-      {/* Header simplificado */}
+    <div className={`base-game ${className}`}>      {/* Header fixo */}
       <GameHeader
         onGoHome={handleGoHome}
         onGoBack={handleGoBack}
         showHomeButton={showHomeButton}
         showBackButton={showBackButton}
-      >
-        {customHeaderContent}
-      </GameHeader>      {/* Informações do jogo */}
-      <GameInfo
         gameTitle={gameTitle}
         gameIcon={gameIcon}
         currentPhase={currentPhase}
         totalPhases={totalPhases}
-        phaseName={currentPhaseData.name}
-        isExecuting={isExecuting}
         onShowPhaseSelector={() => setShowPhaseSelector(true)}
         showPhaseSelector={showPhaseSelectorProp}
-      />      {/* Conteúdo principal */}
-      <Container fluid className="py-4">
-        {/* Layout Principal */}
-        {isMobile && enableMobileTabs ? (
-          // Layout Mobile com Abas
-          <div className="mobile-layout">
-            <Nav variant="tabs" className="mb-3">
-              <Nav.Item>
-                <Nav.Link
-                  active={activeTab === 'editor'}
-                  onClick={() => setActiveTab('editor')}
-                >
-                  🧩 {editorTitle}
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  active={activeTab === 'game'}
-                  onClick={() => setActiveTab('game')}
-                >
-                  🎮 {gameAreaTitle}
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
-
-            <div className="tab-content">
-              {activeTab === 'editor' && editorComponent}
-              {activeTab === 'game' && gameAreaComponent}
-            </div>
-          </div>
-        ) : (          // Layout Desktop (duas colunas)
-          <Row className="g-4">
-            <Col key="editor-col" lg={6} className="order-2 order-lg-1">
-              {editorComponent}
-            </Col>
-            <Col key="game-area-col" lg={6} className="order-1 order-lg-2">
-              {gameAreaComponent}
-            </Col>
-          </Row>
-        )}
-
-        {/* Componentes adicionais */}
-        {additionalComponents.length > 0 && (
-          <Row className="mt-4">
-            {additionalComponents.map((component, index) => (
-              <Col key={index} {...(component.colProps || { xs: 12 })}>
-                {component.content}
-              </Col>
-            ))}
-          </Row>
-        )}
-
-        {/* Controles do jogo */}
-        <Row className="mt-4">
-          <Col>            <GameControls
-              onRunCode={onRunCode}
-              onResetGame={onResetGame}
-              isExecuting={isExecuting}
-              hasCode={Boolean(generatedCode?.trim())}
-              customButtons={customControls}
-            />
-          </Col>
-        </Row>
-
-        {/* Navegação entre fases */}
-        <Row className="mt-4">
-          <Col>
-            <div className="d-flex justify-content-between align-items-center">
-              <button
-                className="btn btn-outline-secondary"
-                onClick={onPreviousPhase}
-                disabled={currentPhase === 1 || isExecuting}
-              >
-                ← Fase Anterior
-              </button>
-
-              <div className="text-center">
-                <small className="text-muted">
-                  Fase {currentPhase} de {totalPhases}
-                  {gameState === 'success' && (
-                    <span className="text-success ms-2">✓ Completa</span>
-                  )}
-                </small>
+        isExecuting={isExecuting}
+      >
+        {customHeaderContent}
+      </GameHeader>
+        {/* Área de conteúdo principal */}
+      <div className="main-content">
+        <GameInfo
+          phaseData={currentPhaseData}
+          isExecuting={isExecuting}
+        />
+          <Container fluid className="h-100 d-flex flex-column">
+          {/* Layout do jogo */}
+          <div className="game-layout flex-grow-1 d-flex flex-column">
+            {isMobile && enableMobileTabs ? (
+              // Layout Mobile com Abas
+              <div className="mobile-layout flex-grow-1 d-flex flex-column">
+                <Nav variant="tabs" className="mb-2 flex-shrink-0">
+                  <Nav.Item>
+                    <Nav.Link
+                      active={activeTab === 'editor'}
+                      onClick={() => setActiveTab('editor')}
+                    >
+                      🧩 Blocos
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link
+                      active={activeTab === 'game'}
+                      onClick={() => setActiveTab('game')}
+                    >
+                      🎮 Game
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>                <div className="tab-content flex-grow-1">
+                  <div style={{ display: activeTab === 'editor' ? 'block' : 'none' }} className="h-100">
+                    {editorComponent}
+                  </div>
+                  <div style={{ display: activeTab === 'game' ? 'block' : 'none' }} className="h-100">
+                    {gameAreaComponent}
+                  </div>
+                </div>
               </div>
+            ) : (
+              // Layout Desktop (duas colunas)
+              <div className="desktop-layout flex-grow-1">                <Row className="h-100 g-2">
+                  <Col key="editor-col" lg={6} className="order-2 order-lg-1 d-flex flex-column">
+                    {editorComponent}
+                  </Col>
+                  <Col key="game-area-col" lg={6} className="order-1 order-lg-2 d-flex flex-column">
+                    {gameAreaComponent}
+                  </Col>
+                </Row>
+              </div>
+            )}
+          </div>
 
-              <button
-                className="btn btn-outline-primary"
-                onClick={onNextPhase}
-                disabled={currentPhase === totalPhases || isExecuting || gameState !== 'success'}
-              >
-                Próxima Fase →
-              </button>
-            </div>
-          </Col>
-        </Row>
+          {/* Componentes adicionais */}
+          {additionalComponents.length > 0 && (
+            <Row className="mb-2">
+              {additionalComponents.map((component, index) => (
+                <Col key={index} {...(component.colProps || { xs: 12 })}>
+                  {component.content}
+                </Col>
+              ))}
+            </Row>
+          )}
+          
+          {/* Conteúdo adicional */}
+          {children}        </Container>
+      </div>
 
-        {/* Conteúdo adicional */}
-        {children}
-      </Container>
-
-      {/* Seletor de Fases */}
+      {/* Seletor de fases (modal) */}
       {showPhaseSelector && (
-        <PhaseSelector
-          currentPhase={currentPhase}
-          unlockedPhases={unlockedPhases}
-          completedPhases={completedPhases}
-          totalPhases={totalPhases}
-          onPhaseSelect={handlePhaseSelect}
-          getPhaseData={getPhaseData}
+        <PhaseSelector 
           gameConfig={gameConfig}
+          currentPhase={currentPhase}
+          completedPhases={completedPhases}
+          unlockedPhases={unlockedPhases}
+          totalPhases={totalPhases}
+          getPhaseData={getPhaseData}
+          onPhaseSelect={handlePhaseSelect}
           isVisible={showPhaseSelector}
           onClose={() => setShowPhaseSelector(false)}
         />
@@ -240,16 +190,16 @@ BaseGame.propTypes = {
   gameTitle: PropTypes.string.isRequired,
   gameIcon: PropTypes.string,
   gameDescription: PropTypes.string,
-  
+
   // Dados da fase
   currentPhase: PropTypes.number.isRequired,
   totalPhases: PropTypes.number.isRequired,
   currentPhaseData: PropTypes.object,
-    // Estados
+
+  // Estados
   isExecuting: PropTypes.bool,
   gameState: PropTypes.oneOf(['idle', 'running', 'success', 'failure']),
-  generatedCode: PropTypes.string,
-  
+
   // Conteúdo específico
   editorComponent: PropTypes.node.isRequired,
   gameAreaComponent: PropTypes.node.isRequired,
@@ -257,36 +207,29 @@ BaseGame.propTypes = {
     content: PropTypes.node.isRequired,
     colProps: PropTypes.object
   })),
-  
-  // Ações
-  onRunCode: PropTypes.func.isRequired,
-  onResetGame: PropTypes.func.isRequired,
+  // Ações de fase
   onPhaseChange: PropTypes.func,
   onNextPhase: PropTypes.func,
   onPreviousPhase: PropTypes.func,
-  
   // Layout
   isMobile: PropTypes.bool,
   enableMobileTabs: PropTypes.bool,
-  editorTitle: PropTypes.string,
-  gameAreaTitle: PropTypes.string,
-  
+
   // Sistema de fases
   unlockedPhases: PropTypes.array,
   completedPhases: PropTypes.array,
   getPhaseData: PropTypes.func,
   gameConfig: PropTypes.object,
-  
   // Customização
-  customControls: PropTypes.array,
   customHeaderContent: PropTypes.node,
   onGoHome: PropTypes.func,
   onGoBack: PropTypes.func,
-    // Configurações do header
+
+  // Configurações do header
   showPhaseSelectorProp: PropTypes.bool,
   showHomeButton: PropTypes.bool,
   showBackButton: PropTypes.bool,
-  
+
   // Props adicionais
   className: PropTypes.string,
   children: PropTypes.node

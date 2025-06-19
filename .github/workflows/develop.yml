@@ -11,7 +11,8 @@ on:
 env:
   NODE_VERSION: '20'
 
-jobs:  build-and-test:
+jobs:
+  build-and-test:
     runs-on: ubuntu-latest
     name: Build and Test on Develop
     

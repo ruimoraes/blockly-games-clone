@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Home, List } from 'lucide-react';
+import logo from '../../assets/logont.svg';
 
 /**
  * Header simplificado para jogos - navegação básica e informações de jogo
@@ -10,58 +11,34 @@ const GameHeader = ({
   showHomeButton = true,
   gameTitle = '',
   gameIcon = '',
-  currentPhase = null,
-  totalPhases = null,
-  onShowPhaseSelector,
-  showPhaseSelector = false,
-  isExecuting = false,
   children
-}) => {
-  return (
-    <nav>
-      <div>
+}) => {return (    <nav className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 sticky top-0 z-50 border-b border-white/20 shadow-lg">
+      <div className="flex items-center justify-between px-4 py-1 lg:px-6 lg:py-2">
         {/* Lado esquerdo - Botões de navegação */}
-        <div>          {showHomeButton && (
+        <div className="flex items-center space-x-4">          
+          {showHomeButton && (
             <div 
               onClick={onGoHome}
               title="Ir para Home"
-            >
-              <span>🎮</span>
-              <span>Blockly NT</span>
+              className="header-logo group"
+            >              <img 
+                src={logo} 
+                alt="Blockly NT Logo" 
+                className="header-logo-icon group-hover:scale-110 w-12 h-12 lg:w-10 lg:h-10" 
+              />
+              <span className="header-logo-text">Blockly NT</span>
             </div>
           )}
-        </div>
-
-        {/* Centro - Conteúdo customizado (se necessário) */}
-        <div>
+        </div>        {/* Centro - Conteúdo customizado (se necessário) */}
+        <div className="flex-1 flex justify-center">
           {children}
-        </div>
-
-        {/* Lado direito - Título, indicador de fase e seletor */}
-        <div>          
+        </div>        {/* Lado direito - Título do jogo */}
+        <div className="flex items-center space-x-4">
           {gameTitle && (
-            <div>
-              {gameIcon && <span>{gameIcon}</span>}
-              <h5>{gameTitle}</h5>
+            <div className="flex items-center space-x-2">
+              {gameIcon && <span className="text-2xl lg:text-3xl">{gameIcon}</span>}
+              <h5 className="text-white font-semibold text-2xl lg:text-3xl">{gameTitle}</h5>
             </div>
-          )}
-          {currentPhase && totalPhases && (
-            <div>
-              <span>
-                <span>{currentPhase}</span>/<span>{totalPhases}</span>
-              </span>
-            </div>
-          )}
-          {/* Botão do seletor de fases */}
-          {showPhaseSelector && (
-            <button
-              onClick={onShowPhaseSelector}
-              disabled={isExecuting}
-              title="Selecionar Fase"
-            >
-              <List size={16} />
-              <span>Fases</span>
-            </button>
           )}
         </div>
       </div>
@@ -74,12 +51,6 @@ GameHeader.propTypes = {
   showHomeButton: PropTypes.bool,
   gameTitle: PropTypes.string,
   gameIcon: PropTypes.string,
-  currentPhase: PropTypes.number,
-  totalPhases: PropTypes.number,
-  onShowPhaseSelector: PropTypes.func,
-  showPhaseSelector: PropTypes.bool,
-  isExecuting: PropTypes.bool,
-  className: PropTypes.string,
   children: PropTypes.node
 };
 

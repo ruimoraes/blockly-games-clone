@@ -1,3 +1,8 @@
+/* ===== TAILWIND CSS ===== */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ===== GLOBAL DESIGN SYSTEM ===== */
 :root {
   /* Primary Brand Colors */
@@ -10,4 +15,88 @@
   --brand-dark: #C41E3A;
   --brand-purple-light: #D946EF;
   --brand-purple-dark: #9333EA;
+}
+
+/* ===== CUSTOM COMPONENTS ===== */
+@layer components {
+  .glass-panel {
+    @apply bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl shadow-lg;
+  }
+    .game-gradient {
+    @apply bg-gradient-to-br from-red-600 via-pink-600 to-purple-600;
+  }
+    .btn-primary {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }  .tab-active {
+    @apply bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-inner shadow-black/30;
+  }
+  
+  .tab-inactive {
+    @apply bg-white text-gray-800 hover:bg-gray-100 shadow-md hover:shadow-lg transition-all duration-200;
+  }
+}
+
+/* ===== GAME HEADER COMPONENTS ===== */
+@layer components {  .header-logo {
+    @apply flex items-center space-x-2 cursor-pointer hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-200;
+  }
+    .header-logo-icon {
+    @apply text-2xl transition-transform duration-200;
+  }
+  
+  .header-logo-text {
+    @apply text-white font-bold text-lg hidden sm:block;
+  }
+  
+  .game-title-badge {
+    @apply flex items-center space-x-2 bg-white/10 px-4 py-2 rounded-lg;
+  }
+  
+  .phase-indicator {
+    @apply bg-white/20 px-3 py-1 rounded-full;
+  }
+  
+  .phase-current {
+    @apply text-yellow-300 font-bold;
+  }
+  
+  .phase-separator {
+    @apply text-white/60 mx-1;
+  }
+  
+  .phase-total {
+    @apply text-white/80;
+  }
+  
+  .header-glass {
+    @apply bg-white/10 backdrop-blur-sm border-b border-white/20 shadow-lg;
+  }
+}
+
+/* ===== ADDITIONAL UTILITIES ===== */
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* ===== COMPONENT ANIMATIONS ===== */
+@layer components {
+  .fade-in {
+    @apply animate-in fade-in duration-300;
+  }
+  
+  .slide-in-bottom {
+    @apply animate-in slide-in-from-bottom-4 duration-300;
+  }
 }

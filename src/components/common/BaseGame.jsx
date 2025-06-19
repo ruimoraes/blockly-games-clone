@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import GameHeader from './GameHeader';
 import GameInfo from './GameInfo';
+import GameFooter from './GameFooter';
 import PhaseSelector from './PhaseSelector';
 
 /**
@@ -46,7 +47,7 @@ const BaseGame = ({
   onGoBack,
 
   // Configurações do header
-  showPhaseSelectorProp = true,  showHomeButton = true,
+  showPhaseSelectorProp = true, showHomeButton = true,
   showBackButton = true,
 
   // Props adicionais
@@ -54,7 +55,7 @@ const BaseGame = ({
 }) => {
   const [showPhaseSelector, setShowPhaseSelector] = useState(false);
   const [activeTab, setActiveTab] = useState('editor');
-  
+
   // Handlers padrão
   const handleGoHome = () => {
     if (onGoHome) {
@@ -77,98 +78,108 @@ const BaseGame = ({
       onPhaseChange(phase);
     }
     setShowPhaseSelector(false);
-  };
-    return (
-    <div>      
-      {/* Header fixo */}
+  };  return (
+    <div className="h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden">{/* Header fixo */}
       <GameHeader
         onGoHome={handleGoHome}
-        onGoBack={handleGoBack}
         showHomeButton={showHomeButton}
-        showBackButton={showBackButton}
         gameTitle={gameTitle}
         gameIcon={gameIcon}
-        currentPhase={currentPhase}
-        totalPhases={totalPhases}
-        onShowPhaseSelector={() => setShowPhaseSelector(true)}
-        showPhaseSelector={showPhaseSelectorProp}
-        isExecuting={isExecuting}
       >
         {customHeaderContent}
-      </GameHeader>
-        
-      {/* Área de conteúdo principal */}
-      <div>
-        <GameInfo
-          phaseData={currentPhaseData}
-          isExecuting={isExecuting}
-        />
-            <div>
-          {/* Layout do jogo */}
-          <div>
-            {isMobile && enableMobileTabs ? (
-              // Layout Mobile com Abas
-              <div>
-                <nav>
-                  <div>
+      </GameHeader>{/* Área de conteúdo principal - ocupa o restante da tela */}
+      <div className="flex-1 flex flex-col overflow-hidden">        {/* GameInfo compacto */}
+        <div className="flex-shrink-0 px-1 py-1 lg:px-3 lg:py-3">
+          <GameInfo
+            phaseData={currentPhaseData}
+            currentPhase={currentPhase}
+            isExecuting={isExecuting}
+          />
+        </div>{/* Área do jogo - ocupa todo espaço restante */}
+        <div className="flex-1 px-1 pb-1 overflow-hidden">
+          <div className="h-full flex flex-col">
+            {/* Layout do jogo */}
+            <div className="flex-1 overflow-hidden">            {isMobile && enableMobileTabs ? (              // Layout Mobile com Abas Integradas
+              <div className="glass-panel h-full flex flex-col overflow-hidden">
+                {/* Abas integradas no topo do painel */}
+                <nav className="flex space-x-2 p-1 rounded-lg flex-shrink-0 m-4 mb-0">                  <div className="flex-1">
                     <a
-                      onClick={() => setActiveTab('editor')}
+                      onClick={() => setActiveTab('editor')} 
+                      className={`block w-full text-center py-3 px-4 rounded-full font-medium cursor-pointer ${
+                        activeTab === 'editor' 
+                          ? 'tab-active' 
+                          : 'tab-inactive'
+                      }`}
                     >
                       🧩 Blocos
                     </a>
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <a
-                      onClick={() => setActiveTab('game')}
+                      onClick={() => setActiveTab('game')} 
+                      className={`block w-full text-center py-3 px-4 rounded-full font-medium cursor-pointer ${
+                        activeTab === 'game' 
+                          ? 'tab-active' 
+                          : 'tab-inactive'
+                      }`}
                     >
                       🎮 Game
                     </a>
                   </div>
-                </nav>
-                
-                <div>
-                  <div style={{ display: activeTab === 'editor' ? 'block' : 'none' }}>
+                </nav>                {/* Conteúdo das abas */}
+                <div className="flex-1 p-2 pt-1 overflow-hidden">
+                  <div className={`h-full transition-all duration-300 ${activeTab === 'editor' ? 'block' : 'hidden'}`}>
                     {editorComponent}
                   </div>
-                  <div style={{ display: activeTab === 'game' ? 'block' : 'none' }}>
+                  <div className={`h-full transition-all duration-300 ${activeTab === 'game' ? 'block' : 'hidden'}`}>
                     {gameAreaComponent}
                   </div>
                 </div>
-              </div>
-            ) : (
+              </div>) : (
               // Layout Desktop (duas colunas)
-              <div>
-                <div>
-                  <div>
+              <div className="h-full grid lg:grid-cols-2 gap-6 overflow-hidden">
+                <div className="flex flex-col space-y-6 overflow-hidden">
+                  <div className="glass-panel flex-1 p-4 overflow-hidden">
                     {editorComponent}
                   </div>
-                  <div>
+                </div>
+                <div className="flex flex-col space-y-6 overflow-hidden">
+                  <div className="glass-panel flex-1 p-4 overflow-hidden">
                     {gameAreaComponent}
                   </div>
                 </div>
               </div>
             )}
+            
+            {/* Componentes adicionais */}
+            {additionalComponents.length > 0 && (
+              <div className="flex-shrink-0 space-y-4 mt-4">
+                {additionalComponents.map((component, index) => (
+                  <div key={index} {...(component.colProps || { xs: 12 })}>
+                    {component.content}
+                  </div>
+                ))}
+              </div>            )}
+              {/* Conteúdo adicional */}
+            {children}
           </div>
-
-          {/* Componentes adicionais */}
-          {additionalComponents.length > 0 && (
-            <div>
-              {additionalComponents.map((component, index) => (
-                <div key={index} {...(component.colProps || { xs: 12 })}>
-                  {component.content}
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {/* Conteúdo adicional */}
-          {children}
         </div>
       </div>
 
+      {/* Footer experimental com informações de fase */}
+      <GameFooter
+        currentPhase={currentPhase}
+        totalPhases={totalPhases}
+        onShowPhaseSelector={() => setShowPhaseSelector(true)}
+        showPhaseSelector={showPhaseSelectorProp}
+        isExecuting={isExecuting}
+        onShowHelp={() => alert('Funcionalidade de ajuda em desenvolvimento')}
+      />
+    </div>
+
       {/* Seletor de fases (modal) */}
       {showPhaseSelector && (
-        <PhaseSelector 
+        <PhaseSelector
           gameConfig={gameConfig}
           currentPhase={currentPhase}
           completedPhases={completedPhases}

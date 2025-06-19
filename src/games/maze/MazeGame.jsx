@@ -124,9 +124,9 @@ function MazeGame() {
   return (
     <BaseGame
       // Configuração do jogo
-      gameTitle="Labirinto"
-      gameIcon="🧩"
-      gameDescription="Aprenda programação visual guiando um personagem através de labirintos"
+      gameTitle="Autômato"
+      gameIcon="🤖"
+      gameDescription="Aprenda programação visual guiando um robô através de labirintos"
 
       // Dados da fase
       currentPhase={currentPhase}

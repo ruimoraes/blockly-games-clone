@@ -83,9 +83,17 @@ function PuzzleGame() {
 
   // Componente da área do jogo
   const gameAreaComponent = (
-    <div className="puzzle-display-section">
+    <GameArea
+      gameState={gameState}
+      title="Puzzle"
+      phaseNumber={currentPhase}
+      className="puzzle-game-area"
+      onRunCode={checkSolution}
+      onResetGame={resetPuzzle}
+      isExecuting={isExecuting}
+    >
       <PuzzleDisplay animalStates={animalStates} />
-    </div>
+    </GameArea>
   );
 
   // Componentes adicionais (toolbar e dicas)

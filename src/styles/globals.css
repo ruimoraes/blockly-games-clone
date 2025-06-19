@@ -143,6 +143,7 @@ body {
   --bs-btn-disabled-color: #fff;
   --bs-btn-disabled-bg: var(--brand-primary);
   --bs-btn-disabled-border-color: var(--brand-primary);
+  --bs-btn-disabled-opacity: 0.85;
 }
 
 .btn-outline-brand-primary {
@@ -546,6 +547,36 @@ body {
   background-color: var(--muted);
   border-radius: var(--border-radius-lg);
   margin-bottom: 1rem;
+}
+
+/* Estilos específicos para os controles do jogo */
+.card-footer .game-controls-button {
+  font-weight: 600;
+  transform: translateY(0);
+  transition: transform 0.2s ease;
+}
+
+.card-footer .game-controls-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.card-footer .game-controls-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Transição suave para os botões de controle de jogo */
+.game-controls-button {
+  transition: all 0.3s ease;
+}
+
+/* Estilo especial para o botão em estado de reinicialização */
+.game-controls-button.btn-reset {
+  animation: pulse 1.5s infinite alternate;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
 }
 
 /* Level indicator */

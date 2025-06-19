@@ -5,58 +5,65 @@ import { Play, RotateCcw, Loader } from 'lucide-react';
 
 /**
  * Componente genérico de controles para jogos
- * Fornece interface consistente para executar/resetar código
+ * Fornece interface consistente para executar e resetar código
  */
 const GameControls = ({
   onRunCode,
   onResetGame,
   isExecuting = false,
-  isBlocklyLoaded = true,
-  hasCode = false,
+  gameState = 'idle',
+
   customButtons = [],
   runButtonText = 'Executar Código',
-  resetButtonText = 'Resetar Jogo',
+  resetButtonText = 'Reiniciar Jogo',
   runButtonIcon = Play,
   resetButtonIcon = RotateCcw,
-  variant = 'primary',
-  size = 'lg',
+  variant = 'brand-primary',
+  size = 'sm',
   className = ''
 }) => {
   const RunIcon = runButtonIcon;
   const ResetIcon = resetButtonIcon;
-
+  
+  // Determina se o jogo precisa ser reiniciado (após sucesso ou falha)
+  const needsReset = gameState === 'success' || gameState === 'failure';
+  
+  // Handler para o botão que muda de comportamento
+  const handleButtonClick = () => {
+    if (needsReset) {
+      // Se o jogo terminou (sucesso ou falha), reinicia
+      onResetGame();
+    } else {
+      // Se está no estado inicial, executa o código
+      onRunCode();
+    }
+  };
+  
   return (
-    <div className={`d-flex justify-content-center gap-3 flex-wrap ${className}`}>
+    <div className={`d-flex justify-content-center ${className}`}>
       <ButtonGroup size={size}>
-        {/* Botão Executar */}
-        <Button
-          variant={variant}
-          onClick={onRunCode}
-          disabled={isExecuting || !isBlocklyLoaded || !hasCode}
-          className="d-flex align-items-center gap-2"
+        {/* Botão Único (Executar ou Reiniciar) */}        <Button
+          variant={needsReset ? "outline-secondary" : variant}
+          onClick={handleButtonClick}
+          disabled={isExecuting}
+          className={`d-flex align-items-center gap-1 px-3 game-controls-button ${needsReset ? 'btn-reset' : ''}`}
         >
           {isExecuting ? (
             <>
-              <Loader size={20} className="animate-spin" />
-              Executando...
+              <Loader size={16} className="animate-spin" />
+              <span>Executando...</span>
+            </>
+          ) : needsReset ? (
+            <>
+              <ResetIcon size={16} />
+              <span>{resetButtonText}</span>
             </>
           ) : (
             <>
-              <RunIcon size={20} />
-              {runButtonText}
+              <RunIcon size={16} />
+              <span>{runButtonText}</span>
             </>
           )}
-        </Button>
-
-        {/* Botão Reset */}
-        <Button
-          variant="outline-secondary"
-          onClick={onResetGame}
-          disabled={isExecuting}
-          className="d-flex align-items-center gap-2"
-        >
-          <ResetIcon size={20} />
-          {resetButtonText}
         </Button>
 
         {/* Botões customizados */}
@@ -66,28 +73,14 @@ const GameControls = ({
             variant={button.variant || 'outline-primary'}
             onClick={button.onClick}
             disabled={button.disabled || isExecuting}
-            className={`d-flex align-items-center gap-2 ${button.className || ''}`}
+            className={`d-flex align-items-center gap-1 ${button.className || ''}`}
             title={button.tooltip}
           >
-            {button.icon && <button.icon size={20} />}
-            {button.text}
+            {button.icon && <button.icon size={16} />}
+            <span>{button.text}</span>
           </Button>
         ))}
-      </ButtonGroup>      {/* Status indicators */}
-      <div className="d-flex align-items-center gap-2">
-        {!isBlocklyLoaded && (
-          <span className="badge bg-warning">
-            <Loader size={14} className="animate-spin me-1" />
-            Carregando Blockly...
-          </span>
-        )}
-        
-        {isBlocklyLoaded && !hasCode && (
-          <span className="badge bg-info">
-            💡 Arraste blocos para criar seu código
-          </span>
-        )}
-      </div>
+      </ButtonGroup>
     </div>
   );
 };
@@ -96,8 +89,8 @@ GameControls.propTypes = {
   onRunCode: PropTypes.func.isRequired,
   onResetGame: PropTypes.func.isRequired,
   isExecuting: PropTypes.bool,
-  isBlocklyLoaded: PropTypes.bool,
-  hasCode: PropTypes.bool,
+  gameState: PropTypes.oneOf(['idle', 'running', 'success', 'failure']),
+
   customButtons: PropTypes.arrayOf(PropTypes.shape({
     text: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,

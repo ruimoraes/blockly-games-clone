@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import GameControls from './GameControls';
 
-const GameArea = ({ 
-  gameState, 
+const GameArea = ({
+  gameState,
   title,
   phaseNumber,
   children,
-  footerInfo,
+  onRunCode,
+  onResetGame,
+  isExecuting,
+  customButtons,
   className = ''
 }) => {
   // Estados padrão com ícones e cores
@@ -37,20 +41,25 @@ const GameArea = ({
             {stateDisplay.icon} {stateDisplay.text}
           </span>
         </div>
-      </div>
-      <div className="card-body d-flex justify-content-center align-items-center p-2 p-sm-3">
-        <div className="game-display">
+      </div>      <div className="card-body d-flex flex-column p-2 p-sm-3">
+        <div className="game-display flex-grow-1 d-flex justify-content-center align-items-center mb-3">
           {children}
+        </div>        
+      </div>        <div className="card-footer py-2">
+          {onRunCode && (
+            <GameControls
+              onRunCode={onRunCode}
+              onResetGame={onResetGame}
+              isExecuting={isExecuting}
+              gameState={gameState}
+              customButtons={customButtons}
+              variant="brand-primary"
+              size="lg"
+            />
+          )}
         </div>
-      </div>
-      {footerInfo && (
-        <div className="card-footer text-center">
-          <small className="text-muted">
-            {footerInfo}
-          </small>
-        </div>
-      )}
     </div>
+
   );
 };
 
@@ -60,6 +69,11 @@ GameArea.propTypes = {
   phaseNumber: PropTypes.number.isRequired,
   children: PropTypes.node.isRequired,
   footerInfo: PropTypes.node,
+  onRunCode: PropTypes.func,
+  onResetGame: PropTypes.func,
+  isExecuting: PropTypes.bool,
+
+  customButtons: PropTypes.array,
   className: PropTypes.string
 };
 

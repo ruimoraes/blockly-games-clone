@@ -30,8 +30,8 @@ O jogo inclui:
 ## 📦 Instalação
 
 ### Pré-requisitos
-- Node.js 18 ou superior
-- npm ou pnpm
+- Node.js 20 ou superior
+- npm
 
 ### Passos para instalação
 
@@ -44,13 +44,9 @@ cd blockly-games-clone
 
 # Instale as dependências
 npm install
-# ou
-pnpm install
 
 # Execute o projeto em modo de desenvolvimento
 npm run dev
-# ou
-pnpm run dev
 
 # Acesse no navegador
 http://localhost:5173

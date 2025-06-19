@@ -53,10 +53,10 @@ Para sugerir uma nova funcionalidade:
 
 1. **Configure o ambiente**:
    ```bash
-   # Clone e instale dependências com pnpm
+   # Clone e instale dependências com npm
    git clone https://github.com/SEU_USUARIO/blockly-games-clone.git
    cd blockly-games-clone
-   pnpm install
+   npm install
    ```
 
 2. **Crie uma branch** a partir de `develop`:
@@ -69,13 +69,13 @@ Para sugerir uma nova funcionalidade:
 3. **Desenvolva e teste localmente**:
    ```bash
    # Desenvolvimento
-   pnpm dev
+   npm run dev
    
    # Teste o build
-   pnpm build
+   npm run build
    
    # Execute linting
-   pnpm lint
+   npm run lint
    ```
 
 4. **Commit e push**:

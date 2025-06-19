@@ -20,7 +20,7 @@ Marque o tipo de mudança que se aplica:
 
 Descreva os passos para testar as mudanças:
 
-1. Execute `pnpm dev`
+1. Execute `npm run dev`
 2. Navegue para...
 3. Clique em...
 4. Verifique que...
@@ -35,7 +35,7 @@ Antes de submeter o PR, verifique:
 - [ ] Minhas mudanças não geram novos warnings
 - [ ] Adicionei testes que provam que a mudança funciona
 - [ ] Testes novos e existentes passam localmente
-- [ ] Build local (`pnpm build`) funciona sem erros
+- [ ] Build local (`npm run build`) funciona sem erros
 - [ ] Documentação foi atualizada se necessário
 
 ## 📸 Screenshots (se aplicável)

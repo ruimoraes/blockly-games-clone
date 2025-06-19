@@ -53,7 +53,7 @@ graph LR
 **Disparado por:** Push em qualquer branch (exceto `main` e `develop`)
 
 **Etapas:**
-1. 🔧 Setup do ambiente (Node.js 18 + pnpm)
+1. 🔧 Setup do ambiente (Node.js 20 + npm)
 2. 📦 Instalação de dependências
 3. 🔍 Execução do linting
 4. 🏗️ Build da aplicação
@@ -64,7 +64,7 @@ graph LR
 **Disparado por:** Push na branch `develop`
 
 **Etapas:**
-1. 🔧 Setup do ambiente (Node.js 18 + pnpm)
+1. 🔧 Setup do ambiente (Node.js 20 + npm)
 2. 📦 Instalação de dependências
 3. 🔍 Execução do linting
 4. 🏗️ Build da aplicação
@@ -130,16 +130,16 @@ Siga as instruções em `.github/BRANCH_PROTECTION.md`
 ### Build e Desenvolvimento
 ```bash
 # Desenvolvimento local
-pnpm dev
+npm run dev
 
 # Build para produção
-pnpm build
+npm run build
 
 # Linting
-pnpm lint
+npm run lint
 
 # Preview da build
-pnpm preview
+npm run preview
 ```
 
 ### Configuração de Branches
@@ -170,11 +170,11 @@ pnpm preview
 
 ### Build falhando
 1. Verificar logs da GitHub Action
-2. Testar build localmente: `pnpm build`
+2. Testar build localmente: `npm run build`
 3. Verificar dependências e versões do Node.js
 
 ## 📚 Recursos Adicionais
 
 - [GitHub Branch Protection Rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/defining-the-mergeability-of-pull-requests/about-protected-branches)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [pnpm Documentation](https://pnpm.io/)
+- [npm Documentation](https://docs.npmjs.com/)

@@ -50,20 +50,20 @@ show_help() {
 setup_project() {
     print_status "Configurando projeto..."
     
-    # Verificar se pnpm está instalado
-    if ! command -v pnpm &> /dev/null; then
-        print_error "pnpm não está instalado. Instale com: npm install -g pnpm"
+    # Verificar se npm está disponível
+    if ! command -v npm &> /dev/null; then
+        print_error "npm não está instalado. npm vem com Node.js: https://nodejs.org/"
         exit 1
     fi
     
     # Instalar dependências
     print_status "Instalando dependências..."
-    pnpm install
+    npm install
     
     # Configurar Git hooks (se houver)
     if [ -f ".husky/install" ]; then
         print_status "Configurando Git hooks..."
-        pnpm husky install
+        npm run husky install
     fi
     
     print_success "Projeto configurado com sucesso!"
@@ -72,7 +72,7 @@ setup_project() {
 
 start_dev() {
     print_status "Iniciando servidor de desenvolvimento..."
-    pnpm dev
+    npm run dev
 }
 
 build_project() {
@@ -82,7 +82,7 @@ build_project() {
     rm -rf dist/
     
     # Executar build
-    pnpm build
+    npm run build
     
     if [ $? -eq 0 ]; then
         print_success "Build concluído com sucesso!"
@@ -95,7 +95,7 @@ build_project() {
 
 run_lint() {
     print_status "Executando linting..."
-    pnpm lint
+    npm run lint
     
     if [ $? -eq 0 ]; then
         print_success "Linting passou sem problemas!"
@@ -133,15 +133,15 @@ clean_project() {
     rm -rf dist/
     rm -rf build/
     
-    # Limpar cache do pnpm
-    pnpm store prune
+    # Limpar cache do npm
+    npm cache clean --force
     
     # Limpar node_modules e reinstalar (opcional)
     read -p "Deseja limpar node_modules e reinstalar? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         rm -rf node_modules/
-        pnpm install
+        npm install
     fi
     
     print_success "Limpeza concluída!"
@@ -184,15 +184,15 @@ check_project() {
     
     # Verificar dependências
     print_status "Verificando dependências..."
-    pnpm install --frozen-lockfile
+    npm install
     
     # Executar linting
     print_status "Verificando código..."
-    pnpm lint
+    npm run lint
     
     # Executar build
     print_status "Testando build..."
-    pnpm build
+    npm run build
     
     print_success "✅ Projeto está funcionando corretamente!"
 }

@@ -12,6 +12,8 @@ permissions:
   contents: read
   pull-requests: write
   issues: write
+  actions: read
+  checks: read
 
 env:
   NODE_VERSION: "20"
@@ -48,7 +50,6 @@ jobs:
           name: develop-build-artifacts
           path: dist/
           retention-days: 30
-
   create-pr-to-main:
     runs-on: ubuntu-latest
     needs: build-and-test
@@ -59,8 +60,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Check if PR already exists
         id: check-pr
@@ -72,6 +77,7 @@ jobs:
 
       - name: Get latest commits for PR description
         id: commits
+        if: steps.check-pr.outputs.pr_exists == '0'
         run: |
           COMMITS=$(git log main..develop --oneline --max-count=10 | sed 's/^/- /')
           echo "commits<<EOF" >> $GITHUB_OUTPUT
@@ -80,21 +86,23 @@ jobs:
 
       - name: Create Pull Request to main
         if: steps.check-pr.outputs.pr_exists == '0'
-        run: |
-          gh pr create \
-            --base main \
-            --head develop \
-            --title "🚀 Release: develop → main" \
-            --body "Automated pull request for release to main branch.
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: develop
+          title: "🚀 Release: develop → main"
+          body: |
+            Automated pull request for release to main branch.
             
-            **Source branch:** \`develop\`
-            **Target branch:** \`main\`
+            **Source branch:** `develop`
+            **Target branch:** `main`
             **Build status:** ✅ Passed
             
             ## Recent Changes:
             ${{ steps.commits.outputs.commits }}
             
             This PR was automatically created after a successful build on the develop branch.
-            Please review and merge when ready for release."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Please review and merge when ready for release.
+          delete-branch: false
+          draft: false

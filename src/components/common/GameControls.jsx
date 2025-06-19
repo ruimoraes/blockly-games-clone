@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup } from 'react-bootstrap';
 import { Play, RotateCcw, Loader } from 'lucide-react';
 
 /**
@@ -12,14 +11,11 @@ const GameControls = ({
   onResetGame,
   isExecuting = false,
   gameState = 'idle',
-
   customButtons = [],
   runButtonText = 'Executar Código',
   resetButtonText = 'Reiniciar Jogo',
   runButtonIcon = Play,
   resetButtonIcon = RotateCcw,
-  variant = 'brand-primary',
-  size = 'sm',
   className = ''
 }) => {
   const RunIcon = runButtonIcon;
@@ -38,15 +34,14 @@ const GameControls = ({
       onRunCode();
     }
   };
-  
-  return (
-    <div className={`d-flex justify-content-center ${className}`}>
-      <ButtonGroup size={size}>
-        {/* Botão Único (Executar ou Reiniciar) */}        <Button
-          variant={needsReset ? "outline-secondary" : variant}
+    return (
+    <div className={`game-controls ${className}`}>
+      <div>
+        {/* Botão Único (Executar ou Reiniciar) */}
+        <button
           onClick={handleButtonClick}
           disabled={isExecuting}
-          className={`d-flex align-items-center gap-1 px-3 game-controls-button ${needsReset ? 'btn-reset' : ''}`}
+          className={`game-controls-button ${needsReset ? 'btn-reset' : ''}`}
         >
           {isExecuting ? (
             <>
@@ -62,25 +57,23 @@ const GameControls = ({
             <>
               <RunIcon size={16} />
               <span>{runButtonText}</span>
-            </>
-          )}
-        </Button>
+            </>          )}
+        </button>
 
         {/* Botões customizados */}
         {customButtons.map((button, index) => (
-          <Button
+          <button
             key={index}
-            variant={button.variant || 'outline-primary'}
             onClick={button.onClick}
             disabled={button.disabled || isExecuting}
-            className={`d-flex align-items-center gap-1 ${button.className || ''}`}
+            className={`custom-button ${button.className || ''}`}
             title={button.tooltip}
           >
             {button.icon && <button.icon size={16} />}
             <span>{button.text}</span>
-          </Button>
+          </button>
         ))}
-      </ButtonGroup>
+      </div>
     </div>
   );
 };
@@ -90,12 +83,10 @@ GameControls.propTypes = {
   onResetGame: PropTypes.func.isRequired,
   isExecuting: PropTypes.bool,
   gameState: PropTypes.oneOf(['idle', 'running', 'success', 'failure']),
-
   customButtons: PropTypes.arrayOf(PropTypes.shape({
     text: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     icon: PropTypes.elementType,
-    variant: PropTypes.string,
     disabled: PropTypes.bool,
     className: PropTypes.string,
     tooltip: PropTypes.string
@@ -104,8 +95,6 @@ GameControls.propTypes = {
   resetButtonText: PropTypes.string,
   runButtonIcon: PropTypes.elementType,
   resetButtonIcon: PropTypes.elementType,
-  variant: PropTypes.string,
-  size: PropTypes.string,
   className: PropTypes.string
 };
 

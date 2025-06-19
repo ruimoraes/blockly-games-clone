@@ -63,10 +63,9 @@ function PuzzleGame() {
 
   // Componente do editor Blockly
   const editorComponent = (
-    <div className="puzzle-editor-section">
-      <div className="editor-instructions mb-3">
+    <div className="puzzle-editor-section">      <div className="editor-instructions">
         <h6>🔧 Editor de Blocos</h6>
-        <p className="text-muted small">
+        <p className="instructions-text">
           Arraste blocos das categorias à esquerda para configurar os animais. 
           Conecte os blocos de propriedades aos blocos de animais.
         </p>
@@ -111,50 +110,45 @@ function PuzzleGame() {
     ),
     colProps: { xs: 12 }
   });
-
   // Adicionar dica se estiver visível
   if (showHint && currentHint) {
     additionalComponents.push({
       content: (
-        <div className="card border-warning">
-          <div className="card-header bg-warning bg-opacity-10">
-            <h6 className="mb-0">💡 Dica</h6>
+        <div className="hint-card">
+          <div className="hint-header">
+            <h6>💡 Dica</h6>
           </div>
-          <div className="card-body">
-            <p className="mb-0">{currentHint}</p>
+          <div className="hint-body">
+            <p>{currentHint}</p>
           </div>
         </div>
       ),
       colProps: { xs: 12 }
     });
   }
-
   // Controles customizados específicos do puzzle
   const customControls = [
     {
       text: 'Verificar Solução',
       onClick: checkSolution,
-      variant: 'success',
       disabled: false,
       tooltip: 'Verificar se os animais estão configurados corretamente'
     },
     {
       text: showHint ? 'Ocultar Dica' : 'Mostrar Dica',
       onClick: toggleHint,
-      variant: 'info',
       disabled: false,
       tooltip: 'Mostrar/ocultar dica para a fase atual'
     }
   ];
-
   // Conteúdo customizado do header
   const customHeaderContent = (
-    <div className="d-flex align-items-center gap-2">
-      <span className="badge bg-success">
+    <div className="puzzle-header-stats">
+      <span className="score-badge">
         {correctCount}/{totalAnimals} corretos
       </span>
       {isComplete && (
-        <span className="badge bg-warning">
+        <span className="complete-badge">
           ✓ Completo
         </span>
       )}

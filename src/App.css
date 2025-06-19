@@ -2,11 +2,7 @@
  * Blockly NT - App.css
  * 
  * This file contains essential imports for the application.
- * Uses Bootstrap as the main CSS framework.
  */
-
-/* Bootstrap CSS Framework */
-@import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* Main Design System */
 @import './styles/globals.css';

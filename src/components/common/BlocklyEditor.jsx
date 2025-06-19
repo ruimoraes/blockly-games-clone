@@ -234,17 +234,10 @@ const BlocklyEditor = forwardRef(({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);  return (
-    <div className="card game-card blockly-editor-card h-100 border-0 rounded-0">
-      <div className="card-body p-0 d-flex flex-column overflow-hidden">
+    <div>
+      <div>
         <div 
-          ref={blocklyDiv} 
-          className="blockly-editor flex-grow-1"
-          style={{ 
-            width: '100%',
-            minHeight: '300px',
-            position: 'relative',
-            overflow: 'hidden'
-          }}
+          ref={blocklyDiv}
         />
       </div>
     </div>

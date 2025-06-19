@@ -32,7 +32,7 @@ const PuzzleToolbar = ({
       
       <div className="action-buttons">
         <button 
-          className="btn btn-primary"
+          className="check-button"
           onClick={onCheckSolution}
           title="Verificar se a solução está correta"
         >
@@ -40,7 +40,7 @@ const PuzzleToolbar = ({
         </button>
         
         <button 
-          className="btn btn-secondary"
+          className="hint-button"
           onClick={onShowHint}
           title="Mostrar dica para resolver o puzzle"
         >
@@ -48,7 +48,7 @@ const PuzzleToolbar = ({
         </button>
         
         <button 
-          className="btn btn-danger"
+          className="reset-button"
           onClick={onResetPuzzle}
           title="Limpar todos os blocos e recomeçar"
         >
@@ -129,7 +129,9 @@ const PuzzleToolbar = ({
           flex-wrap: wrap;
         }
         
-        .btn {
+        .check-button,
+        .hint-button,
+        .reset-button {
           padding: 10px 16px;
           border: none;
           border-radius: 8px;
@@ -143,39 +145,43 @@ const PuzzleToolbar = ({
           white-space: nowrap;
         }
         
-        .btn:hover {
+        .check-button:hover,
+        .hint-button:hover,
+        .reset-button:hover {
           transform: translateY(-1px);
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         
-        .btn:active {
+        .check-button:active,
+        .hint-button:active,
+        .reset-button:active {
           transform: translateY(0);
         }
         
-        .btn-primary {
+        .check-button {
           background: linear-gradient(135deg, #3498db, #2980b9);
           color: white;
         }
         
-        .btn-primary:hover {
+        .check-button:hover {
           background: linear-gradient(135deg, #2980b9, #1f5f8b);
         }
         
-        .btn-secondary {
+        .hint-button {
           background: linear-gradient(135deg, #f39c12, #e67e22);
           color: white;
         }
         
-        .btn-secondary:hover {
+        .hint-button:hover {
           background: linear-gradient(135deg, #e67e22, #d35400);
         }
         
-        .btn-danger {
+        .reset-button {
           background: linear-gradient(135deg, #e74c3c, #c0392b);
           color: white;
         }
         
-        .btn-danger:hover {
+        .reset-button:hover {
           background: linear-gradient(135deg, #c0392b, #a93226);
         }
         
@@ -193,7 +199,9 @@ const PuzzleToolbar = ({
             justify-content: center;
           }
           
-          .btn {
+          .check-button,
+          .hint-button,
+          .reset-button {
             flex: 1;
             justify-content: center;
           }

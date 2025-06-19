@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
@@ -28,9 +28,8 @@ const BlocklyEditor = forwardRef(({
 }, ref) => {
   const blocklyDiv = useRef(null);
   const workspace = useRef(null);
-
   // Configurações padrão do Blockly
-  const defaultOptions = {
+  const defaultOptions = useMemo(() => ({
     toolbox: toolbox,
     scrollbars: true,
     trashcan: true,
@@ -50,7 +49,7 @@ const BlocklyEditor = forwardRef(({
     },
     theme: Blockly.Themes.Modern,
     ...options
-  };  // Inicializar Blockly
+  }), [toolbox, options]);// Inicializar Blockly
   useEffect(() => {
     if (blocklyDiv.current && !workspace.current) {
       workspace.current = Blockly.inject(blocklyDiv.current, defaultOptions);
@@ -79,10 +78,8 @@ const BlocklyEditor = forwardRef(({
         } catch (error) {
           console.warn('Erro ao carregar blocos iniciais:', error);
         }
-      }
-
-      // Listener para mudanças no workspace
-      workspace.current.addChangeListener((event) => {
+      }      // Listener para mudanças no workspace
+      workspace.current.addChangeListener(() => {
         if (onWorkspaceChange) {
           onWorkspaceChange(workspace.current);
         }
@@ -105,7 +102,7 @@ const BlocklyEditor = forwardRef(({
         workspace.current = null;
       }
     };
-  }, [toolbox]);
+  }, [toolbox, defaultOptions, initialBlocks, onCodeChange, onWorkspaceChange]);
 
   // Métodos expostos via ref
   useImperativeHandle(ref, () => ({

@@ -2,7 +2,7 @@
 
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Row, Col, Nav } from 'react-bootstrap';
 import GameHeader from './GameHeader';
@@ -18,7 +18,7 @@ const BaseGame = ({
   // Configuração do jogo
   gameTitle,
   gameIcon = '🎮',
-  gameDescription = '',
+  // gameDescription = '', // Não utilizado atualmente
   
   // Dados da fase
   currentPhase,
@@ -71,23 +71,8 @@ const BaseGame = ({
 }) => {
   const [showPhaseSelector, setShowPhaseSelector] = useState(false);
   const [activeTab, setActiveTab] = useState('editor');
-
   // Detectar se é mobile automaticamente se não especificado
-  useEffect(() => {
-    if (isMobile === undefined) {
-      const checkIsMobile = () => {
-        return window.innerWidth < 768;
-      };
-
-      const mediaQuery = window.matchMedia('(max-width: 767px)');
-      const handleMediaChange = () => {
-        // Atualizar estado mobile se necessário
-      };
-
-      mediaQuery.addListener(handleMediaChange);
-      return () => mediaQuery.removeListener(handleMediaChange);
-    }
-  }, [isMobile]);
+  // useEffect removido pois não estava sendo utilizado corretamente
 
   // Handlers padrão
   const handleGoHome = () => {

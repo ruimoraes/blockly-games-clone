@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BREAKPOINTS, useBreakpoint, isMobile, isTablet, isDesktop } from '../config/responsive';
+import { BREAKPOINTS, useBreakpoint as getBreakpoint, isMobile, isTablet, isDesktop } from '../config/responsive';
 
 /**
  * Hook para gerenciar estado responsivo da aplicação
@@ -21,7 +21,7 @@ export const useResponsive = () => {
       const height = window.innerHeight;
       
       setScreenSize({ width, height });
-      setBreakpoint(useBreakpoint());
+      setBreakpoint(getBreakpoint());
       setIsMobileDevice(isMobile());
       setIsTabletDevice(isTablet());
       setIsDesktopDevice(isDesktop());
@@ -52,7 +52,7 @@ export const useResponsive = () => {
  * Hook para classes CSS responsivas
  */
 export const useResponsiveClasses = () => {
-  const { isMobile, isTablet, isDesktop, breakpoint } = useResponsive();
+  const { isMobile, isTablet, breakpoint } = useResponsive();
 
   const getResponsiveClass = (mobileClass, tabletClass, desktopClass) => {
     if (isMobile) return mobileClass;

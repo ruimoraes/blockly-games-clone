@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import * as Blockly from 'blockly';
 import { useBaseGame } from '../../../hooks/useBaseGame';
 import { PUZZLE_GAME_CONFIG } from '../config/puzzleGameConfig';
-import { checkPuzzleSolution, ANIMALS_DATA } from '../blocks/puzzleBlocks';
+import { ANIMALS_DATA } from '../blocks/puzzleBlocks';
 
 export const usePuzzleGame = () => {
   // Estados específicos do Puzzle
@@ -150,9 +150,8 @@ export const usePuzzleGame = () => {
       }, 100);
     }
   }, [workspace, checkSolution]);
-
   // Função executeCode para compatibilidade com BaseGame
-  const executeCode = useCallback((code) => {
+  const executeCode = useCallback(() => {
     setIsExecuting(true);
     setGameState('running');
     

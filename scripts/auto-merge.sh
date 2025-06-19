@@ -1,81 +1,81 @@
 #!/bin/bash
 
-# Auto-merge script for develop → main
-# This script creates a PR from develop to main when develop branch is updated
+# Script de auto-merge para develop → main
+# Este script cria um PR de develop para main quando a branch develop é atualizada
 
 set -e
 
-echo "🚀 Auto-merge script: develop → main"
+echo "🚀 Script de auto-merge: develop → main"
 
-# Check if we're on develop branch
+# Verificar se estamos na branch develop
 CURRENT_BRANCH=$(git branch --show-current)
 if [ "$CURRENT_BRANCH" != "develop" ]; then
-    echo "❌ Error: Must be on develop branch. Currently on: $CURRENT_BRANCH"
+    echo "❌ Erro: Deve estar na branch develop. Atualmente em: $CURRENT_BRANCH"
     exit 1
 fi
 
-# Check if there are uncommitted changes
+# Verificar se há mudanças não commitadas
 if ! git diff-index --quiet HEAD --; then
-    echo "❌ Error: There are uncommitted changes. Please commit or stash them first."
+    echo "❌ Erro: Há mudanças não commitadas. Por favor, faça commit ou stash primeiro."
     exit 1
 fi
 
-# Fetch latest changes
-echo "📥 Fetching latest changes..."
+# Buscar as mudanças mais recentes
+echo "📥 Buscando mudanças mais recentes..."
 git fetch origin
 
-# Check if develop is ahead of main
+# Verificar se develop está à frente de main
 BEHIND_COUNT=$(git rev-list --count main..develop)
 if [ "$BEHIND_COUNT" -eq 0 ]; then
-    echo "✅ develop is up to date with main. No PR needed."
+    echo "✅ develop está atualizada com main. Nenhum PR necessário."
     exit 0
 fi
 
-echo "📊 develop is $BEHIND_COUNT commits ahead of main"
+echo "📊 develop está $BEHIND_COUNT commits à frente de main"
 
-# Check if PR already exists
+# Verificar se PR já existe
 if command -v gh &> /dev/null; then
     PR_COUNT=$(gh pr list --base main --head develop --json number --jq length)
     if [ "$PR_COUNT" -gt 0 ]; then
-        echo "✅ PR from develop to main already exists."
+        echo "✅ PR de develop para main já existe."
         gh pr list --base main --head develop
         exit 0
     fi
 fi
 
-# Get recent commits for PR description
-echo "📝 Generating PR description..."
+# Obter commits recentes para descrição do PR
+echo "📝 Gerando descrição do PR..."
 COMMITS=$(git log main..develop --oneline --max-count=10 | sed 's/^/- /')
 
-# Create PR using GitHub CLI if available
+# Criar PR usando GitHub CLI se disponível
 if command -v gh &> /dev/null; then
-    echo "🔄 Creating PR using GitHub CLI..."
+    echo "🔄 Criando PR usando GitHub CLI..."
     gh pr create \
         --base main \
         --head develop \
         --title "🚀 Release: develop → main" \
-        --body "Automated pull request for release to main branch.
+        --body "Pull request automatizado para release na branch main.
 
-**Source branch:** \`develop\`
-**Target branch:** \`main\`
-**Build status:** ✅ Passed
+**Branch origem:** \`develop\`
+**Branch destino:** \`main\`
+**Status da build:** ✅ Aprovado
 
-## Recent Changes:
+## Mudanças Recentes:
 $COMMITS
 
-This PR was automatically created after a successful build on the develop branch.
-Please review and merge when ready for release." \
+Este PR foi criado automaticamente após uma build bem-sucedida na branch develop.
+Por favor, revise e faça merge quando estiver pronto para release." \
         --draft=false
-    echo "✅ PR created successfully!"
+    echo "✅ PR criado com sucesso!"
 else
-    echo "❌ GitHub CLI (gh) not found. Please install it or create the PR manually."
+    echo "❌ GitHub CLI (gh) não encontrado. Instale ou crie o PR manualmente."
     echo ""
-    echo "PR Details:"
-    echo "Title: 🚀 Release: develop → main"
+    echo "Detalhes do PR:"
+    echo "Título: 🚀 Release: develop → main"
     echo "Base: main"
     echo "Head: develop"
     echo ""
-    echo "Recent changes:"
+    echo "Mudanças recentes:"
     echo "$COMMITS"
     exit 1
 fi

@@ -1,4 +1,4 @@
-name: Develop CI - Build and PR to Main
+name: Develop CI - Build e PR para Main
 
 on:
   push:
@@ -21,7 +21,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    name: Build and Test on Develop
+    name: Build e Teste na Develop
 
     steps:
       - name: Checkout code
@@ -50,12 +50,11 @@ jobs:
           name: develop-build-artifacts
           path: dist/
           retention-days: 30
-
   create-pr-to-main:
     runs-on: ubuntu-latest
     needs: build-and-test
     if: github.event_name == 'push' && github.ref_name == 'develop'
-    name: Create PR to Main
+    name: Criar PR para Main
 
     steps:
       - name: Checkout code
@@ -81,14 +80,13 @@ jobs:
         if: steps.check-pr.outputs.pr_exists == '0'
         run: |
           COMMITS=$(git log main..develop --oneline --max-count=10 | sed 's/^/- /')
-          echo "commits<<EOF" >> $GITHUB_OUTPUT
-          echo "$COMMITS" >> $GITHUB_OUTPUT
+          echo "commits<<EOF" >> $GITHUB_OUTPUT          echo "$COMMITS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request to main
         if: steps.check-pr.outputs.pr_exists == '0'
         id: create-pr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: main

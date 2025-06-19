@@ -1,4 +1,4 @@
-name: Develop CI - Build and PR to Main
+name: Develop CI - Build e PR para Main
 
 on:
   push:
@@ -21,7 +21,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    name: Build and Test on Develop
+    name: Build e Teste na Develop
 
     steps:
       - name: Checkout code
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-test
     if: github.event_name == 'push' && github.ref_name == 'develop'
-    name: Create PR to Main
+    name: Criar PR para Main
 
     steps:
       - name: Checkout code
@@ -67,6 +67,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: Fetch all branches
+        run: |
+          git fetch origin main:main || git fetch origin main
+          git branch -a
 
       - name: Check if PR already exists
         id: check-pr
@@ -95,17 +100,17 @@ jobs:
           branch: develop
           title: "🚀 Release: develop → main"
           body: |
-            Automated pull request for release to main branch.
+            Pull request automatizado para release na branch main.
             
-            **Source branch:** `develop`
-            **Target branch:** `main`
-            **Build status:** ✅ Passed
+            **Branch origem:** `develop`
+            **Branch destino:** `main`
+            **Status da build:** ✅ Aprovado
             
-            ## Recent Changes:
+            ## Mudanças Recentes:
             ${{ steps.commits.outputs.commits }}
             
-            This PR was automatically created after a successful build on the develop branch.
-            Please review and merge when ready for release.
+            Este PR foi criado automaticamente após uma build bem-sucedida na branch develop.
+            Por favor, revise e faça merge quando estiver pronto para release.
           delete-branch: false
           draft: false
 
@@ -116,17 +121,17 @@ jobs:
             --base main \
             --head develop \
             --title "🚀 Release: develop → main" \
-            --body "Automated pull request for release to main branch.
+            --body "Pull request automatizado para release na branch main.
 
-          **Source branch:** \`develop\`
-          **Target branch:** \`main\`
-          **Build status:** ✅ Passed
+          **Branch origem:** \`develop\`
+          **Branch destino:** \`main\`
+          **Status da build:** ✅ Aprovado
 
-          ## Recent Changes:
+          ## Mudanças Recentes:
           ${{ steps.commits.outputs.commits }}
 
-          This PR was automatically created after a successful build on the develop branch.
-          Please review and merge when ready for release." \
+          Este PR foi criado automaticamente após uma build bem-sucedida na branch develop.
+          Por favor, revise e faça merge quando estiver pronto para release." \
             --draft=false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

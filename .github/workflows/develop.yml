@@ -11,12 +11,12 @@ on:
 env:
   NODE_VERSION: '20'
 
-jobs:
-  build-and-test:
+jobs:  build-and-test:
     runs-on: ubuntu-latest
     name: Build and Test on Develop
     
-    steps:      - name: Checkout code
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0

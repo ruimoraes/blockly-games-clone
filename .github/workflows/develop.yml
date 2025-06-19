@@ -9,7 +9,7 @@ on:
       - develop
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
   actions: read
@@ -50,6 +50,7 @@ jobs:
           name: develop-build-artifacts
           path: dist/
           retention-days: 30
+
   create-pr-to-main:
     runs-on: ubuntu-latest
     needs: build-and-test
@@ -86,6 +87,7 @@ jobs:
 
       - name: Create Pull Request to main
         if: steps.check-pr.outputs.pr_exists == '0'
+        id: create-pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -106,3 +108,25 @@ jobs:
             Please review and merge when ready for release.
           delete-branch: false
           draft: false
+
+      - name: Fallback - Create PR via GitHub CLI
+        if: steps.check-pr.outputs.pr_exists == '0' && steps.create-pr.outcome == 'failure'
+        run: |
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "🚀 Release: develop → main" \
+            --body "Automated pull request for release to main branch.
+
+          **Source branch:** \`develop\`
+          **Target branch:** \`main\`
+          **Build status:** ✅ Passed
+
+          ## Recent Changes:
+          ${{ steps.commits.outputs.commits }}
+
+          This PR was automatically created after a successful build on the develop branch.
+          Please review and merge when ready for release." \
+            --draft=false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

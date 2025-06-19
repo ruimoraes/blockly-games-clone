@@ -28,7 +28,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "vite preview"
+    "start": "vite preview",
+    "auto-merge": "./scripts/auto-merge.sh"
   },
   "dependencies": {
     "blockly": "^12.1.0",

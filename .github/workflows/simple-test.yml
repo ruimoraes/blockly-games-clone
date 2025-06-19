@@ -5,7 +5,8 @@ on:
     branches:
       - feature/test-ci-cd
 
-jobs:  test:
+jobs:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,7 +16,9 @@ jobs:  test:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-        - name: Install dependencies
+          cache: 'npm'
+      
+      - name: Install dependencies
         run: npm ci
       
       - name: Build

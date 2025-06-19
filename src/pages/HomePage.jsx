@@ -31,10 +31,9 @@ function HomePage() {
 
     return games;
   };
-
   const games = getFilteredGames();
   const categories = Object.keys(GAME_CATEGORIES);
-  const difficulties = Object.keys(DIFFICULTY_LEVELS);
+  // const difficulties = Object.keys(DIFFICULTY_LEVELS); // Não utilizado atualmente
 
   // Dados para as estatísticas
   const statsData = [

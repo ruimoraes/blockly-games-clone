@@ -56,9 +56,8 @@ export function useBlockly(props = {}) {
               // Usar o método atualizado para obter variáveis
               const variableMap = workspaceInstance.getVariableMap();
               const variables = variableMap ? variableMap.getAllVariables() : [];
-              
-              // Gerar código com o contexto das variáveis
-              const code = BlocklyJavaScript.javascriptGenerator.workspaceToCode(workspaceInstance);
+                // Gerar código com o contexto das variáveis
+              const code = javascriptGenerator.workspaceToCode(workspaceInstance);
               console.log('Código gerado:', code);
               console.log('Variáveis disponíveis:', variables);
               

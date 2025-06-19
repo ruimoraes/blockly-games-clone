@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useBaseGame } from '../../../hooks/useBaseGame';
 import { MAZE_GAME_CONFIG } from '../config/mazeConfig';
 
@@ -28,10 +28,9 @@ export const useMazeGame = () => {
     getPhaseData,
     gameConfig
   } = baseGameHook;
-
   // Obter dados da fase atual
   const currentPhaseData = getCurrentPhaseData();
-  const mazeData = currentPhaseData?.map || [];
+  const mazeData = useMemo(() => currentPhaseData?.map || [], [currentPhaseData]);
 
   // Inicializar posição do jogador baseada na fase atual
   const initializePlayerPosition = useCallback(() => {

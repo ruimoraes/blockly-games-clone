@@ -1,22 +1,12 @@
 /* 
- * Blockly NT - Minimal App.css
+ * Blockly NT - App.css
  * 
- * This file contains only essential imports and base layer configurations.
- * All styling is consolidated in src/styles/globals.css for better maintainability.
+ * This file contains essential imports for the application.
+ * Uses Bootstrap as the main CSS framework.
  */
 
-/* Essential Framework Imports */
-@import "tailwindcss";
-@import "tw-animate-css";
+/* Bootstrap CSS Framework */
+@import 'bootstrap/dist/css/bootstrap.min.css';
 
 /* Main Design System */
 @import './styles/globals.css';
-
-/* Minimal base layer for Tailwind compatibility */
-@layer base {
-  * {
-    border-color: var(--border);
-    outline-color: var(--ring);
-    outline-offset: 2px;
-  }
-}

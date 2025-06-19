@@ -161,17 +161,16 @@ export const defineBlocks = () => {
 };
 
 // Definir geradores de código JavaScript
-export const defineGenerators = () => {
-  // Gerador: Mover Frente
-  javascriptGenerator.forBlock['maze_move_forward'] = function(block) {
+export const defineGenerators = () => {  // Gerador: Mover Frente
+  javascriptGenerator.forBlock['maze_move_forward'] = function() {
     return 'await moveForward();\n';
   };
   // Gerador: Virar à Esquerda
-  javascriptGenerator.forBlock['maze_turn_left'] = function(block) {
+  javascriptGenerator.forBlock['maze_turn_left'] = function() {
     return 'await turnLeft();\n';
   };
   // Gerador: Virar à Direita
-  javascriptGenerator.forBlock['maze_turn_right'] = function(block) {
+  javascriptGenerator.forBlock['maze_turn_right'] = function() {
     return 'await turnRight();\n';
   };  // Gerador: Repetir
   javascriptGenerator.forBlock['maze_repeat'] = function(block) {
@@ -211,9 +210,8 @@ export const defineGenerators = () => {
     const doStatements = javascriptGenerator.statementToCode(block, 'DO0');
     const elseStatements = javascriptGenerator.statementToCode(block, 'ELSE');
     return `if (${condition}) {\n${doStatements}} else {\n${elseStatements}}\n`;
-  };
-  // Gerador: Há caminho
-  javascriptGenerator.forBlock['maze_path_ahead'] = function(block) {
+  };  // Gerador: Há caminho
+  javascriptGenerator.forBlock['maze_path_ahead'] = function() {
     return ['isPathAhead()', javascriptGenerator.ORDER_FUNCTION_CALL];
   };
 };

@@ -7,7 +7,7 @@ const GameArea = ({
   className = ''
 }) => {
   return (
-    <div className={'card game-card blockly-editor-card h-100 border-0 rounded-0'}>
+    <div className={`card game-card blockly-editor-card h-100 border-0 rounded-0 ${className}`}>
       <div className="card-body p-0 d-flex flex-column overflow-hidden">        
         <div className="game-display flex-grow-1 position-relative overflow-hidden">
           <Container fluid className="h-100 p-2 d-flex align-items-center justify-content-center" style={{

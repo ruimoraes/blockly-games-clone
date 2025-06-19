@@ -18,21 +18,18 @@ const BaseGame = ({
   // Dados da fase
   currentPhase,
   totalPhases,
-  currentPhaseData = {},
-
-  // Estados
+  currentPhaseData = {},  // Estados
   isExecuting = false,
-  gameState = 'idle',
+  // gameState = 'idle', // TODO: implementar uso do gameState
 
   // Conteúdo específico do jogo
   editorComponent,
   gameAreaComponent,
   additionalComponents = [],
-
   // Ações para navegação de fases
   onPhaseChange,
-  onNextPhase,
-  onPreviousPhase,
+  onNextPhase, // eslint-disable-line no-unused-vars
+  onPreviousPhase, // eslint-disable-line no-unused-vars
   // Configurações de layout
   isMobile = false,
   enableMobileTabs = true,

@@ -10,9 +10,9 @@ import './GameInfo.css';
  */
 const GameInfo = ({
   phaseData = {},
-  isExecuting = false,
+  // isExecuting = false, // TODO: implementar indicador visual durante execução
   className = ''
-}) => {  return (
+}) => {return (
     <div className={`game-info bg-light border-bottom ${className}`}>
       <Container fluid >
         <Row className="align-items-center">
@@ -41,7 +41,7 @@ GameInfo.propTypes = {
     description: PropTypes.string,
     maxBlocks: PropTypes.number
   }),
-  isExecuting: PropTypes.bool,
+  // isExecuting: PropTypes.bool, // removido temporariamente
   className: PropTypes.string
 };
 

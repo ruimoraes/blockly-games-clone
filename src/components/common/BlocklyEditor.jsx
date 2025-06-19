@@ -2,7 +2,6 @@ import React, { useRef, useEffect, forwardRef, useImperativeHandle, useMemo } fr
 import PropTypes from 'prop-types';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
-import { Container } from 'react-bootstrap';
 
 /**
  * Componente genérico de Editor Blockly para jogos
@@ -24,7 +23,7 @@ const BlocklyEditor = forwardRef(({
   onWorkspaceChange,
   options = {},
   initialBlocks,
-  isExecuting = false,
+  // isExecuting = false, // TODO: implementar indicador visual durante execução
   title = "Editor de Blocos Blockly"
 }, ref) => {
   const blocklyDiv = useRef(null);
@@ -257,13 +256,12 @@ BlocklyEditor.displayName = 'BlocklyEditor';
 BlocklyEditor.propTypes = {
   toolbox: PropTypes.object.isRequired,
   onCodeChange: PropTypes.func,
-  onWorkspaceChange: PropTypes.func,
-  options: PropTypes.object,
+  onWorkspaceChange: PropTypes.func,  options: PropTypes.object,
   initialBlocks: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.array
   ]),
-  isExecuting: PropTypes.bool,
+  // isExecuting: PropTypes.bool, // removido temporariamente
   title: PropTypes.string
 };
 

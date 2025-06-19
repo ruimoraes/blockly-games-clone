@@ -9,13 +9,13 @@ on:
       - develop
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: "20"
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     name: Build and Test on Develop
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -49,7 +49,7 @@ jobs:
     needs: build-and-test
     if: github.event_name == 'push' && github.ref_name == 'develop'
     name: Create PR to Main
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,7 +90,6 @@ jobs:
             ${{ steps.commits.outputs.commits }}
             
             This PR was automatically created after a successful build on the develop branch.
-            Please review and merge when ready for release." \
-            --label "automated,release"
+            Please review and merge when ready for release."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

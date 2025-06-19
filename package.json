@@ -34,7 +34,7 @@
   "dependencies": {
     "blockly": "^12.1.0",
     "bootstrap": "^5.3.6",
-    "lucide-react": "^0.510.0",
+    "lucide-react": "^0.517.0",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",

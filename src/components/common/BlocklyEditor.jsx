@@ -2,6 +2,7 @@ import React, { useRef, useEffect, forwardRef, useImperativeHandle, useMemo } fr
 import PropTypes from 'prop-types';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
+import { Container } from 'react-bootstrap';
 
 /**
  * Componente genérico de Editor Blockly para jogos
@@ -34,19 +35,18 @@ const BlocklyEditor = forwardRef(({
     const gameId = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
     return `blockly-workspace-${gameId}`;
   }, [title]);
-  
-  // Configurações padrão do Blockly
+    // Configurações padrão do Blockly
   const defaultOptions = useMemo(() => ({
     toolbox: toolbox,
     scrollbars: true,
     trashcan: true,
     zoom: {
-      controls: true,
-      wheel: false,
+      controls: false, // Removido controles de zoom
+      wheel: false,    // Evitar zoom com a roda do mouse
       startScale: 1.0,
-      maxScale: 3,
-      minScale: 0.3,
-      scaleSpeed: 1.2
+      maxScale: 1.0,   // Impedir zoom para aumentar
+      minScale: 0.8,   // Permitir apenas um zoom out limitado
+      scaleSpeed: 1.0  // Velocidade neutra
     },
     grid: {
       spacing: 25,
@@ -234,31 +234,17 @@ const BlocklyEditor = forwardRef(({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  return (
-    <div className="card game-card h-100">
-      <div className="card-header">
-        <h5 className="mb-0">{title}</h5>
-        <div className="status-badges">
-          <span className={`badge ${workspace.current ? 'bg-success' : 'bg-warning'}`}>
-            {workspace.current ? 'Pronto' : 'Carregando...'}
-          </span>
-          {isExecuting && (
-            <span className="badge bg-info ms-2">
-              Executando...
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="card-body p-0">
+  }, []);  return (
+    <div className="card game-card blockly-editor-card h-100 border-0 rounded-0">
+      <div className="card-body p-0 d-flex flex-column overflow-hidden">
         <div 
           ref={blocklyDiv} 
-          className="blockly-editor"
+          className="blockly-editor flex-grow-1"
           style={{ 
-            height: '400px', 
             width: '100%',
-            minHeight: '300px'
+            minHeight: '300px',
+            position: 'relative',
+            overflow: 'hidden'
           }}
         />
       </div>

@@ -103,23 +103,13 @@ function MazeGame() {
     isExecuting={isExecuting}
     title="Editor de Blocos - Labirinto" />
   );
-
   const gameAreaComponent = (
     <GameArea
       gameState={gameState}
-      title="Labirinto"
-      phaseNumber={currentPhase}
       className="maze-game-area"
       onRunCode={handleRunCode}
       onResetGame={handleResetGame}
       isExecuting={isExecuting}
-      footerInfo={
-        <>
-          <span className="d-block d-sm-inline">Posição: ({playerPosition.x}, {playerPosition.y})</span>
-          <span className="d-none d-sm-inline"> | </span>
-          <span className="d-block d-sm-inline">Direção: {['Norte', 'Leste', 'Sul', 'Oeste'][playerPosition.direction]}</span>
-        </>
-      }
     >
       <MazeRenderer
         mazeData={mazeData}
@@ -134,7 +124,7 @@ function MazeGame() {
   return (
     <BaseGame
       // Configuração do jogo
-      gameTitle="Jogo do Labirinto"
+      gameTitle="Labirinto"
       gameIcon="🧩"
       gameDescription="Aprenda programação visual guiando um personagem através de labirintos"
 
@@ -163,7 +153,6 @@ function MazeGame() {
       // Configurações de layout
       isMobile={isMobile}
       enableMobileTabs={true}
-      editorTitle="Editor de Blocos"
       gameAreaTitle="Labirinto"
 
       // Sistema de fases

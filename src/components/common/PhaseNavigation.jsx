@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Badge } from 'react-bootstrap';
-import { ChevronLeft, ChevronRight, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import './PhaseNavigation.css';
 
 /**
  * Componente de navegação simples entre fases adjacentes
@@ -17,38 +18,33 @@ export function PhaseNavigation({
   totalPhases
 }) {
   return (
-    <Card className="phase-navigation mb-3">
-      <Card.Body className="py-3">
+    <Card className="phase-navigation">
+      <Card.Body>
         <div className="d-flex justify-content-between align-items-center">
           <Button
-            variant="outline-primary"
+            variant="outline-brand-primary"
             onClick={onPrevious}
             disabled={isExecuting || currentPhase === 1}
             className="d-flex align-items-center gap-2"
+            size="sm"
           >
             <ChevronLeft size={16} />
             <span className="d-none d-sm-inline">Fase Anterior</span>
             <span className="d-sm-none">Anterior</span>
-          </Button>
-
-          <div className="text-center flex-grow-1 mx-3">
-            <div className="d-flex align-items-center justify-content-center gap-2 mb-1">
-              <Target size={18} className="text-primary" />
-              <strong className="h6 mb-0">{phaseData.name}</strong>
-            </div>
-            <p className="text-muted small mb-2">{phaseData.description}</p>
+          </Button>          <div className="text-center flex-grow-1 mx-2 mx-sm-3">
             {phaseData.maxBlocks !== Infinity && (
-              <Badge bg="warning" text="dark" className="small">
-                Máximo: {phaseData.maxBlocks} blocos
+              <Badge bg="brand-accent" pill className="small">
+                Máx: {phaseData.maxBlocks} blocos
               </Badge>
             )}
           </div>
-
+          
           <Button
-            variant="outline-primary"
+            variant={canAdvance && currentPhase < totalPhases ? "brand-primary" : "outline-brand-primary"}
             onClick={onNext}
             disabled={isExecuting || !canAdvance || currentPhase >= totalPhases}
             className="d-flex align-items-center gap-2"
+            size="sm"
           >
             <span className="d-none d-sm-inline">Próxima Fase</span>
             <span className="d-sm-none">Próxima</span>

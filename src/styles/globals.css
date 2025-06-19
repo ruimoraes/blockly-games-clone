@@ -1,5 +1,7 @@
 /* ===== FRAMEWORK IMPORTS ===== */
 @import 'bootstrap/dist/css/bootstrap.min.css';
+@import './fix-card-borders.css';
+@import './game-area-controls.css';
 
 /* ===== GLOBAL DESIGN SYSTEM ===== */
 :root {
@@ -304,8 +306,14 @@ body {
     padding-right: 1rem;
   }
   
-  .card-body {
+  /* Ajustando padding para cards que não explicitamente definiram padding zero */
+  .card-body:not(.p-0) {
     padding: 1.5rem !important;
+  }
+  
+  /* Garantir que cards com padding zero permaneçam assim */
+  .card-body.p-0 {
+    padding: 0 !important;
   }
   
   .btn-lg {
@@ -843,10 +851,10 @@ body {
   .mobile-layout .tab-content {
     min-height: 500px;
   }
-
   .mobile-layout .card {
-    border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
+    border-radius: 0 !important;
+    border: none !important;
   }
 }
 
@@ -856,4 +864,134 @@ body {
   display: block !important;
   visibility: visible !important;
   position: relative !important;
+}
+
+/* ===== LAYOUT CONTAINERS ===== */
+.card.game-card, .card.h-100 {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.card-body {
+  flex: 1 1 auto;
+}
+
+.card-body.overflow-hidden {
+  overflow: hidden !important;
+}
+
+/* Remover bordas e cantos arredondados dos componentes de jogo */
+.game-area .card,
+.blockly-editor-card,
+.game-display,
+.game-content-wrapper,
+.game-footer .card {
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.card-footer {
+  background-color: white !important;
+  border-top: 1px solid var(--border) !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: none !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1002 !important;
+}
+
+/* Desativar efeito de hover para o card do editor de blocos */
+.blockly-editor-card.game-card:hover,
+.blockly-editor-card:hover {
+  transform: none;
+  box-shadow: var(--shadow-md);
+}
+
+.blockly-editor-card.game-card:hover .game-icon {
+  transform: none;
+}
+
+/* Estilos específicos para o GameArea */
+.game-display {
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+}
+
+/* Estilos específicos para o BlocklyEditor */
+.blockly-editor {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+/* Garantir que os elementos dentro do SVG do Blockly não ultrapassem */
+.blocklyDropdownDiv {
+  position: fixed;
+}
+
+.blocklyTooltipDiv {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Estilos para o footer fixo de navegação */
+.game-footer {
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(237,27,47,0.05) 100%);
+  border-top: 1px solid rgba(237,27,47,0.1);
+}
+
+/* Ajustes de altura para garantir que o conteúdo se ajuste sem scroll vertical */
+.base-game {
+  display: flex;
+  flex-direction: column;
+}
+
+.phase-navigation {
+  border: none !important;
+  border-top: 3px solid var(--brand-primary) !important;
+  border-radius: 0 !important;
+}
+
+.phase-navigation .card-body {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.phase-navigation .text-brand-primary {
+  color: var(--brand-primary) !important;
+}
+
+.phase-navigation .badge.bg-brand-accent {
+  background-color: var(--brand-accent) !important;
+  color: white !important;
+}
+
+/* Ajustes para telas pequenas */
+@media (max-width: 576px) {
+  .phase-navigation .card-body {
+    padding: 0.5rem;
+  }
+  
+  .phase-navigation .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .phase-navigation .text-muted.small {
+    font-size: 0.75rem;
+  }
 }

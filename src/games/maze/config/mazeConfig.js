@@ -1,7 +1,7 @@
 // Configuração do jogo Maze
 export const MAZE_GAME_CONFIG = {
   gameId: 'maze',
-  gameName: 'Jogo do Labirinto',
+  gameName: 'Labirinto',
   phases: [
     {
       level: 1,

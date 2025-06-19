@@ -85,8 +85,6 @@ function PuzzleGame() {
   const gameAreaComponent = (
     <GameArea
       gameState={gameState}
-      title="Puzzle"
-      phaseNumber={currentPhase}
       className="puzzle-game-area"
       onRunCode={checkSolution}
       onResetGame={resetPuzzle}

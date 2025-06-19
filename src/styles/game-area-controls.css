@@ -1,0 +1,125 @@
+/* Garantir que controles do GameArea sejam sempre visíveis */
+
+/* Estrutura principal do GameArea */
+.game-area .card,
+.maze-game-area .card,
+.puzzle-game-area .card {
+  position: relative;
+  z-index: 1001;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 400px; /* Altura mínima para garantir usabilidade */
+}
+
+/* Card body - área principal do jogo */
+.game-area .card-body,
+.maze-game-area .card-body,
+.puzzle-game-area .card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0; /* Importante para flexbox */
+}
+
+/* Área de display do jogo - ocupa espaço disponível */
+.game-area .game-display,
+.maze-game-area .game-display,
+.puzzle-game-area .game-display {
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 200px; /* Altura mínima para o conteúdo do jogo */
+}
+
+/* Footer dos cards - sempre visível no final */
+.game-area .card-footer,
+.maze-game-area .card-footer,
+.puzzle-game-area .card-footer {
+  position: relative !important;
+  z-index: 1003 !important;
+  background-color: white !important;
+  border-top: 1px solid var(--border) !important;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.1) !important;
+  flex-shrink: 0 !important; /* Nunca encolhe */
+  margin-top: auto !important; /* Empurra para o final */
+  min-height: 60px !important; /* Altura mínima para os controles */
+}
+
+/* Container do conteúdo do jogo */
+.game-area .game-display .container-fluid,
+.maze-game-area .game-display .container-fluid,
+.puzzle-game-area .game-display .container-fluid {
+  height: 100%;
+  overflow: auto; /* Permite scroll no conteúdo se necessário */
+}
+
+/* Responsividade para telas muito pequenas */
+@media (max-width: 576px) {
+  .game-area .card,
+  .maze-game-area .card,
+  .puzzle-game-area .card {
+    min-height: 300px; /* Altura menor para mobile */
+  }
+  
+  .game-area .game-display,
+  .maze-game-area .game-display,
+  .puzzle-game-area .game-display {
+    min-height: 150px; /* Altura menor para o conteúdo em mobile */
+  }
+  
+  .game-area .card-footer,
+  .maze-game-area .card-footer,
+  .puzzle-game-area .card-footer {
+    padding: 0.5rem !important;
+    min-height: 50px !important;
+  }
+}
+
+/* Para telas médias */
+@media (min-width: 577px) and (max-width: 768px) {
+  .game-area .card,
+  .maze-game-area .card,
+  .puzzle-game-area .card {
+    min-height: 350px;
+  }
+}
+
+/* Para telas grandes - garantir que não haja desperdício de espaço */
+@media (min-width: 992px) {
+  .game-area .card,
+  .maze-game-area .card,
+  .puzzle-game-area .card {
+    min-height: 500px;
+  }
+  
+  .game-area .game-display,
+  .maze-game-area .game-display,
+  .puzzle-game-area .game-display {
+    min-height: 300px;
+  }
+}
+
+/* Regras especiais para evitar sobreposição entre PhaseNavigation e GameArea controles */
+.base-game .main-content {
+  /* Garante espaço suficiente para ambos os footers */
+  padding-bottom: 80px; /* Espaço para PhaseNavigation + margem */
+}
+
+/* Quando PhaseNavigation estiver ativo, ajustar espaçamento */
+.phase-navigation + * .card-footer,
+.phase-navigation ~ * .card-footer {
+  margin-bottom: 70px !important; /* Espaço para não sobrepor o PhaseNavigation */
+}
+
+/* Em telas muito pequenas, ajustar ainda mais */
+@media (max-width: 576px) {
+  .base-game .main-content {
+    padding-bottom: 70px;
+  }
+  
+  .phase-navigation {
+    height: 50px;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import BaseGame from '../../components/common/BaseGame';
 import BlocklyEditor from '../../components/common/BlocklyEditor';
 import GameArea from '../../components/common/GameArea';
@@ -16,6 +16,8 @@ function MazeGame() {
   // Estado local para mobile e código gerado
   const [isMobile, setIsMobile] = useState(false);
   const [generatedCode, setGeneratedCode] = useState('');
+  // Referência para o editor Blockly
+  const blocklyEditorRef = useRef(null);
 
   // Estabilizar a função de callback para evitar re-renderizações
   const handleCodeChange = useCallback((code) => {
@@ -34,7 +36,7 @@ function MazeGame() {
     playerPosition,
     isExecuting,
     mazeData,
-    
+
     // Dados da fase (vem da base genérica)
     currentPhase,
     currentPhaseData,
@@ -42,11 +44,11 @@ function MazeGame() {
     unlockedPhases,
     completedPhases,
     gameConfig,
-    
+
     // Ações do jogo
     executeCode,
     resetGame,
-    
+
     // Ações de fase (vem da base genérica)
     handlePhaseChange,
     handleNextPhase,
@@ -63,21 +65,54 @@ function MazeGame() {
     checkIsMobile();
     window.addEventListener('resize', checkIsMobile);
     return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);  // Componentes específicos do jogo
+  }, []);  
+  
+  // Salvar explicitamente o workspace antes de executar código
+  // para garantir que não seja perdido durante a execução
+  const handleRunCode = useCallback(() => {
+    // Tentar salvar o workspace antes de executar
+    if (blocklyEditorRef.current) {
+      blocklyEditorRef.current.saveWorkspace();
+    }
+    executeCode(generatedCode || '');
+  }, [executeCode, generatedCode]);
+  
+  // Handler para garantir que o workspace seja preservado ao resetar o jogo
+  const handleResetGame = useCallback(() => {
+    // Certificar que o workspace está salvo antes de resetar
+    if (blocklyEditorRef.current) {
+      blocklyEditorRef.current.saveWorkspace();
+    }
+    // Reset apenas o estado do jogo, não o workspace
+    resetGame();
+    
+    // Opcional: restaurar o workspace após o reset para garantir
+    setTimeout(() => {
+      if (blocklyEditorRef.current) {
+        blocklyEditorRef.current.restoreWorkspace();
+      }
+    }, 50);
+  }, [resetGame]);
+  
+  // Componentes específicos do jogo  
   const editorComponent = (
-    <BlocklyEditor
-      toolbox={toolboxConfig}
-      onCodeChange={handleCodeChange}
-      isExecuting={isExecuting}
-      title="Editor de Blocos - Labirinto"
-    />
+  <BlocklyEditor
+    ref={blocklyEditorRef}
+    toolbox={toolboxConfig}
+    onCodeChange={handleCodeChange}
+    isExecuting={isExecuting}
+    title="Editor de Blocos - Labirinto" />
   );
+
   const gameAreaComponent = (
     <GameArea
       gameState={gameState}
       title="Labirinto"
       phaseNumber={currentPhase}
       className="maze-game-area"
+      onRunCode={handleRunCode}
+      onResetGame={handleResetGame}
+      isExecuting={isExecuting}
       footerInfo={
         <>
           <span className="d-block d-sm-inline">Posição: ({playerPosition.x}, {playerPosition.y})</span>
@@ -91,7 +126,7 @@ function MazeGame() {
         playerPosition={playerPosition}
         gameState={gameState}
       />
-    </GameArea>  );
+    </GameArea>);
 
   // Componentes adicionais - removido código gerado para simplificar interface
   const additionalComponents = [];
@@ -102,46 +137,46 @@ function MazeGame() {
       gameTitle="Jogo do Labirinto"
       gameIcon="🧩"
       gameDescription="Aprenda programação visual guiando um personagem através de labirintos"
-      
+
       // Dados da fase
       currentPhase={currentPhase}
       totalPhases={totalPhases}
       currentPhaseData={currentPhaseData}
-      
+
       // Estados
       isExecuting={isExecuting}
       gameState={gameState}
       generatedCode={generatedCode}
-      
+
       // Conteúdo específico do jogo
       editorComponent={editorComponent}
       gameAreaComponent={gameAreaComponent}
       additionalComponents={additionalComponents}
-      
+
       // Ações
-      onRunCode={() => executeCode(generatedCode || '')}
-      onResetGame={resetGame}
+      onRunCode={handleRunCode}
+      onResetGame={handleResetGame}
       onPhaseChange={handlePhaseChange}
       onNextPhase={handleNextPhase}
       onPreviousPhase={handlePreviousPhase}
-      
+
       // Configurações de layout
       isMobile={isMobile}
       enableMobileTabs={true}
       editorTitle="Editor de Blocos"
       gameAreaTitle="Labirinto"
-      
+
       // Sistema de fases
       unlockedPhases={unlockedPhases}
       completedPhases={completedPhases}
       getPhaseData={getPhaseData}
       gameConfig={gameConfig}
-      
+
       // Configurações do header
       showPhaseSelectorProp={true}
       showHomeButton={true}
       showBackButton={true}
-      
+
       // Classe CSS específica
       className="maze-game"
     />

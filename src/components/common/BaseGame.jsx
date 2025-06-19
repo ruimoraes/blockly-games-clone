@@ -1,13 +1,8 @@
-
-
-
-
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Container, Row, Col, Nav } from 'react-bootstrap';
 import GameHeader from './GameHeader';
 import GameInfo from './GameInfo';
-import GameControls from './GameControls';
 import PhaseSelector from './PhaseSelector';
 
 /**
@@ -24,19 +19,17 @@ const BaseGame = ({
   currentPhase,
   totalPhases,
   currentPhaseData = {},
-    // Estados
+  
+  // Estados
   isExecuting = false,
   gameState = 'idle',
-  generatedCode = '',
   
   // Conteúdo específico do jogo
   editorComponent,
   gameAreaComponent,
   additionalComponents = [],
   
-  // Ações
-  onRunCode,
-  onResetGame,
+  // Ações para navegação de fases - usados abaixo
   onPhaseChange,
   onNextPhase,
   onPreviousPhase,
@@ -54,13 +47,13 @@ const BaseGame = ({
   gameConfig = {},
   
   // Controles customizados
-  customControls = [],
   customHeaderContent,
   
   // Callbacks de navegação
   onGoHome,
   onGoBack,
-    // Configurações do header
+  
+  // Configurações do header
   showPhaseSelectorProp = true,
   showHomeButton = true,
   showBackButton = true,
@@ -117,8 +110,8 @@ const BaseGame = ({
         isExecuting={isExecuting}
         onShowPhaseSelector={() => setShowPhaseSelector(true)}
         showPhaseSelector={showPhaseSelectorProp}
-      />      {/* Conteúdo principal */}
-      <Container fluid className="py-4">
+      />      {/* Conteúdo principal - com margem para o header fixo */}
+      <Container fluid className="py-4 mt-5">
         {/* Layout Principal */}
         {isMobile && enableMobileTabs ? (
           // Layout Mobile com Abas
@@ -140,11 +133,13 @@ const BaseGame = ({
                   🎮 {gameAreaTitle}
                 </Nav.Link>
               </Nav.Item>
-            </Nav>
-
-            <div className="tab-content">
-              {activeTab === 'editor' && editorComponent}
-              {activeTab === 'game' && gameAreaComponent}
+            </Nav>            <div className="tab-content">
+              <div style={{ display: activeTab === 'editor' ? 'block' : 'none' }}>
+                {editorComponent}
+              </div>
+              <div style={{ display: activeTab === 'game' ? 'block' : 'none' }}>
+                {gameAreaComponent}
+              </div>
             </div>
           </div>
         ) : (          // Layout Desktop (duas colunas)
@@ -153,7 +148,7 @@ const BaseGame = ({
               {editorComponent}
             </Col>
             <Col key="game-area-col" lg={6} className="order-1 order-lg-2">
-              {gameAreaComponent}
+              {gameAreaComponent}                        
             </Col>
           </Row>
         )}
@@ -167,19 +162,7 @@ const BaseGame = ({
               </Col>
             ))}
           </Row>
-        )}
-
-        {/* Controles do jogo */}
-        <Row className="mt-4">
-          <Col>            <GameControls
-              onRunCode={onRunCode}
-              onResetGame={onResetGame}
-              isExecuting={isExecuting}
-              hasCode={Boolean(generatedCode?.trim())}
-              customButtons={customControls}
-            />
-          </Col>
-        </Row>
+        )}        {/* Controles do jogo movidos para o GameArea */}
 
         {/* Navegação entre fases */}
         <Row className="mt-4">
@@ -245,10 +228,10 @@ BaseGame.propTypes = {
   currentPhase: PropTypes.number.isRequired,
   totalPhases: PropTypes.number.isRequired,
   currentPhaseData: PropTypes.object,
-    // Estados
+  
+  // Estados
   isExecuting: PropTypes.bool,
   gameState: PropTypes.oneOf(['idle', 'running', 'success', 'failure']),
-  generatedCode: PropTypes.string,
   
   // Conteúdo específico
   editorComponent: PropTypes.node.isRequired,
@@ -257,10 +240,7 @@ BaseGame.propTypes = {
     content: PropTypes.node.isRequired,
     colProps: PropTypes.object
   })),
-  
-  // Ações
-  onRunCode: PropTypes.func.isRequired,
-  onResetGame: PropTypes.func.isRequired,
+    // Ações de fase
   onPhaseChange: PropTypes.func,
   onNextPhase: PropTypes.func,
   onPreviousPhase: PropTypes.func,
@@ -276,13 +256,12 @@ BaseGame.propTypes = {
   completedPhases: PropTypes.array,
   getPhaseData: PropTypes.func,
   gameConfig: PropTypes.object,
-  
-  // Customização
-  customControls: PropTypes.array,
+    // Customização
   customHeaderContent: PropTypes.node,
   onGoHome: PropTypes.func,
   onGoBack: PropTypes.func,
-    // Configurações do header
+  
+  // Configurações do header
   showPhaseSelectorProp: PropTypes.bool,
   showHomeButton: PropTypes.bool,
   showBackButton: PropTypes.bool,

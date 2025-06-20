@@ -3,16 +3,12 @@ import PropTypes from 'prop-types';
 
 const GameArea = ({
   children
-}) => {  return (
-    <div>
-      <div>        
-        <div>
-          <div>
-            <div>
-              {children}
-            </div>
-          </div>
-        </div>
+}) => {
+  return (
+    <div className="h-full flex flex-col">
+      {/* Área principal do jogo */}
+      <div className="flex-1 overflow-hidden">
+        {children}
       </div>
     </div>
   );

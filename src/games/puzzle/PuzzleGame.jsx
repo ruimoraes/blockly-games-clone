@@ -70,24 +70,26 @@ function PuzzleGame() {
           Conecte os blocos de propriedades aos blocos de animais.
         </p>
       </div>
-      
-      <BlocklyEditor
+        <BlocklyEditor
         toolbox={PUZZLE_TOOLBOX}
         onWorkspaceChange={handleWorkspaceChange}
         initialBlocks={null}
         title="Editor de Blocos do Puzzle"
+        // Props do GameControls
+        onRunCode={checkSolution}
+        onResetGame={resetPuzzle}
+        isExecuting={isExecuting}
+        gameState={gameState}
+        runButtonText="Verificar Solução"
+        resetButtonText="Reiniciar Puzzle"
       />
     </div>
   );
-
   // Componente da área do jogo
   const gameAreaComponent = (
     <GameArea
       gameState={gameState}
       className="puzzle-game-area"
-      onRunCode={checkSolution}
-      onResetGame={resetPuzzle}
-      isExecuting={isExecuting}
     >
       <PuzzleDisplay animalStates={animalStates} />
     </GameArea>

@@ -1,7 +1,63 @@
-import React, { useRef, useEffect, forwardRef, useImperativeHandle, useMemo } from 'react';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
+import GameControls from './GameControls';
+import { Play, RotateCcw, Loader, Puzzle } from 'lucide-react';
+
+/**
+ * Componente customizado de controles para o footer do BlocklyEditor
+ * Versão simplificada e estilizada do GameControls
+ */
+const GameControlsCustom = ({
+  onRunCode,
+  onResetGame,
+  isExecuting = false,
+  gameState = 'idle',
+  runButtonText = 'Executar Código',
+  resetButtonText = 'Reiniciar Jogo'
+}) => {
+  // Determina se o jogo precisa ser reiniciado (após sucesso ou falha)
+  const needsReset = gameState === 'success' || gameState === 'failure';
+  
+  // Handler para o botão que muda de comportamento
+  const handleButtonClick = () => {
+    if (needsReset) {
+      onResetGame();
+    } else {
+      onRunCode();
+    }
+  };
+
+  return (    <button
+      onClick={handleButtonClick}
+      disabled={isExecuting}
+      className={`flex items-center space-x-1.5 lg:space-x-3 px-4 py-2 lg:px-8 lg:py-4 rounded-full font-medium transition-all duration-200 shadow-md ${
+        isExecuting
+          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          : needsReset
+            ? 'bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white shadow-orange-200'
+            : 'bg-gradient-to-r from-red-500 via-pink-500 to-purple-600 hover:from-red-600 hover:via-pink-600 hover:to-purple-700 text-white shadow-red-200'
+      } ${!isExecuting ? 'hover:scale-105 hover:shadow-lg' : ''}`}
+    >      {isExecuting ? (
+        <>
+          <Loader className="w-3.5 h-3.5 lg:w-5 lg:h-5 animate-spin" />
+          <span className="text-xs lg:text-base font-medium">Executando...</span>
+        </>
+      ) : needsReset ? (
+        <>
+          <RotateCcw className="w-3.5 h-3.5 lg:w-5 lg:h-5" />
+          <span className="text-xs lg:text-base font-medium">{resetButtonText}</span>
+        </>
+      ) : (
+        <>
+          <Play className="w-3.5 h-3.5 lg:w-5 lg:h-5" />
+          <span className="text-xs lg:text-base font-medium">{runButtonText}</span>
+        </>
+      )}
+    </button>
+  );
+};
 
 /**
  * Componente genérico de Editor Blockly para jogos
@@ -23,13 +79,21 @@ const BlocklyEditor = forwardRef(({
   onWorkspaceChange,
   options = {},
   initialBlocks,
-  // isExecuting = false, // TODO: implementar indicador visual durante execução
-  title = "Editor de Blocos Blockly",
+  title = "Editor de Blocos Blockly",  // Props do GameControls
+  onRunCode,
+  onResetGame,
+  isExecuting = false,
+  gameState = 'idle',
+  runButtonText = 'Executar Código',
+  resetButtonText = 'Reiniciar Jogo',
   footerButtons = null
-}, ref) => {  const blocklyDiv = useRef(null);
+}, ref) => {const blocklyDiv = useRef(null);
   const workspace = useRef(null);
   const isInitialized = useRef(false); // Flag para evitar dupla inicialização
-  const initTimeoutRef = useRef(null); // Para controlar timeouts  // Identificador único para este editor (útil para múltiplos jogos)
+  const initTimeoutRef = useRef(null); // Para controlar timeouts
+  const [currentBlockCount, setCurrentBlockCount] = useState(0); // Estado para contador de blocos
+
+  // Identificador único para este editor (útil para múltiplos jogos)
   const storageKey = useMemo(() => {
     // Usar parte do título como identificador
     const gameId = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
@@ -120,9 +184,12 @@ const BlocklyEditor = forwardRef(({
           } catch (error) {
             console.warn('Erro ao restaurar workspace:', error);
           }
-          
-          // Listener para mudanças no workspace
+            // Listener para mudanças no workspace
           workspace.current.addChangeListener(() => {
+            // Contar blocos no workspace
+            const blocks = workspace.current.getAllBlocks(false);
+            setCurrentBlockCount(blocks.length);
+            
             if (onWorkspaceChange) {
               onWorkspaceChange(workspace.current);
             }
@@ -280,17 +347,41 @@ const BlocklyEditor = forwardRef(({
           className="h-full w-full"
           style={{ minHeight: '400px', minWidth: '300px' }}
         />
-      </div>
-      
-      {/* Footer para botões do editor */}
-      <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3">
-        <div className="flex items-center justify-center space-x-3">
-          {footerButtons || (
+      </div>      {/* Footer para botões do editor */}
+      <div className="flex-shrink-0 bg-gradient-to-r from-gray-50 to-white border-t border-gray-200">
+        {footerButtons || (onRunCode && onResetGame) ? (
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">              {/* Lado esquerdo: Contador de blocos */}              <div className="flex items-center space-x-2 lg:space-x-3 text-gray-600">
+                <div className="w-5 h-5 lg:w-7 lg:h-7 bg-gradient-to-br from-red-500 via-pink-500 to-purple-600 rounded-md flex items-center justify-center">
+                  <Puzzle className="w-3 h-3 lg:w-4 lg:h-4 text-white" />
+                </div>
+                <span className="text-sm lg:text-base font-medium">
+                  {currentBlockCount} {currentBlockCount === 1 ? 'bloco' : 'blocos'}
+                </span>
+              </div>
+
+              {/* Lado direito: GameControls customizado */}
+              <div className="flex items-center">
+                {footerButtons || (
+                  <GameControlsCustom
+                    onRunCode={onRunCode}
+                    onResetGame={onResetGame}
+                    isExecuting={isExecuting}
+                    gameState={gameState}
+                    runButtonText={runButtonText}
+                    resetButtonText={resetButtonText}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="p-3 flex items-center justify-center">
             <div className="text-gray-400 text-sm">
               Área reservada para controles do editor de blocos
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -301,14 +392,21 @@ BlocklyEditor.displayName = 'BlocklyEditor';
 BlocklyEditor.propTypes = {
   toolbox: PropTypes.object.isRequired,
   onCodeChange: PropTypes.func,
-  onWorkspaceChange: PropTypes.func,  options: PropTypes.object,
+  onWorkspaceChange: PropTypes.func,
+  options: PropTypes.object,
   initialBlocks: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.array
   ]),
-  // isExecuting: PropTypes.bool, // removido temporariamente
   title: PropTypes.string,
-  footerButtons: PropTypes.node
+  footerButtons: PropTypes.node,
+  // Props do GameControls
+  onRunCode: PropTypes.func,
+  onResetGame: PropTypes.func,
+  isExecuting: PropTypes.bool,
+  gameState: PropTypes.oneOf(['idle', 'running', 'success', 'failure']),
+  runButtonText: PropTypes.string,
+  resetButtonText: PropTypes.string
 };
 
 // Memoizar o componente para evitar re-renderizações desnecessárias

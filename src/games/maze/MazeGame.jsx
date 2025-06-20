@@ -93,30 +93,32 @@ function MazeGame() {
       }
     }, 50);
   }, [resetGame]);
-  
-  // Componentes específicos do jogo  
+    // Componentes específicos do jogo  
   const editorComponent = (
   <BlocklyEditor
     ref={blocklyEditorRef}
     toolbox={toolboxConfig}
     onCodeChange={handleCodeChange}
     isExecuting={isExecuting}
-    title="Editor de Blocos - Labirinto" />
-  );
-  const gameAreaComponent = (
+    title="Editor de Blocos - Labirinto"    // Props do GameControls
+    onRunCode={handleRunCode}
+    onResetGame={handleResetGame}
+    gameState={gameState}
+    runButtonText="Executar Blocos"
+    resetButtonText="Reiniciar Labirinto"
+  />
+  );  const gameAreaComponent = (
     <GameArea
       gameState={gameState}
       className="maze-game-area"
-      onRunCode={handleRunCode}
-      onResetGame={handleResetGame}
-      isExecuting={isExecuting}
     >
       <MazeRenderer
         mazeData={mazeData}
         playerPosition={playerPosition}
         gameState={gameState}
       />
-    </GameArea>);
+    </GameArea>
+  );
 
   // Componentes adicionais - removido código gerado para simplificar interface
   const additionalComponents = [];

@@ -141,6 +141,7 @@ const BaseGame = ({
                 <div className="flex flex-col space-y-6 overflow-hidden">
                   <div className="glass-panel flex-1 p-4 overflow-hidden">
                     {editorComponent}
+                    
                   </div>
                 </div>
                 <div className="flex flex-col space-y-6 overflow-hidden">

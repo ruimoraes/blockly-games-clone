@@ -24,111 +24,149 @@ const BlocklyEditor = forwardRef(({
   options = {},
   initialBlocks,
   // isExecuting = false, // TODO: implementar indicador visual durante execução
-  title = "Editor de Blocos Blockly"
-}, ref) => {
-  const blocklyDiv = useRef(null);
+  title = "Editor de Blocos Blockly",
+  footerButtons = null
+}, ref) => {  const blocklyDiv = useRef(null);
   const workspace = useRef(null);
-  // Identificador único para este editor (útil para múltiplos jogos)
+  const isInitialized = useRef(false); // Flag para evitar dupla inicialização
+  const initTimeoutRef = useRef(null); // Para controlar timeouts  // Identificador único para este editor (útil para múltiplos jogos)
   const storageKey = useMemo(() => {
     // Usar parte do título como identificador
     const gameId = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
     return `blockly-workspace-${gameId}`;
   }, [title]);
-    // Configurações padrão do Blockly
-  const defaultOptions = useMemo(() => ({
-    toolbox: toolbox,
-    scrollbars: true,
-    trashcan: true,
-    zoom: {
-      controls: false, // Removido controles de zoom
-      wheel: false,    // Evitar zoom com a roda do mouse
-      startScale: 1.0,
-      maxScale: 1.0,   // Impedir zoom para aumentar
-      minScale: 0.8,   // Permitir apenas um zoom out limitado
-      scaleSpeed: 1.0  // Velocidade neutra
-    },
-    grid: {
-      spacing: 25,
-      length: 3,
-      colour: '#ccc',
-      snap: true
-    },
-    theme: Blockly.Themes.Modern,
-    ...options
-  }), [toolbox, options]);
-  
+
   // Inicializar Blockly
   useEffect(() => {
-    if (blocklyDiv.current && !workspace.current) {
-      workspace.current = Blockly.inject(blocklyDiv.current, defaultOptions);
+    if (blocklyDiv.current && !workspace.current && !isInitialized.current) {
+      isInitialized.current = true; // Marcar como em processo de inicialização
+      let tentativas = 0;
+      const maxTentativas = 10; // Máximo 10 tentativas (1 segundo)
       
-      // Tentar restaurar workspace do localStorage primeiro
-      try {
-        const savedState = localStorage.getItem(storageKey);
-        if (savedState) {
-          Blockly.Xml.domToWorkspace(
-            Blockly.Xml.textToDom(savedState),
-            workspace.current
-          );
-          console.log('Workspace restaurado do localStorage', storageKey);
-        }
-        // Se não houver estado salvo, usar blocos iniciais
-        else if (initialBlocks) {
-          if (typeof initialBlocks === 'string') {
-            Blockly.Xml.domToWorkspace(
-              Blockly.Xml.textToDom(initialBlocks),
-              workspace.current
-            );
-          } else if (Array.isArray(initialBlocks)) {
-            // Assumir que é um array de definições de blocos
-            initialBlocks.forEach(blockDef => {
-              const block = workspace.current.newBlock(blockDef.type);
-              if (blockDef.fields) {
-                Object.entries(blockDef.fields).forEach(([field, value]) => {
-                  block.setFieldValue(value, field);
-                });
-              }
-              block.initSvg();
-              block.render();
-            });
-          }
-        }
-      } catch (error) {
-        console.warn('Erro ao restaurar workspace:', error);
-      }
-      
-      // Listener para mudanças no workspace
-      workspace.current.addChangeListener(() => {
-        if (onWorkspaceChange) {
-          onWorkspaceChange(workspace.current);
+      // Configurações do Blockly (movidas para dentro do useEffect)
+      const defaultOptions = {
+        toolbox: toolbox,
+        scrollbars: true,
+        trashcan: true,
+        zoom: {
+          controls: false, // Removido controles de zoom
+          wheel: false,    // Evitar zoom com a roda do mouse
+          startScale: 1.0,
+          maxScale: 1.0,   // Impedir zoom para aumentar
+          minScale: 0.8,   // Permitir apenas um zoom out limitado
+          scaleSpeed: 1.0  // Velocidade neutra
+        },
+        grid: {
+          spacing: 25,
+          length: 3,
+          colour: '#ccc',
+          snap: true
+        },
+        theme: Blockly.Themes.Modern,
+        ...options
+      };// Garantir que o elemento tenha dimensões antes da injeção
+      const initBlockly = () => {
+        // Se já foi inicializado durante uma tentativa anterior, parar
+        if (workspace.current || !blocklyDiv.current) {
+          return;
         }
         
-        if (onCodeChange) {
+        tentativas++;
+          // Log apenas a cada 5 tentativas para evitar spam
+        if (tentativas === 1 || tentativas % 5 === 0) {
+          console.log(`⏳ Inicializando Blockly... (${tentativas}/${maxTentativas})`);
+        }
+
+        if (blocklyDiv.current && blocklyDiv.current.offsetWidth > 0 && blocklyDiv.current.offsetHeight > 0 && !workspace.current) {
+          // Verificar se já existe um workspace no DOM para evitar duplicação
+          const existingWorkspace = blocklyDiv.current.querySelector('.blocklyDiv');
+          if (existingWorkspace) {
+            blocklyDiv.current.innerHTML = '';
+          }
+          
+          workspace.current = Blockly.inject(blocklyDiv.current, defaultOptions);
+          console.log('✅ Blockly inicializado com sucesso');
+          
+          // Tentar restaurar workspace do localStorage primeiro
           try {
-            const code = javascriptGenerator.workspaceToCode(workspace.current);
-            onCodeChange(code);
-            
-            // Salvar workspace no localStorage após cada mudança
-            const xml = Blockly.Xml.workspaceToDom(workspace.current);
-            const xmlText = Blockly.Xml.domToText(xml);
-            localStorage.setItem(storageKey, xmlText);
-            // console.log('Workspace salvo:', storageKey);
+            const savedState = localStorage.getItem(storageKey);
+            if (savedState) {
+              Blockly.Xml.domToWorkspace(
+                Blockly.Xml.textToDom(savedState),
+                workspace.current
+              );
+            }
+            // Se não houver estado salvo, usar blocos iniciais
+            else if (initialBlocks) {
+              if (typeof initialBlocks === 'string') {
+                Blockly.Xml.domToWorkspace(
+                  Blockly.Xml.textToDom(initialBlocks),
+                  workspace.current
+                );
+              } else if (Array.isArray(initialBlocks)) {
+                // Assumir que é um array de definições de blocos
+                initialBlocks.forEach(blockDef => {
+                  const block = workspace.current.newBlock(blockDef.type);
+                  if (blockDef.fields) {
+                    Object.entries(blockDef.fields).forEach(([field, value]) => {
+                      block.setFieldValue(value, field);
+                    });
+                  }
+                  block.initSvg();
+                  block.render();
+                });
+              }
+            }
           } catch (error) {
-            console.warn('Erro ao gerar código ou salvar workspace:', error);
-            onCodeChange('');
+            console.warn('Erro ao restaurar workspace:', error);
+          }
+          
+          // Listener para mudanças no workspace
+          workspace.current.addChangeListener(() => {
+            if (onWorkspaceChange) {
+              onWorkspaceChange(workspace.current);
+            }
+            
+            if (onCodeChange) {
+              try {
+                const code = javascriptGenerator.workspaceToCode(workspace.current);
+                onCodeChange(code);
+                  // Salvar workspace no localStorage após cada mudança
+                const xml = Blockly.Xml.workspaceToDom(workspace.current);
+                const xmlText = Blockly.Xml.domToText(xml);
+                localStorage.setItem(storageKey, xmlText);
+              } catch (error) {
+                console.warn('Erro ao gerar código ou salvar workspace:', error);
+                onCodeChange('');
+              }
+            }
+          });        } else {
+          // Se ainda não tem dimensões, tentar novamente em breve
+          if (tentativas < maxTentativas) {
+            initTimeoutRef.current = setTimeout(initBlockly, 100);
+          } else {
+            console.error('❌ Falha ao inicializar Blockly: elemento sem dimensões após', maxTentativas, 'tentativas');
+            isInitialized.current = false; // Permitir nova tentativa se necessário
           }
         }
-      });
+      };
+      
+      // Usar timeout para garantir que o DOM esteja pronto
+      initTimeoutRef.current = setTimeout(initBlockly, 50);
     }
 
     return () => {
+      // Limpar timeout se ainda estiver pendente
+      if (initTimeoutRef.current) {
+        clearTimeout(initTimeoutRef.current);
+        initTimeoutRef.current = null;
+      }
+      
       // Ao desmontar, salvar o estado atual do workspace antes de destruí-lo
-      if (workspace.current) {
-        try {
+      if (workspace.current) {try {
           const xml = Blockly.Xml.workspaceToDom(workspace.current);
           const xmlText = Blockly.Xml.domToText(xml);
           localStorage.setItem(storageKey, xmlText);
-          console.log('Workspace salvo antes de desmontar:', storageKey);
         } catch (e) {
           console.error('Erro ao salvar workspace antes de desmontar:', e);
         }
@@ -136,8 +174,11 @@ const BlocklyEditor = forwardRef(({
         workspace.current.dispose();
         workspace.current = null;
       }
+      
+      // Resetar flag de inicialização para permitir nova inicialização
+      isInitialized.current = false;
     };
-  }, [toolbox, defaultOptions, initialBlocks, onCodeChange, onWorkspaceChange, storageKey]);
+  }, [toolbox, options, initialBlocks, onCodeChange, onWorkspaceChange, storageKey]);
 
   // Métodos expostos via ref
   useImperativeHandle(ref, () => ({
@@ -184,11 +225,9 @@ const BlocklyEditor = forwardRef(({
     
     saveWorkspace: () => {
       if (workspace.current) {
-        try {
-          const xml = Blockly.Xml.workspaceToDom(workspace.current);
+        try {          const xml = Blockly.Xml.workspaceToDom(workspace.current);
           const xmlText = Blockly.Xml.domToText(xml);
           localStorage.setItem(storageKey, xmlText);
-          console.log('Workspace salvo manualmente:', storageKey);
           return true;
         } catch (e) {
           console.error('Erro ao salvar workspace manualmente:', e);
@@ -202,11 +241,9 @@ const BlocklyEditor = forwardRef(({
       if (workspace.current) {
         try {
           const xmlText = localStorage.getItem(storageKey);
-          if (xmlText) {
-            workspace.current.clear();
+          if (xmlText) {            workspace.current.clear();
             const xml = Blockly.Xml.textToDom(xmlText);
             Blockly.Xml.domToWorkspace(xml, workspace.current);
-            console.log('Workspace restaurado manualmente:', storageKey);
             return true;
           }
         } catch (e) {
@@ -233,12 +270,27 @@ const BlocklyEditor = forwardRef(({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);  return (
-    <div>
-      <div>
+  }, []);
+  return (
+    <div className="h-full w-full flex flex-col">
+      {/* Área principal do Blockly */}
+      <div className="flex-1 overflow-hidden">
         <div 
           ref={blocklyDiv}
+          className="h-full w-full"
+          style={{ minHeight: '400px', minWidth: '300px' }}
         />
+      </div>
+      
+      {/* Footer para botões do editor */}
+      <div className="flex-shrink-0 bg-gray-50 border-t border-gray-200 p-3">
+        <div className="flex items-center justify-center space-x-3">
+          {footerButtons || (
+            <div className="text-gray-400 text-sm">
+              Área reservada para controles do editor de blocos
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -255,7 +307,8 @@ BlocklyEditor.propTypes = {
     PropTypes.array
   ]),
   // isExecuting: PropTypes.bool, // removido temporariamente
-  title: PropTypes.string
+  title: PropTypes.string,
+  footerButtons: PropTypes.node
 };
 
 // Memoizar o componente para evitar re-renderizações desnecessárias

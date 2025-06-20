@@ -1,12 +1,12 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import MazePage from './pages/MazePage';
+import AutomatoPage from './pages/AutomatoPage';
 import './App.css';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<MazePage />} />
+      <Route path="/" element={<AutomatoPage />} />
     </Routes>
   );
 }

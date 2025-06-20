@@ -1,0 +1,254 @@
+/* Automato Game - Estilos com paleta Blockly NT */
+
+.automato-game {
+  background-color: white;
+  min-height: 100vh;
+}
+
+.automato-game .mobile-layout {
+  margin-bottom: 20px;
+  background-color: white;
+}
+
+.automato-game .nav-tabs {
+  border-bottom: 2px solid var(--brand-primary);
+  background-color: var(--brand-primary);
+  padding: 0;
+  margin: 0;
+}
+
+.automato-game .nav-link {
+  padding: 12px 20px;
+  border: none;
+  margin-right: 0;
+  border-radius: 0;
+  color: white;
+  font-weight: bold;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+.automato-game .nav-link:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
+}
+
+.automato-game .nav-link.active {
+  color: var(--brand-primary);
+  background-color: white;
+  border: none;
+  border-bottom: 3px solid var(--brand-primary);
+  font-weight: 600;
+}
+
+.automato-game .blockly-editor {
+  height: 400px;
+  width: 100%;
+}
+
+.automato-game .loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.automato-game .loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--brand-primary);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.automato-game .game-area {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.automato-game .automato-canvas {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 350px;
+  width: 100%;
+}
+
+.automato-game .controls-panel {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.automato-game .run-button {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.automato-game .run-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.automato-game .run-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.automato-game .reset-button {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(116, 185, 255, 0.3);
+}
+
+.automato-game .reset-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(116, 185, 255, 0.4);
+}
+
+.automato-game .phase-info {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.automato-game .phase-title {
+  color: #d63031;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.automato-game .phase-description {
+  color: #2d3436;
+  font-size: 14px;
+}
+
+.automato-game .success-message {
+  background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+}
+
+.automato-game .error-message {
+  background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(225, 112, 85, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .automato-game .game-area {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .automato-game .controls-panel {
+    padding: 15px;
+  }
+  
+  .automato-game .run-button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .automato-game .reset-button {
+    width: 100%;
+  }
+  
+  .automato-game .phase-info {
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .automato-game .game-area {
+    padding: 10px;
+    min-height: 300px;
+  }
+  
+  .automato-game .automato-canvas {
+    min-height: 250px;
+  }
+  
+  .automato-game .controls-panel {
+    padding: 10px;
+  }
+  
+  .automato-game .run-button,
+  .automato-game .reset-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+/* Animações para o autômato */
+.automato-game .automato-moving {
+  transition: transform 0.5s ease-in-out;
+}
+
+.automato-game .automato-rotating {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Estados do jogo */
+.automato-game.game-success .automato-canvas {
+  background: linear-gradient(135deg, #00b894, #55a3ff);
+}
+
+.automato-game.game-failure .automato-canvas {
+  background: linear-gradient(135deg, #ff7675, #fd79a8);
+}
+
+.automato-game.game-running .automato-canvas {
+  background: linear-gradient(135deg, #fdcb6e, #e84393);
+}

@@ -184,3 +184,32 @@ svg[class*="blockly"] .blocklyScrollbarHorizontal {
 .blocklyTreeRoot {
   overflow: hidden !important;
 }
+
+/* Prevenir piscar durante inicialização do Blockly */
+.blocklyDiv {
+  /* Inicializar com opacity 0 - será alterado via JS após carregamento */
+  background-color: #f8f9fa;
+  min-height: 200px;
+}
+
+.blocklyDiv .blocklyWorkspace {
+  background-color: #f8f9fa !important;
+}
+
+/* Suavizar aparição de elementos do Blockly */
+.blocklyDiv .blocklyFlyout,
+.blocklyDiv .blocklyToolboxDiv {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Evitar flash de conteúdo durante carregamento */
+.blocklyDiv:empty {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

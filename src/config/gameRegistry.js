@@ -3,6 +3,7 @@
 
 import { MAZE_GAME_CONFIG } from '../games/maze/config/mazeConfig';
 import { PUZZLE_GAME_CONFIG } from '../games/puzzle/config/puzzleGameConfig';
+import { AUTOMATO_GAME_CONFIG } from '../games/automato/config/automatoConfig';
 
 // Enhanced game configurations with metadata for the registry
 const enhanceGameConfig = (baseConfig, metadata) => ({
@@ -78,6 +79,41 @@ export const GAMES_REGISTRY = {
       supportsMultipleUsers: false,
       lastUpdated: '2025-06-18',
       version: '2.0.0'
+    }
+  }),
+
+  // Automato Game Registration
+  automato: enhanceGameConfig(AUTOMATO_GAME_CONFIG, {
+    name: 'Jogo do Autômato',
+    icon: '🤖',
+    description: 'Aprenda programação visual guiando um autômato através de labirintos',
+    category: 'Lógica',
+    difficulty: 'Iniciante',
+    estimatedTime: '15-30 min',
+    concepts: [
+      'Sequências',
+      'Loops/Repetição', 
+      'Condicionais',
+      'Estruturas de controle'
+    ],
+    route: '/games/automato',
+    component: 'AutomatoPage',
+    isActive: true,
+    enabled: true,
+    featured: true,
+    ageRange: '8+',
+    objectives: [
+      'Entender sequências de comandos',
+      'Usar loops para otimizar código',
+      'Aplicar condicionais para tomada de decisão',
+      'Resolver problemas de navegação com autômato'
+    ],
+    metadata: {
+      totalPhases: 10,
+      hasProgressTracking: true,
+      supportsMultipleUsers: false,
+      lastUpdated: '2025-06-19',
+      version: '1.0.0'
     }
   })
 };

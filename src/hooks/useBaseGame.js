@@ -117,7 +117,38 @@ export const useBaseGame = (gameConfig) => {
       
       return true;
     }
-    return false;
+    return false;  }, [phaseSystem]);  // ========== FUNÇÕES DE DEBUG ==========
+  
+  // Usar as funções de debug diretas do phaseSystem
+  const debugUnlockAllPhases = useCallback(() => {
+    phaseSystem.debugUnlockAllPhases();
+    setGameState('idle');
+    setIsExecuting(false);
+    setGeneratedCode('');
+  }, [phaseSystem]);
+
+  const debugCompleteAllPhases = useCallback(() => {
+    phaseSystem.debugCompleteAllPhases();
+    setGameState('idle');
+    setIsExecuting(false);
+    setGeneratedCode('');
+  }, [phaseSystem]);
+
+  const debugResetProgress = useCallback(() => {
+    phaseSystem.debugResetProgress();
+    setGameState('idle');
+    setIsExecuting(false);
+    setGeneratedCode('');
+  }, [phaseSystem]);
+
+  const debugGoToPhase = useCallback((targetPhase) => {
+    const success = phaseSystem.debugGoToPhase(targetPhase);
+    if (success) {
+      setGameState('idle');
+      setIsExecuting(false);
+      setGeneratedCode('');
+    }
+    return success;
   }, [phaseSystem]);
 
   return {
@@ -140,10 +171,15 @@ export const useBaseGame = (gameConfig) => {
     handlePhaseChange,
     handleNextPhase,
     handlePreviousPhase,
-    
-    // Setters para casos específicos
+      // Setters para casos específicos
     setGameState,
     setIsExecuting,
-    setGeneratedCode
+    setGeneratedCode,
+    
+    // ========== FUNÇÕES DE DEBUG ==========
+    debugUnlockAllPhases,
+    debugCompleteAllPhases,
+    debugResetProgress,
+    debugGoToPhase
   };
 };

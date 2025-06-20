@@ -105,12 +105,13 @@ const BlocklyEditor = forwardRef(({
     if (blocklyDiv.current && !workspace.current && !isInitialized.current) {
       isInitialized.current = true; // Marcar como em processo de inicialização
       let tentativas = 0;
-      const maxTentativas = 10; // Máximo 10 tentativas (1 segundo)
-      
-      // Configurações do Blockly (movidas para dentro do useEffect)
+      const maxTentativas = 10; // Máximo 10 tentativas (1 segundo)      // Configurações do Blockly (movidas para dentro do useEffect)
       const defaultOptions = {
         toolbox: toolbox,
-        scrollbars: true,
+        scrollbars: {
+          horizontal: false,
+          vertical: false
+        }, // Desabilitar scrollbars completamente
         trashcan: true,
         zoom: {
           controls: false, // Removido controles de zoom
@@ -147,26 +148,40 @@ const BlocklyEditor = forwardRef(({
           if (existingWorkspace) {
             blocklyDiv.current.innerHTML = '';
           }
-          
-          workspace.current = Blockly.inject(blocklyDiv.current, defaultOptions);
+            workspace.current = Blockly.inject(blocklyDiv.current, defaultOptions);
           console.log('✅ Blockly inicializado com sucesso');
-          
-          // Tentar restaurar workspace do localStorage primeiro
+          console.log('📦 Versão do Blockly:', Blockly.VERSION);
+          console.log('🔧 APIs disponíveis:', {
+            serialization: !!Blockly.serialization,
+            utils: !!Blockly.utils,
+            xml: !!Blockly.utils?.xml
+          });
+            // Tentar restaurar workspace do localStorage primeiro
           try {
             const savedState = localStorage.getItem(storageKey);
             if (savedState) {
-              Blockly.Xml.domToWorkspace(
-                Blockly.Xml.textToDom(savedState),
-                workspace.current
-              );
+              // Tentar primeiro com a nova API de serialização
+              try {
+                const state = JSON.parse(savedState);
+                Blockly.serialization.workspaces.load(state, workspace.current);              } catch {
+                // Fallback para XML se for um estado antigo
+                try {
+                  const dom = Blockly.utils.xml.textToDom(savedState);
+                  Blockly.Xml.domToWorkspace(dom, workspace.current);
+                } catch (xmlError) {
+                  console.warn('Erro ao restaurar workspace (formato antigo):', xmlError);
+                }
+              }
             }
             // Se não houver estado salvo, usar blocos iniciais
             else if (initialBlocks) {
               if (typeof initialBlocks === 'string') {
-                Blockly.Xml.domToWorkspace(
-                  Blockly.Xml.textToDom(initialBlocks),
-                  workspace.current
-                );
+                try {
+                  const dom = Blockly.utils.xml.textToDom(initialBlocks);
+                  Blockly.Xml.domToWorkspace(dom, workspace.current);
+                } catch (xmlError) {
+                  console.warn('Erro ao carregar blocos iniciais:', xmlError);
+                }
               } else if (Array.isArray(initialBlocks)) {
                 // Assumir que é um array de definições de blocos
                 initialBlocks.forEach(blockDef => {
@@ -198,16 +213,21 @@ const BlocklyEditor = forwardRef(({
               try {
                 const code = javascriptGenerator.workspaceToCode(workspace.current);
                 onCodeChange(code);
-                  // Salvar workspace no localStorage após cada mudança
-                const xml = Blockly.Xml.workspaceToDom(workspace.current);
-                const xmlText = Blockly.Xml.domToText(xml);
-                localStorage.setItem(storageKey, xmlText);
+                
+                // Salvar workspace no localStorage após cada mudança
+                try {
+                  const state = Blockly.serialization.workspaces.save(workspace.current);
+                  localStorage.setItem(storageKey, JSON.stringify(state));
+                } catch (saveError) {
+                  console.warn('Erro ao salvar workspace:', saveError);
+                }
               } catch (error) {
                 console.warn('Erro ao gerar código ou salvar workspace:', error);
                 onCodeChange('');
               }
-            }
-          });        } else {
+            }          });
+
+        } else {
           // Se ainda não tem dimensões, tentar novamente em breve
           if (tentativas < maxTentativas) {
             initTimeoutRef.current = setTimeout(initBlockly, 100);
@@ -228,12 +248,11 @@ const BlocklyEditor = forwardRef(({
         clearTimeout(initTimeoutRef.current);
         initTimeoutRef.current = null;
       }
-      
-      // Ao desmontar, salvar o estado atual do workspace antes de destruí-lo
-      if (workspace.current) {try {
-          const xml = Blockly.Xml.workspaceToDom(workspace.current);
-          const xmlText = Blockly.Xml.domToText(xml);
-          localStorage.setItem(storageKey, xmlText);
+        // Ao desmontar, salvar o estado atual do workspace antes de destruí-lo
+      if (workspace.current) {
+        try {
+          const state = Blockly.serialization.workspaces.save(workspace.current);
+          localStorage.setItem(storageKey, JSON.stringify(state));
         } catch (e) {
           console.error('Erro ao salvar workspace antes de desmontar:', e);
         }
@@ -244,8 +263,7 @@ const BlocklyEditor = forwardRef(({
       
       // Resetar flag de inicialização para permitir nova inicialização
       isInitialized.current = false;
-    };
-  }, [toolbox, options, initialBlocks, onCodeChange, onWorkspaceChange, storageKey]);
+    };  }, [toolbox, options, initialBlocks, onCodeChange, onWorkspaceChange, storageKey]);
 
   // Métodos expostos via ref
   useImperativeHandle(ref, () => ({
@@ -265,36 +283,44 @@ const BlocklyEditor = forwardRef(({
         localStorage.removeItem(storageKey);
       }
     },
-    
-    loadBlocks: (blocks) => {
+      loadBlocks: (blocks) => {
       if (workspace.current) {
         workspace.current.clear();
         if (typeof blocks === 'string') {
-          Blockly.Xml.domToWorkspace(
-            Blockly.Xml.textToDom(blocks),
-            workspace.current
-          );
-          
-          // Após carregar, salvar no localStorage
-          const xml = Blockly.Xml.workspaceToDom(workspace.current);
-          localStorage.setItem(storageKey, Blockly.Xml.domToText(xml));
+          try {
+            const dom = Blockly.utils.xml.textToDom(blocks);
+            Blockly.Xml.domToWorkspace(dom, workspace.current);
+            
+            // Após carregar, salvar no localStorage
+            const state = Blockly.serialization.workspaces.save(workspace.current);
+            localStorage.setItem(storageKey, JSON.stringify(state));          } catch (error) {
+            console.error('Erro ao carregar blocos:', error);
+          }
         }
       }
     },
-    
-    getBlocksXml: () => {
+      getBlocksXml: () => {
       if (workspace.current) {
-        const xml = Blockly.Xml.workspaceToDom(workspace.current);
-        return Blockly.Xml.domToText(xml);
+        try {
+          const state = Blockly.serialization.workspaces.save(workspace.current);
+          return JSON.stringify(state);        } catch {
+          // Fallback para XML se necessário
+          try {
+            const xml = Blockly.Xml.workspaceToDom(workspace.current);
+            return Blockly.Xml.domToText(xml);
+          } catch (xmlError) {
+            console.error('Erro ao exportar workspace:', xmlError);
+            return '';
+          }
+        }
       }
       return '';
     },
-    
-    saveWorkspace: () => {
+      saveWorkspace: () => {
       if (workspace.current) {
-        try {          const xml = Blockly.Xml.workspaceToDom(workspace.current);
-          const xmlText = Blockly.Xml.domToText(xml);
-          localStorage.setItem(storageKey, xmlText);
+        try {
+          const state = Blockly.serialization.workspaces.save(workspace.current);
+          localStorage.setItem(storageKey, JSON.stringify(state));
           return true;
         } catch (e) {
           console.error('Erro ao salvar workspace manualmente:', e);
@@ -303,14 +329,20 @@ const BlocklyEditor = forwardRef(({
       }
       return false;
     },
-    
-    restoreWorkspace: () => {
+      restoreWorkspace: () => {
       if (workspace.current) {
         try {
-          const xmlText = localStorage.getItem(storageKey);
-          if (xmlText) {            workspace.current.clear();
-            const xml = Blockly.Xml.textToDom(xmlText);
-            Blockly.Xml.domToWorkspace(xml, workspace.current);
+          const savedData = localStorage.getItem(storageKey);
+          if (savedData) {
+            workspace.current.clear();
+            try {
+              // Tentar primeiro com a nova API
+              const state = JSON.parse(savedData);
+              Blockly.serialization.workspaces.load(state, workspace.current);            } catch {
+              // Fallback para XML se for formato antigo
+              const dom = Blockly.utils.xml.textToDom(savedData);
+              Blockly.Xml.domToWorkspace(dom, workspace.current);
+            }
             return true;
           }
         } catch (e) {

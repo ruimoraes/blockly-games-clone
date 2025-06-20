@@ -44,11 +44,9 @@ const BaseGame = ({
 
   // Callbacks de navegação
   onGoHome,
-  onGoBack,
 
   // Configurações do header
   showPhaseSelectorProp = true, showHomeButton = true,
-  showBackButton = true,
 
   // Props adicionais
   children
@@ -62,14 +60,6 @@ const BaseGame = ({
       onGoHome();
     } else {
       window.location.href = '/';
-    }
-  };
-
-  const handleGoBack = () => {
-    if (onGoBack) {
-      onGoBack();
-    } else {
-      window.history.back();
     }
   };
 
@@ -234,7 +224,6 @@ BaseGame.propTypes = {
   // Customização
   customHeaderContent: PropTypes.node,
   onGoHome: PropTypes.func,
-  onGoBack: PropTypes.func,
 
   // Configurações do header
   showPhaseSelectorProp: PropTypes.bool,

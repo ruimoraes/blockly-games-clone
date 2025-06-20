@@ -100,3 +100,87 @@
     @apply animate-in slide-in-from-bottom-4 duration-300;
   }
 }
+
+/* ===== BLOCKLY CUSTOMIZATIONS ===== */
+/* Desabilitar completamente scrollbars do workspace e toolbox */
+.blocklyScrollbarVertical,
+.blocklyScrollbarHorizontal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Forçar remoção das scrollbars em todos os contextos */
+.blocklyToolboxDiv .blocklyScrollbarVertical,
+.blocklyToolboxDiv .blocklyScrollbarHorizontal,
+.blocklyFlyout .blocklyScrollbarVertical,
+.blocklyFlyout .blocklyScrollbarHorizontal,
+.blocklyWorkspace .blocklyScrollbarVertical,
+.blocklyWorkspace .blocklyScrollbarHorizontal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Desabilitar scrollbars em todos os elementos do Blockly */
+.blocklyDiv .blocklyScrollbarVertical,
+.blocklyDiv .blocklyScrollbarHorizontal,
+.blocklyDiv * .blocklyScrollbarVertical,
+.blocklyDiv * .blocklyScrollbarHorizontal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Esconder handles das scrollbars */
+.blocklyScrollbarHandle,
+.blocklyScrollbarKnob,
+.blocklyScrollbarBackground {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Garantir que o workspace não mostre scrollbars nativas */
+.blocklyWorkspace,
+.blocklyWorkspace svg {
+  overflow: hidden !important;
+}
+
+.blocklyToolboxDiv,
+.blocklyToolboxDiv * {
+  overflow: hidden !important;
+}
+
+.blocklyFlyout,
+.blocklyFlyout * {
+  overflow: hidden !important;
+}
+
+/* Seletores ainda mais específicos para casos extremos */
+div[class*="blockly"] .blocklyScrollbarVertical,
+div[class*="blockly"] .blocklyScrollbarHorizontal,
+svg[class*="blockly"] .blocklyScrollbarVertical,
+svg[class*="blockly"] .blocklyScrollbarHorizontal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Garantir que todos os containers do Blockly tenham overflow hidden */
+.blocklyDiv,
+.blocklyDiv *,
+.blocklyMainBackground,
+.blocklyTreeRoot {
+  overflow: hidden !important;
+}

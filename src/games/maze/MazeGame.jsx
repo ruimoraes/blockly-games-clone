@@ -93,30 +93,32 @@ function MazeGame() {
       }
     }, 50);
   }, [resetGame]);
-  
-  // Componentes específicos do jogo  
+    // Componentes específicos do jogo  
   const editorComponent = (
   <BlocklyEditor
     ref={blocklyEditorRef}
     toolbox={toolboxConfig}
     onCodeChange={handleCodeChange}
     isExecuting={isExecuting}
-    title="Editor de Blocos - Labirinto" />
-  );
-  const gameAreaComponent = (
+    title="Editor de Blocos - Labirinto"    // Props do GameControls
+    onRunCode={handleRunCode}
+    onResetGame={handleResetGame}
+    gameState={gameState}
+    runButtonText="Executar Blocos"
+    resetButtonText="Reiniciar Labirinto"
+  />
+  );  const gameAreaComponent = (
     <GameArea
       gameState={gameState}
       className="maze-game-area"
-      onRunCode={handleRunCode}
-      onResetGame={handleResetGame}
-      isExecuting={isExecuting}
     >
       <MazeRenderer
         mazeData={mazeData}
         playerPosition={playerPosition}
         gameState={gameState}
       />
-    </GameArea>);
+    </GameArea>
+  );
 
   // Componentes adicionais - removido código gerado para simplificar interface
   const additionalComponents = [];
@@ -124,9 +126,9 @@ function MazeGame() {
   return (
     <BaseGame
       // Configuração do jogo
-      gameTitle="Labirinto"
-      gameIcon="🧩"
-      gameDescription="Aprenda programação visual guiando um personagem através de labirintos"
+      gameTitle="Autômato"
+      gameIcon="🤖"
+      gameDescription="Aprenda programação visual guiando um robô através de labirintos"
 
       // Dados da fase
       currentPhase={currentPhase}

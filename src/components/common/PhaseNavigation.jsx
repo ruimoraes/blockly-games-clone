@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Badge } from 'react-bootstrap';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import './PhaseNavigation.css';
 
 /**
  * Componente de navegação simples entre fases adjacentes
@@ -16,43 +14,38 @@ export function PhaseNavigation({
   isExecuting,
   canAdvance,
   totalPhases
-}) {
-  return (
-    <Card className="phase-navigation">
-      <Card.Body>
-        <div className="d-flex justify-content-between align-items-center">
-          <Button
-            variant="outline-brand-primary"
+}) {  return (
+    <div>
+      <div>
+        <div>
+          <button
             onClick={onPrevious}
             disabled={isExecuting || currentPhase === 1}
-            className="d-flex align-items-center gap-2"
-            size="sm"
           >
             <ChevronLeft size={16} />
-            <span className="d-none d-sm-inline">Fase Anterior</span>
-            <span className="d-sm-none">Anterior</span>
-          </Button>          <div className="text-center flex-grow-1 mx-2 mx-sm-3">
+            <span>Fase Anterior</span>
+            <span>Anterior</span>
+          </button>
+          
+          <div>
             {phaseData.maxBlocks !== Infinity && (
-              <Badge bg="brand-accent" pill className="small">
+              <span>
                 Máx: {phaseData.maxBlocks} blocos
-              </Badge>
+              </span>
             )}
           </div>
           
-          <Button
-            variant={canAdvance && currentPhase < totalPhases ? "brand-primary" : "outline-brand-primary"}
+          <button
             onClick={onNext}
             disabled={isExecuting || !canAdvance || currentPhase >= totalPhases}
-            className="d-flex align-items-center gap-2"
-            size="sm"
           >
-            <span className="d-none d-sm-inline">Próxima Fase</span>
-            <span className="d-sm-none">Próxima</span>
+            <span>Próxima Fase</span>
+            <span>Próxima</span>
             <ChevronRight size={16} />
-          </Button>
+          </button>
         </div>
-      </Card.Body>
-    </Card>
+      </div>
+    </div>
   );
 }
 

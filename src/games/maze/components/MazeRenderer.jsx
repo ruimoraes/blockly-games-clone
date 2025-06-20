@@ -67,10 +67,9 @@ export function MazeRenderer({ mazeData, playerPosition, gameState }) {
         return '8,0 -4,-6 -4,6';
     }
   };
-  
-  return (    <div 
+    return (    <div 
       ref={containerRef}
-      className="maze-container d-flex justify-content-center align-items-center w-100 h-100"
+      className="maze-container"
       style={{ padding: 0, borderRadius: 0, overflow: 'hidden' }}
     >
       <svg

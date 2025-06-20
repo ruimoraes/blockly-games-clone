@@ -19,11 +19,6 @@ const BaseGame = ({
   totalPhases,
   currentPhaseData = {},  // Estados
   isExecuting = false,
-  gameState = 'idle',
-
-  // Ações de controle do jogo
-  onRunCode,
-  onResetGame,
 
   // Conteúdo específico do jogo
   editorComponent,

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import * as Blockly from 'blockly';
 import { javascriptGenerator } from 'blockly/javascript';
 import { Play, RotateCcw, Loader, Puzzle } from 'lucide-react';
-import './BlocklyEditor.mobile.css';
 
 // Sistema global mais robusto para prevenir múltiplas inicializações
 const BlocklyInstances = {
@@ -590,20 +589,17 @@ const BlocklyEditor = forwardRef(({
       }
     }
   }));
-  
+
   return (
     <div className="flex flex-col h-full rounded-2xl bg-white/80 shadow-lg overflow-hidden">
       {/* Header */}
-      <div
-        className="flex-shrink-0 px-4 py-3 shadow-md rounded-t-2xl blockly-header-responsive"
-        style={{ background: 'linear-gradient(135deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%)' }}
-      >
-        <div className="flex items-center justify-between text-white min-h-0">
-          <div className="flex items-center space-x-3 blockly-header-title-group">
-            <Puzzle className="w-5 h-5 blockly-header-icon" />
-            <h3 className="font-semibold text-xs blockly-header-title">{title}</h3>
+      <div className="flex-shrink-0 px-4 py-3 shadow-md rounded-t-2xl" style={{background: 'linear-gradient(135deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%)'}}>
+        <div className="flex items-center justify-between text-white">
+          <div className="flex items-center space-x-3">
+            <Puzzle className="w-5 h-5" />
+            <h3 className="font-semibold text-lg">{title}</h3>
           </div>
-          <div className="flex items-center space-x-2 text-sm blockly-header-blockcount">
+          <div className="flex items-center space-x-2 text-sm">
             <span className="bg-white/20 px-2 py-1 rounded-full">
               {currentBlockCount} blocos
             </span>
@@ -612,7 +608,7 @@ const BlocklyEditor = forwardRef(({
       </div>
 
       {/* Área do Blockly */}
-      <div className="flex-1 relative min-h-0">
+      <div className="flex-1 relative">
         {/* Loading overlay */}
         {!isReady && (
           <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-10 rounded-b-2xl">
@@ -622,12 +618,12 @@ const BlocklyEditor = forwardRef(({
             </div>
           </div>
         )}
+        
         <div 
           ref={blocklyDiv}
-          className={`w-full h-full ${isReady ? 'opacity-100' : 'opacity-0'} rounded-b-2xl overflow-auto`}
-          style={{
-            minHeight: '200px',
-            maxHeight: 'calc(100vh - 170px)',
+          className={`w-full h-full ${isReady ? 'opacity-100' : 'opacity-0'} rounded-b-2xl`}
+          style={{ 
+            minHeight: '400px',
             transition: 'opacity 0.3s ease-in-out'
           }}
         />

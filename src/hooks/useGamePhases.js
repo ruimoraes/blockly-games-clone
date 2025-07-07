@@ -25,17 +25,17 @@ export const useGamePhases = (gameConfig) => {
   // Salvar no localStorage sempre que houver mudanças
   useEffect(() => {
     localStorage.setItem(`${gameId}-unlocked-phases`, JSON.stringify(unlockedPhases));
-    console.log(`📦 Salvando fases desbloqueadas para ${gameId}:`, unlockedPhases);
+    //console.log(`📦 Salvando fases desbloqueadas para ${gameId}:`, unlockedPhases);
   }, [unlockedPhases, gameId]);
 
   useEffect(() => {
     localStorage.setItem(`${gameId}-completed-phases`, JSON.stringify(completedPhases));
-    console.log(`📦 Salvando fases completadas para ${gameId}:`, completedPhases);
+    //console.log(`📦 Salvando fases completadas para ${gameId}:`, completedPhases);
   }, [completedPhases, gameId]);
 
   useEffect(() => {
     localStorage.setItem(`${gameId}-current-phase`, currentPhase.toString());
-    console.log(`📦 Salvando fase atual para ${gameId}:`, currentPhase);
+    //console.log(`📦 Salvando fase atual para ${gameId}:`, currentPhase);
   }, [currentPhase, gameId]);
 
   // Função para desbloquear próxima fase
@@ -106,10 +106,10 @@ export const useGamePhases = (gameConfig) => {
   // Funções de debug diretas com atualização forçada
   const debugUnlockAllPhases = useCallback(() => {
     const allPhases = Array.from({ length: gamePhasesConfig.length }, (_, i) => i + 1);
-    console.log('🐛 DEBUG useGamePhases: Desbloqueando todas as fases');
-    console.log('🐛 gameId:', gameId);
-    console.log('🐛 Phases antes:', unlockedPhases);
-    console.log('🐛 Phases que serão definidas:', allPhases);
+    //console.log('🐛 DEBUG useGamePhases: Desbloqueando todas as fases');
+    //console.log('🐛 gameId:', gameId);
+    //console.log('🐛 Phases antes:', unlockedPhases);
+    //console.log('🐛 Phases que serão definidas:', allPhases);
     
     // Atualizar localStorage imediatamente
     localStorage.setItem(`${gameId}-unlocked-phases`, JSON.stringify(allPhases));
@@ -121,15 +121,15 @@ export const useGamePhases = (gameConfig) => {
     // Verificar imediatamente
     setTimeout(() => {
       const stored = localStorage.getItem(`${gameId}-unlocked-phases`);
-      console.log('🐛 Verificação localStorage após debug:', stored);
+      //console.log('🐛 Verificação localStorage após debug:', stored);
     }, 50);
   }, [gamePhasesConfig.length, gameId, unlockedPhases]);
 
   const debugCompleteAllPhases = useCallback(() => {
     const allPhases = Array.from({ length: gamePhasesConfig.length }, (_, i) => i + 1);
-    console.log('🐛 DEBUG useGamePhases: Completando todas as fases');
-    console.log('🐛 gameId:', gameId);
-    console.log('🐛 Phases que serão definidas:', allPhases);
+    //console.log('🐛 DEBUG useGamePhases: Completando todas as fases');
+    //console.log('🐛 gameId:', gameId);
+    //console.log('🐛 Phases que serão definidas:', allPhases);
     
     // Atualizar localStorage imediatamente
     localStorage.setItem(`${gameId}-unlocked-phases`, JSON.stringify(allPhases));
@@ -142,8 +142,8 @@ export const useGamePhases = (gameConfig) => {
   }, [gamePhasesConfig.length, gameId]);
 
   const debugResetProgress = useCallback(() => {
-    console.log('🐛 DEBUG useGamePhases: Resetando progresso');
-    console.log('🐛 gameId:', gameId);
+    //console.log('🐛 DEBUG useGamePhases: Resetando progresso');
+    //console.log('🐛 gameId:', gameId);
     
     // Atualizar localStorage imediatamente
     localStorage.setItem(`${gameId}-unlocked-phases`, JSON.stringify([1]));
@@ -159,8 +159,8 @@ export const useGamePhases = (gameConfig) => {
 
   const debugGoToPhase = useCallback((targetPhase) => {
     if (targetPhase >= 1 && targetPhase <= gamePhasesConfig.length) {
-      console.log(`🐛 DEBUG useGamePhases: Indo para fase ${targetPhase}`);
-      console.log('🐛 gameId:', gameId);
+      //console.log(`🐛 DEBUG useGamePhases: Indo para fase ${targetPhase}`);
+      //console.log('🐛 gameId:', gameId);
       
       // Desbloquear fases necessárias
       const currentUnlocked = [...unlockedPhases];
@@ -172,7 +172,7 @@ export const useGamePhases = (gameConfig) => {
       }
       if (phasesToUnlock.length > 0) {
         const newUnlocked = [...currentUnlocked, ...phasesToUnlock].sort((a, b) => a - b);
-        console.log(`🐛 DEBUG: Fases ${phasesToUnlock.join(', ')} desbloqueadas automaticamente`);
+        //console.log(`🐛 DEBUG: Fases ${phasesToUnlock.join(', ')} desbloqueadas automaticamente`);
         
         // Atualizar localStorage imediatamente
         localStorage.setItem(`${gameId}-unlocked-phases`, JSON.stringify(newUnlocked));

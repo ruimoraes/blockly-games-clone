@@ -35,10 +35,10 @@ const BlocklyInstances = {
   // Método para reutilizar workspace existente
   reuseOrCreateInstance(id, createFn) {
     if (this.isActive(id)) {
-      console.log(`♻️ Reutilizando instância existente: ${id}`);
+      //console.log(`♻️ Reutilizando instância existente: ${id}`);
       return this.getInstance(id);
     }
-    console.log(`🆕 Criando nova instância: ${id}`);
+    //console.log(`🆕 Criando nova instância: ${id}`);
     return createFn();
   }
 };
@@ -56,23 +56,23 @@ const GameControlsCustom = ({
   
   // Debug: monitorar mudanças no gameState
   useEffect(() => {
-    console.log('🎮 GameControlsCustom - gameState mudou para:', gameState);
-    console.log('🎮 needsReset agora é:', needsReset);
-    console.log('🎮 isExecuting:', isExecuting);
+    //console.log('🎮 GameControlsCustom - gameState mudou para:', gameState);
+    //console.log('🎮 needsReset agora é:', needsReset);
+    //console.log('🎮 isExecuting:', isExecuting);
   }, [gameState, needsReset, isExecuting]);
   
   const handleClick = () => {
-    console.log('🔥 GameControlsCustom handleClick chamado!');
-    console.log('needsReset:', needsReset);
-    console.log('gameState atual:', gameState);
-    console.log('onRunCode:', typeof onRunCode);
-    console.log('onResetGame:', typeof onResetGame);
+    //console.log('🔥 GameControlsCustom handleClick chamado!');
+    //console.log('needsReset:', needsReset);
+    //console.log('gameState atual:', gameState);
+    //console.log('onRunCode:', typeof onRunCode);
+    //console.log('onResetGame:', typeof onResetGame);
     
     if (needsReset) {
-      console.log('🔄 Chamando onResetGame...');
+      //console.log('🔄 Chamando onResetGame...');
       onResetGame();
     } else {
-      console.log('▶️ Chamando onRunCode...');
+      //console.log('▶️ Chamando onRunCode...');
       onRunCode();
     }
   };
@@ -146,7 +146,7 @@ const BlocklyEditor = forwardRef(({
   // Atualizar toolbox quando ela mudar (importante para mudança de fases)
   useEffect(() => {
     if (workspace.current && toolbox) {
-      console.log('🔄 Toolbox mudou - atualizando workspace');
+      //console.log('🔄 Toolbox mudou - atualizando workspace');
       try {
         // Salvar estado atual dos blocos
         const currentState = Blockly.serialization.workspaces.save(workspace.current);
@@ -161,7 +161,7 @@ const BlocklyEditor = forwardRef(({
           Blockly.serialization.workspaces.load(currentState, workspace.current);
         }
         
-        console.log('✅ Toolbox atualizada com sucesso');
+        //console.log('✅ Toolbox atualizada com sucesso');
       } catch (error) {
         console.warn('⚠️ Erro ao atualizar toolbox:', error);
         // Se houve erro, forçar recriação do workspace
@@ -202,7 +202,7 @@ const BlocklyEditor = forwardRef(({
       if (BlocklyInstances.isActive(instanceId)) {
         const existingWorkspace = BlocklyInstances.getInstance(instanceId);
         if (existingWorkspace) {
-          console.log(`♻️ Tentando reutilizar workspace existente: ${instanceId}`);
+          //console.log(`♻️ Tentando reutilizar workspace existente: ${instanceId}`);
           
           // Verificar se o workspace atual está realmente conectado a um DOM válido
           const existingSvg = existingWorkspace.getParentSvg();
@@ -212,12 +212,12 @@ const BlocklyEditor = forwardRef(({
                                    existingSvg.style.display !== 'none';
           
           if (isWorkspaceVisible) {
-            console.log(`✅ Workspace existente válido - reutilizando`);
+            //console.log(`✅ Workspace existente válido - reutilizando`);
             workspace.current = existingWorkspace;
             setIsReady(true);
             return;
           } else {
-            console.log(`🔄 Workspace existente não está visível - forçando recriação`);
+            //console.log(`🔄 Workspace existente não está visível - forçando recriação`);
             // Salvar estado antes de dispose
             let savedState = null;
             try {
@@ -243,7 +243,7 @@ const BlocklyEditor = forwardRef(({
     const createNewWorkspace = (savedState = null) => {
       if (!mounted || !blocklyDiv.current) return;
 
-      console.log(`🚀 Criando novo workspace para ${instanceId}`);
+      //console.log(`🚀 Criando novo workspace para ${instanceId}`);
 
       // Limpar conteúdo existente
       blocklyDiv.current.innerHTML = '';
@@ -270,7 +270,7 @@ const BlocklyEditor = forwardRef(({
         workspace.current = newWorkspace;
         BlocklyInstances.setInstance(instanceId, newWorkspace);
 
-        console.log('✅ Novo workspace criado com sucesso');
+        //console.log('✅ Novo workspace criado com sucesso');
 
         // Restaurar estado salvo ou localStorage
         try {
@@ -281,7 +281,7 @@ const BlocklyEditor = forwardRef(({
           
           if (stateToLoad) {
             Blockly.serialization.workspaces.load(stateToLoad, newWorkspace);
-            console.log('📁 Estado restaurado no novo workspace');
+            //console.log('📁 Estado restaurado no novo workspace');
           }
         } catch (error) {
           console.warn('Erro ao restaurar workspace:', error);
@@ -342,11 +342,11 @@ const BlocklyEditor = forwardRef(({
       
       resizeTimer = setTimeout(() => {
         if (workspace.current && blocklyDiv.current) {
-          console.log('📐 Redimensionando workspace Blockly devido a mudança de layout');
+          //console.log('📐 Redimensionando workspace Blockly devido a mudança de layout');
           
           // Forçar recálculo de dimensões
           const rect = blocklyDiv.current.getBoundingClientRect();
-          console.log('📏 Dimensões do container:', rect.width, 'x', rect.height);
+          //console.log('📏 Dimensões do container:', rect.width, 'x', rect.height);
           
           if (rect.width > 0 && rect.height > 0) {
             try {
@@ -359,14 +359,14 @@ const BlocklyEditor = forwardRef(({
               // Se ainda não está visível, tentar recriar o SVG
               const svg = workspace.current.getParentSvg();
               if (!svg || svg.style.display === 'none') {
-                console.log('🔄 SVG não visível, forçando re-renderização');
+                //console.log('🔄 SVG não visível, forçando re-renderização');
                 
                 // Re-aplicar o estado para forçar re-renderização
                 workspace.current.clear();
                 Blockly.serialization.workspaces.load(currentState, workspace.current);
               }
               
-              console.log('✅ Workspace redimensionado com sucesso');
+              //console.log('✅ Workspace redimensionado com sucesso');
             } catch (error) {
               console.error('❌ Erro ao redimensionar workspace:', error);
             }
@@ -388,7 +388,7 @@ const BlocklyEditor = forwardRef(({
     // Escutar mudanças de aba
     const handleTabChange = (event) => {
       if (event.detail?.activeTab === 'editor') {
-        console.log('📱 Aba do editor ativada - redimensionando workspace');
+        //console.log('📱 Aba do editor ativada - redimensionando workspace');
         handleResize();
       }
     };
@@ -412,12 +412,12 @@ const BlocklyEditor = forwardRef(({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting && entry.intersectionRatio > 0) {
-            console.log('👁️ BlocklyEditor tornou-se visível - verificando workspace');
+            //console.log('👁️ BlocklyEditor tornou-se visível - verificando workspace');
             
             setTimeout(() => {
               if (workspace.current && blocklyDiv.current) {
                 const rect = blocklyDiv.current.getBoundingClientRect();
-                console.log('👁️ Dimensões ao tornar-se visível:', rect.width, 'x', rect.height);
+                //console.log('👁️ Dimensões ao tornar-se visível:', rect.width, 'x', rect.height);
                 
                 if (rect.width > 0 && rect.height > 0) {
                   // Verificar se o workspace está realmente visível
@@ -429,11 +429,11 @@ const BlocklyEditor = forwardRef(({
                                            svg.style.visibility !== 'hidden';
                   
                   if (!isWorkspaceVisible) {
-                    console.log('🔄 Workspace não visível - forçando recriação');
+                    //console.log('🔄 Workspace não visível - forçando recriação');
                     setIsReady(false); // Reset do estado ready
                     setForceRecreate(prev => prev + 1); // Trigger recriação
                   } else {
-                    console.log('✅ Workspace visível - apenas redimensionando');
+                    //console.log('✅ Workspace visível - apenas redimensionando');
                     try {
                       Blockly.svgResize(workspace.current);
                     } catch (error) {
@@ -462,7 +462,7 @@ const BlocklyEditor = forwardRef(({
                                    blocklyDiv.current?.contains(target);
           
           if (isBlocklyContainer) {
-            // console.log('🔄 Mudança de estilo detectada no container Blockly');
+            // //console.log('🔄 Mudança de estilo detectada no container Blockly');
             setTimeout(() => {
               if (workspace.current) {
                 const rect = blocklyDiv.current.getBoundingClientRect();
@@ -470,11 +470,11 @@ const BlocklyEditor = forwardRef(({
                   // Verificar se precisa recriar ou apenas redimensionar
                   const svg = workspace.current.getParentSvg();
                   if (!svg || !svg.parentNode || !svg.parentNode.isConnected) {
-                    // console.log('🔄 Workspace desconectado - forçando recriação');
+                    // //console.log('🔄 Workspace desconectado - forçando recriação');
                     setIsReady(false);
                     setForceRecreate(prev => prev + 1);
                   } else {
-                    // console.log('🔄 Redimensionando devido a mudança de estilo');
+                    // //console.log('🔄 Redimensionando devido a mudança de estilo');
                     Blockly.svgResize(workspace.current);
                   }
                 }
@@ -531,9 +531,9 @@ const BlocklyEditor = forwardRef(({
     },
     resize: () => {
       if (workspace.current && blocklyDiv.current) {
-        console.log('🔄 Método resize() chamado manualmente');
+        //console.log('🔄 Método resize() chamado manualmente');
         const rect = blocklyDiv.current.getBoundingClientRect();
-        console.log('🔄 Dimensões do container:', rect.width, 'x', rect.height);
+        //console.log('🔄 Dimensões do container:', rect.width, 'x', rect.height);
         
         if (rect.width > 0 && rect.height > 0) {
           try {
@@ -546,7 +546,7 @@ const BlocklyEditor = forwardRef(({
             // Se ainda não visível, forçar recriação
             const svg = workspace.current.getParentSvg();
             if (!svg || svg.style.display === 'none' || svg.style.visibility === 'hidden') {
-              console.log('🔄 Forçando recriação do workspace devido a SVG invisível');
+              //console.log('🔄 Forçando recriação do workspace devido a SVG invisível');
               workspace.current.clear();
               Blockly.serialization.workspaces.load(currentState, workspace.current);
               
@@ -568,7 +568,7 @@ const BlocklyEditor = forwardRef(({
         try {
           const state = Blockly.serialization.workspaces.save(workspace.current);
           localStorage.setItem(storageKey, JSON.stringify(state));
-          console.log('💾 Workspace salvo');
+          //console.log('💾 Workspace salvo');
         } catch (error) {
           console.error('Erro ao salvar workspace:', error);
         }
@@ -581,7 +581,7 @@ const BlocklyEditor = forwardRef(({
           if (savedState) {
             const state = JSON.parse(savedState);
             Blockly.serialization.workspaces.load(state, workspace.current);
-            console.log('📁 Workspace restaurado');
+            //console.log('📁 Workspace restaurado');
           }
         } catch (error) {
           console.error('Erro ao restaurar workspace:', error);

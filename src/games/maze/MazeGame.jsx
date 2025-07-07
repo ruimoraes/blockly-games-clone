@@ -127,7 +127,6 @@ function MazeGame() {
     ); 
 
     useEffect(() => {
-        console.log('🔄 Fase atual mudou para:', currentPhase);
     }, [currentPhase]);    
 
     const gameAreaComponent = (

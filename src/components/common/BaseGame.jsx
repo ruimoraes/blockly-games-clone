@@ -50,6 +50,9 @@ const BaseGame = ({
   // Função para debug panel
   onShowDebugPanel,
 
+  // Nova prop para reset total do progresso
+  onResetAllProgress,
+
   // Props adicionais
   children
 }) => {
@@ -205,6 +208,7 @@ const BaseGame = ({
           onPhaseSelect={handlePhaseSelect}
           isVisible={showPhaseSelector}
           onClose={() => setShowPhaseSelector(false)}
+          onResetAllProgress={typeof onResetAllProgress === 'function' ? onResetAllProgress : undefined}
         />
       )}
     </div>

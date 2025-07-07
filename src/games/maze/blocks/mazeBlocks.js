@@ -380,38 +380,10 @@ export const defineGenerators = () => {
   };
 
   // Gerador: Repita até o objetivo
-  // javascriptGenerator.forBlock['automato_repeat_until_goal'] = function(block) {
-  //   const statements = javascriptGenerator.statementToCode(block, 'DO');
-  //   return `while (!isAtGoal() && !isFailure()) {\n${statements}}\n`;
-  // };  
   javascriptGenerator.forBlock['automato_repeat_until_goal'] = function (block) {
     const statements = javascriptGenerator.statementToCode(block, 'DO');
-    return `let iterationCount = 0;
-  let positionHistory = [];
-  while (!isAtGoal() && !isFailure() && iterationCount < 100) {
-    iterationCount++;
-    
-    // Detectar bloqueio
-    const currentPos = JSON.stringify(playerPositionRef.current);
-    positionHistory.push(currentPos);
-    
-    if (positionHistory.length >= 3) {
-      const lastThree = positionHistory.slice(-3);
-      if (lastThree.every(pos => pos === lastThree[0])) {
-        console.warn('🚫 Jogador bloqueado - parando execução');
-        break;
-      }
-    }
-    
-    if (positionHistory.length > 10) {
-      positionHistory = positionHistory.slice(-5);
-    }
-    
-  ${statements}}
-  `;
+    return `while (!isAtGoal() && !isFailure()) {\n${statements}}\n`;
   };
-
-
 };
 
 // Configuração da toolbox (caixa de ferramentas)
@@ -508,6 +480,3 @@ export const getToolboxConfig = () => {
     ]
   };
 };
-
-// Remover controls_repeat_ext do Maze (não adicionar aqui)
-// Remover controls_repeat_ext da toolbox dinâmica e estática

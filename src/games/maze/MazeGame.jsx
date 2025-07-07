@@ -10,16 +10,25 @@ import MazeRenderer from './components/MazeRenderer';
 defineBlocks();
 defineGenerators();
 
+function clearGameWorkspacesFromStorage(gameName) {
+    if (!gameName) return;
+    const prefix = `ws-${gameName.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix)) {
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+}
+
 function MazeGame() {
     const [isMobile, setIsMobile] = useState(false);
     const [generatedCode, setGeneratedCode] = useState('');
     const [debugPanelOpen, setDebugPanelOpen] = useState(false);
 
     const blocklyEditorRef = useRef(null);
-    
-    const handleCodeChange = useCallback((code) => {
-        setGeneratedCode(code);
-    }, []);
 
     const {
         gameState,
@@ -49,7 +58,16 @@ function MazeGame() {
         debugGoToPhase
     } = useMazeGame();
 
-    const toolboxConfig = useMemo(() => {        
+    const handleResetProgress = useCallback(() => {
+        debugResetProgress();
+        clearGameWorkspacesFromStorage('maze');
+    }, []);
+
+    const handleCodeChange = useCallback((code) => {
+        setGeneratedCode(code);        
+    }, []);    
+
+    const toolboxConfig = useMemo(() => {
         const allowedBlocks = currentPhaseData?.allowedBlocks || [];
         return generateDynamicToolbox(allowedBlocks);
     }, [currentPhaseData]);
@@ -64,12 +82,12 @@ function MazeGame() {
         return () => window.removeEventListener('resize', checkIsMobile);
     }, []);
 
-useEffect(() => {
-}, [currentPhaseData]);    
+    useEffect(() => {
+    }, [currentPhaseData]);
 
     const handleRunCode = () => {
         const code = blocklyEditorRef.current?.getCode?.() || '';
-        
+
         if (isMobile) {
             setTimeout(() => {
                 executeCode(code);
@@ -85,25 +103,40 @@ useEffect(() => {
         resetGame();
     }, [resetGame]);
 
+
+    const handleToggleDebugPanel = useCallback(() => {
+        setDebugPanelOpen(prev => !prev);
+    }, []);
+ 
+
     const editorComponent = (
         <BlocklyEditor
             ref={blocklyEditorRef}
             toolbox={toolboxConfig}
             onCodeChange={handleCodeChange}
+            phaseKey={currentPhase}
             isExecuting={isExecuting}
             title="Editor de Blocos - Autômato"
+            gameName="maze"
             onRunCode={handleRunCode}
             onResetGame={handleResetGame}
             gameState={gameState}
             runButtonText="Executar Blocos"
             resetButtonText="Reiniciar Autômato"
         />
-    );
+    ); 
+
+    useEffect(() => {
+        console.log('🔄 Fase atual mudou para:', currentPhase);
+    }, [currentPhase]);    
 
     const gameAreaComponent = (
         <GameArea
             gameState={gameState}
             className="automato-game-area"
+            onNextPhase={handleNextPhase}
+            currentPhase={currentPhase}
+            totalPhases={totalPhases}
         >      <MazeRenderer
                 mazeData={mazeData}
                 playerPosition={playerPosition}
@@ -115,37 +148,30 @@ useEffect(() => {
 
     const additionalComponents = [];
 
-    // console.log('🎮 MazeGame - gameState:', gameState);
-    
+
     return (
         <>
             <BaseGame
                 gameTitle="Autômato"
                 gameIcon="🤖"
                 gameDescription="Aprenda programação visual guiando um autômato através de labirintos"
-
                 currentPhase={currentPhase}
                 totalPhases={totalPhases}
                 currentPhaseData={currentPhaseData}
-
                 isExecuting={isExecuting}
                 gameState={gameState}
                 generatedCode={generatedCode}
-
                 editorComponent={editorComponent}
                 gameAreaComponent={gameAreaComponent}
                 additionalComponents={additionalComponents}
-
                 onRunCode={handleRunCode}
                 onResetGame={handleResetGame}
                 onPhaseChange={handlePhaseChange}
                 onNextPhase={handleNextPhase}
                 onPreviousPhase={handlePreviousPhase}
-
                 isMobile={isMobile}
                 enableMobileTabs={true}
                 gameAreaTitle="Autômato"
-
                 unlockedPhases={unlockedPhases}
                 completedPhases={completedPhases}
                 getPhaseData={getPhaseData}
@@ -153,8 +179,8 @@ useEffect(() => {
                 showPhaseSelectorProp={true}
                 showHomeButton={true}
                 showBackButton={true}
-
-                className="automato-game"
+                onShowDebugPanel={handleToggleDebugPanel}
+                onResetAllProgress={handleResetProgress}
             />
             {/* Painel de Debug */}
             <DebugPanel
@@ -166,7 +192,7 @@ useEffect(() => {
                 onPhaseChange={debugGoToPhase}
                 onUnlockAllPhases={debugUnlockAllPhases}
                 onCompleteAllPhases={debugCompleteAllPhases}
-                onResetProgress={debugResetProgress}
+                onResetProgress={handleResetProgress}
                 position="bottom-right"
                 isOpen={debugPanelOpen}
                 onToggle={setDebugPanelOpen}

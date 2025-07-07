@@ -10,7 +10,8 @@ const PhaseSelector = ({
   getPhaseData,
   gameConfig,
   isVisible = false,
-  onClose 
+  onClose,
+  onResetAllProgress
 }) => {
   if (!isVisible) return null;
 
@@ -181,10 +182,29 @@ const PhaseSelector = ({
               style={{ width: `${(completedPhases.length / totalPhases) * 100}%` }}
             />
           </div>
+          {/* Botão de reset total do progresso */}
+          {typeof onResetAllProgress === 'function' && (
+            <div className="mt-6 flex justify-center">
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold shadow transition-all duration-200"
+                onClick={() => {
+                  if (window.confirm('Tem certeza que deseja apagar TODO o progresso e blocos salvos deste jogo? Esta ação não pode ser desfeita.')) {
+                    onResetAllProgress();
+                  }
+                }}
+              >
+                Resetar TODO o progresso do jogo
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
+};
+
+PhaseSelector.defaultProps = {
+  onResetAllProgress: undefined
 };
 
 export default PhaseSelector;

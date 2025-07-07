@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useBaseGame } from '../../../hooks/useBaseGame';
 import { MAZE_GAME_CONFIG } from '../config/mazeConfig';
@@ -8,7 +7,7 @@ export const useMazeGame = () => {
     const [gameState, setGameState] = useState('idle');
     const gameStateRef = useRef(gameState);
     const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0, direction: 0 });
-    const playerPositionRef = useRef(playerPosition);    
+    const playerPositionRef = useRef(playerPosition);
     const [isExecuting, setIsExecuting] = useState(false);
     const [playerVisible, setPlayerVisible] = useState(true);
     const [executionSpeed] = useState(500);
@@ -29,8 +28,6 @@ export const useMazeGame = () => {
         totalPhases,
         getPhaseData,
         gameConfig,
-
-        // Funções de debug
         debugUnlockAllPhases,
         debugCompleteAllPhases,
         debugResetProgress,
@@ -40,9 +37,24 @@ export const useMazeGame = () => {
     const currentPhaseData = getCurrentPhaseData();
     const mazeData = useMemo(() => currentPhaseData?.map || [], [currentPhaseData]);
 
+    const executionControlRef = useRef({
+        shouldStop: false,
+        iterationCount: 0,
+        startTime: 0,
+        lastFingerprint: null,
+        sameStateCount: 0,
+        isRunning: false
+    });
+
+    const EXECUTION_CONFIG = {
+        MAX_ITERATIONS: 99000,
+        MAX_TIME: 99000,
+        STUCK_THRESHOLD: 20,
+        YIELD_INTERVAL: 50
+    };
+
     const initializePlayerPosition = useCallback(() => {
         const phaseData = getCurrentPhaseData();
-
         if (phaseData?.startPosition) {
             const { x, y } = phaseData.startPosition;
             const direction = detectInitialDirection(mazeData, x, y);
@@ -63,10 +75,10 @@ export const useMazeGame = () => {
             return { x: 0, y: 0 };
         }
         const directions = [
-            { x: 0, y: -1, value: 0 }, // Norte (0)
-            { x: 1, y: 0, value: 4 },  // Leste (1)
-            { x: 0, y: 1, value: 8 },  // Sul (2)
-            { x: -1, y: 0, value: 12 }  // Oeste (3)
+            { x: 0, y: -1, value: 0 },
+            { x: 1, y: 0, value: 4 },
+            { x: 0, y: 1, value: 8 },
+            { x: -1, y: 0, value: 12 }
         ];
 
         const index = direction / 4;
@@ -81,8 +93,6 @@ export const useMazeGame = () => {
     const turnRight = useCallback(() => {
         return new Promise(resolve => {
             setPlayerPosition(prev => {
-                // Direções: 0=Norte, 4=Leste, 8=Sul, 12=Oeste
-                // Para virar à direita: Norte(0)→Leste(4)→Sul(8)→Oeste(12)→Norte(0)
                 const newDirection = (prev.direction + 4) % 16;
                 return { ...prev, direction: newDirection };
             });
@@ -93,16 +103,13 @@ export const useMazeGame = () => {
     const turnLeft = useCallback(() => {
         return new Promise(resolve => {
             setPlayerPosition(prev => {
-                // Direções: 0=Norte, 4=Leste, 8=Sul, 12=Oeste
-                // Para virar à esquerda: Norte(0)→Oeste(12)→Sul(8)→Leste(4)→Norte(0)
-                // +12 é equivalente a -4 no módulo 16                
                 const newDirection = (prev.direction + 12) % 16;
                 return { ...prev, direction: newDirection };
             });
             setTimeout(resolve, executionSpeed);
         });
     }, [executionSpeed]);
-    
+
     useEffect(() => {
         playerPositionRef.current = playerPosition;
     }, [playerPosition]);
@@ -110,18 +117,10 @@ export const useMazeGame = () => {
     const isPathAhead = useCallback(() => {
         const { x, y, direction } = playerPositionRef.current;
         const nextPos = getNewPosition(direction, { x, y, direction });
-        
-        // console.log('Verificando caminho à frente:');
-        // console.log('  - Posição atual:', { x, y, direction });
-        // console.log('  - Próxima posição:', nextPos);
-        // console.log('  - Valor do mapa:', mazeData[nextPos.y]?.[nextPos.x]);
-        // console.log('  - Resultado:', mazeData[nextPos.y]?.[nextPos.x] === 1);
-        
-        if (nextPos.y < 0 || nextPos.y >= mazeData.length || 
+        if (nextPos.y < 0 || nextPos.y >= mazeData.length ||
             nextPos.x < 0 || nextPos.x >= mazeData[0].length) {
             return false;
         }
-        
         return mazeData[nextPos.y][nextPos.x] === 1;
     }, [getNewPosition, mazeData]);
 
@@ -129,20 +128,10 @@ export const useMazeGame = () => {
         const { x, y, direction } = playerPositionRef.current;
         const leftDirection = (direction + 12) % 16;
         const nextPos = getNewPosition(leftDirection, { x, y, direction: leftDirection });
-        
-        // console.log('Verificando caminho à esquerda:');
-        // console.log('  - Posição atual:', { x, y, direction });
-        // console.log('  - Próxima posição:', nextPos);
-        // console.log('  - Valor do mapa:', mazeData[nextPos.y]?.[nextPos.x]);
-        // console.log('  - Resultado:', mazeData[nextPos.y]?.[nextPos.x] === 1);
-
-        // Verificar se a posição está dentro dos limites do mapa
-        if (nextPos.y < 0 || nextPos.y >= mazeData.length || 
+        if (nextPos.y < 0 || nextPos.y >= mazeData.length ||
             nextPos.x < 0 || nextPos.x >= mazeData[0].length) {
             return false;
         }
-        
-        // Verificar se é especificamente um caminho livre (valor 1)
         return mazeData[nextPos.y][nextPos.x] === 1;
     }, [getNewPosition, mazeData]);
 
@@ -150,30 +139,74 @@ export const useMazeGame = () => {
         const { x, y, direction } = playerPositionRef.current;
         const rightDirection = (direction + 4) % 16;
         const nextPos = getNewPosition(rightDirection, { x, y, direction: rightDirection });
-        
-        // console.log('Verificando caminho à direita:');
-        // console.log('  - Posição atual:', { x, y, direction });
-        // console.log('  - Próxima posição:', nextPos);
-        // console.log('  - Valor do mapa:', mazeData[nextPos.y]?.[nextPos.x]);
-        // console.log('  - Resultado:', mazeData[nextPos.y]?.[nextPos.x] === 1);
-
-        // Verificar se a posição está dentro dos limites do mapa
-        if (nextPos.y < 0 || nextPos.y >= mazeData.length || 
+        if (nextPos.y < 0 || nextPos.y >= mazeData.length ||
             nextPos.x < 0 || nextPos.x >= mazeData[0].length) {
             return false;
         }
-        
-        // Verificar se é especificamente um caminho livre (valor 1)
         return mazeData[nextPos.y][nextPos.x] === 1;
     }, [getNewPosition, mazeData]);
 
-    const isAtGoal = useCallback(() => {
-        const { x, y } = playerPosition;
-        return mazeData[y] && mazeData[y][x] === 3;
-    }, [playerPosition, mazeData]);
 
-    const isFailure = useCallback(() => {
-        return gameStateRef.current === 'failure';
+    const createPositionFingerprint = useCallback(() => {
+        const { x, y, direction } = playerPositionRef.current;
+        const pathAhead = isPathAhead();
+        const pathLeft = isPathLeft();
+        const pathRight = isPathRight();
+        return `${x},${y},${direction}|${pathAhead}|${pathLeft}|${pathRight}`;
+    }, [isPathAhead, isPathLeft, isPathRight]);
+
+    const shouldStopExecution = useCallback(() => {
+        const control = executionControlRef.current;
+        if (control.iterationCount >= EXECUTION_CONFIG.MAX_ITERATIONS) {
+            console.warn('Limite de operações atingido');
+            return true;
+        }
+        if (Date.now() - control.startTime > EXECUTION_CONFIG.MAX_TIME) {
+            console.warn('Tempo limite de execução atingido');
+            return true;
+        }
+        const currentFingerprint = createPositionFingerprint();
+        if (currentFingerprint === control.lastFingerprint) {
+            control.sameStateCount++;
+            if (control.sameStateCount > EXECUTION_CONFIG.STUCK_THRESHOLD) {
+                console.warn('🚫 Personagem preso - interrompendo execução');
+                return true;
+            }
+        } else {
+            control.sameStateCount = 0;
+        }
+        control.lastFingerprint = currentFingerprint;
+        return false;
+    }, [EXECUTION_CONFIG.MAX_ITERATIONS, EXECUTION_CONFIG.MAX_TIME, EXECUTION_CONFIG.STUCK_THRESHOLD, createPositionFingerprint]);
+
+    const yieldToMainThread = useCallback(async () => {
+        const control = executionControlRef.current;
+        control.iterationCount++;
+        if (control.iterationCount % EXECUTION_CONFIG.YIELD_INTERVAL === 0) {
+            await new Promise(resolve => setTimeout(resolve, 1));
+        }
+    }, []);
+
+    const isAtGoalControlled = useCallback(() => {
+        const control = executionControlRef.current;
+        if (shouldStopExecution()) {
+            control.shouldStop = true;
+            setGameState('failure');
+            return true;
+        }
+        yieldToMainThread();
+        const { x, y } = playerPositionRef.current;
+        const actuallyAtGoal = mazeData[y] && mazeData[y][x] === 3;
+        if (actuallyAtGoal) {
+            console.log('🎯 Objetivo alcançado!');
+            setGameState('success');
+        }
+        return actuallyAtGoal;
+    }, [shouldStopExecution, yieldToMainThread, mazeData]);
+
+    const isFailureControlled = useCallback(() => {
+        const control = executionControlRef.current;
+        return control.shouldStop || gameStateRef.current === 'failure';
     }, []);
 
     const executeCode = useCallback(async (code) => {
@@ -182,75 +215,94 @@ export const useMazeGame = () => {
         setIsExecuting(true);
         setGameState('running');
 
+        const control = executionControlRef.current;
+        control.shouldStop = false;
+        control.iterationCount = 0;
+        control.startTime = Date.now();
+        control.lastFingerprint = null;
+        control.sameStateCount = 0;
+        control.isRunning = true;
+
         let goalAchieved = false;
-        let shouldStop = false;    
-        
-        let iterationCount = 0;
-        const MAX_ITERATIONS = 1000; // Limite razoável
-        const startTime = Date.now();
-        const MAX_TIME = 10000; // 10 segundos máximo
 
         try {
             const context = {
                 moveForward: async () => {
-                    if (shouldStop) return true;
-
-                    return new Promise((resolve, reject) => {
+                    if (control.shouldStop) return false;
+                    return new Promise((resolve) => {
                         setPlayerPosition(prev => {
                             const nextPos = getNewPosition(prev.direction, prev);
-
                             if (isValidPosition(nextPos.x, nextPos.y)) {
-                                // console.log(`[moveForward] Caminho à frente é válido: (${nextPos.x}, ${nextPos.y})`);
-
-                                const isGoalReached = mazeData[nextPos.y] && mazeData[nextPos.y][nextPos.x] === 3;
-
-                                if (isGoalReached) {
+                                const cellValue = mazeData[nextPos.y]?.[nextPos.x];
+                                if (cellValue === 3) {
                                     goalAchieved = true;
-                                    shouldStop = true;
+                                    control.shouldStop = true;
                                     setGameState('success');
                                     completePhase(currentPhase);
                                 }
-
+                                setTimeout(() => resolve(true), executionSpeed);
                                 return { ...prev, x: nextPos.x, y: nextPos.y };
                             } else {
-                                setTimeout(() => reject(new Error('Caminho bloqueado!')), executionSpeed);
-                                setGameState('failure');
-                                shouldStop = true;
+                                setTimeout(() => {
+                                    console.warn('🚧 Caminho bloqueado');
+                                    setGameState('failure');
+                                    control.shouldStop = true;
+                                    resolve(false);
+                                }, executionSpeed);
                                 return prev;
                             }
                         });
-
-                        setTimeout(() => resolve(goalAchieved), executionSpeed);
                     });
                 },
-                turnRight,
-                turnLeft,  
-                isPathAhead,
-                isPathLeft,
-                isPathRight,
-                isAtGoal: () => goalAchieved,
-                isFailure
+                turnRight: async () => {
+                    if (control.shouldStop) return false;
+                    await turnRight();
+                    return true;
+                },
+                turnLeft: async () => {
+                    if (control.shouldStop) return false;
+                    await turnLeft();
+                    return true;
+                },
+                isPathAhead: () => {
+                    if (control.shouldStop) return false;
+                    return isPathAhead();
+                },
+                isPathLeft: () => {
+                    if (control.shouldStop) return false;
+                    return isPathLeft();
+                },
+                isPathRight: () => {
+                    if (control.shouldStop) return false;
+                    return isPathRight();
+                },
+                isAtGoal: isAtGoalControlled,
+                isFailure: isFailureControlled
             };
 
-            // console.log('Executando código do jogador:', code);
+            const asyncFunc = new Function(...Object.keys(context), `
+            return (async () => {
+                ${code}
+            })();
+        `);
 
-            const asyncWrapper = `(async () => { ${code} })()`;
-            const func = new Function(...Object.keys(context), asyncWrapper);
-            await func(...Object.values(context));
-
-            // Aguardar tempo suficiente para processamento
+            await asyncFunc(...Object.values(context));
             await new Promise(resolve => setTimeout(resolve, executionSpeed + 100));
-        } catch (e) {
-            console.error('Erro ao executar código do jogador:', e);
-            if (!goalAchieved) { // Só define falha se não alcançou o objetivo
+            console.log(`📊 Execução finalizada: ${control.iterationCount} iterações em ${Date.now() - control.startTime}ms`);
+
+            if (!goalAchieved && control.shouldStop) {
+                setGameState('failure');
+            } else if (!goalAchieved && !control.shouldStop) {
                 setGameState('failure');
             }
+        } catch (error) {
+            console.error('💥 Erro na execução:', error);
+            setGameState('failure');
             await new Promise(resolve => setTimeout(resolve, 300));
-            
         } finally {
+            control.isRunning = false;
             setTimeout(() => {
                 setIsExecuting(false);
-                // console.log('Execução finalizada, botão liberado');
             }, 400);
         }
     }, [
@@ -260,21 +312,20 @@ export const useMazeGame = () => {
         isPathAhead,
         isPathLeft,
         isPathRight,
-        isFailure,
+        isAtGoalControlled,
+        isFailureControlled,
         executionSpeed,
         getNewPosition,
         isValidPosition,
         mazeData,
         completePhase,
         currentPhase
-    ]);    
-
+    ]);
 
     const resetGame = useCallback(() => {
         setGameState('idle');
         setIsExecuting(false);
         setPlayerVisible(false);
-
         setTimeout(() => {
             initializePlayerPosition();
             setPlayerVisible(true);
@@ -282,7 +333,6 @@ export const useMazeGame = () => {
     }, [initializePlayerPosition])
 
     const handlePhaseChangWrapper = useCallback((newPhase) => {
-        // console.log('🎮 handlePhaseChangeWrapper: Mudando para fase', newPhase);
         const result = handlePhaseChange(newPhase);
         if (result) {
             setGameState('idle');
@@ -292,7 +342,6 @@ export const useMazeGame = () => {
     }, [handlePhaseChange]);
 
     const handleNextPhaseWrapper = useCallback(() => {
-        // console.log('🎮 handleNextPhaseWrapper: Indo para próxima fase');
         const result = handleNextPhase();
         if (result) {
             setGameState('idle');
@@ -302,7 +351,6 @@ export const useMazeGame = () => {
     }, [handleNextPhase]);
 
     const handlePreviousPhaseWrapper = useCallback(() => {
-        // console.log('🎮 handlePreviousPhaseWrapper: Indo para fase anterior');
         const result = handlePreviousPhase();
         if (result) {
             setGameState('idle');
@@ -314,12 +362,12 @@ export const useMazeGame = () => {
     useEffect(() => {
         if (mazeData.length > 0) {
             initializePlayerPosition();
-        } 
+        }
     }, [mazeData, initializePlayerPosition]);
 
     useEffect(() => {
         gameStateRef.current = gameState;
-    }, [gameState]);    
+    }, [gameState]);
 
     return {
         gameState,
@@ -327,11 +375,9 @@ export const useMazeGame = () => {
         playerVisible,
         isExecuting,
         mazeData,
-
         executeCode,
-        resetGame,        
+        resetGame,
         turnRight,
-
         currentPhase,
         currentPhaseData,
         totalPhases,
@@ -341,10 +387,11 @@ export const useMazeGame = () => {
         handlePhaseChange: handlePhaseChangWrapper,
         handleNextPhase: handleNextPhaseWrapper,
         handlePreviousPhase: handlePreviousPhaseWrapper,
-
         completePhase,
-        getPhaseData
+        getPhaseData,
+        debugUnlockAllPhases,
+        debugCompleteAllPhases,
+        debugResetProgress,
+        debugGoToPhase        
     };
 }
-
-export default useMazeGame;

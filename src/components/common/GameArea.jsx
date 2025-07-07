@@ -36,7 +36,7 @@ const GameArea = ({
             {canGoNext && onNextPhase && (
               <button
                 onClick={onNextPhase}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 hover:scale-105 shadow-md"
+                className="flex items-center space-x-2 px-6 py-3 rounded-full font-medium transition-all duration-200 shadow-md bg-gradient-to-r from-red-500 via-pink-500 to-purple-600 hover:from-red-600 hover:via-pink-600 hover:to-purple-700 text-white hover:scale-105 hover:shadow-lg"
               >
                 <span>Próxima Fase</span>
                 <ChevronRight className="w-4 h-4" />

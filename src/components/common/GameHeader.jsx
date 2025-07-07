@@ -12,7 +12,8 @@ const GameHeader = ({
   gameTitle = '',
   gameIcon = '',
   children
-}) => {return (    <nav className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 sticky top-0 z-50 border-b border-white/20 shadow-lg">
+}) => {return (    
+    <nav className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 sticky top-0 z-50 border-b border-white/20 shadow-lg">
       <div className="flex items-center justify-between px-4 py-1 lg:px-6 lg:py-2">
         {/* Lado esquerdo - Botões de navegação */}
         <div className="flex items-center space-x-4">          
@@ -21,7 +22,8 @@ const GameHeader = ({
               onClick={onGoHome}
               title="Ir para Home"
               className="header-logo group"
-            >              <img 
+            >              
+            <img 
                 src={logo} 
                 alt="Blockly NT Logo" 
                 className="header-logo-icon group-hover:scale-110 w-12 h-12 lg:w-10 lg:h-10" 

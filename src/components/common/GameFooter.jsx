@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Settings } from 'lucide-react';
+import './GameFooter.mobile.css'; // Importar estilos específicos para o footer
 
 /**
  * Footer experimental para jogos - informações de fase movidas do header
@@ -42,8 +43,9 @@ const GameFooter = ({
     window.addEventListener('debugModeToggle', handleDebugToggle);
     return () => window.removeEventListener('debugModeToggle', handleDebugToggle);
   }, []);  return (
-    <div className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 border-t border-white/20 border-b-0">
-      <div className="flex items-center justify-between px-6 py-3">        {/* Lado esquerdo - Botão de Ajuda */}
+    <div className="bg-gradient-to-r from-red-600 via-pink-600 to-purple-600 border-t border-white/20 border-b-0" >
+      <div className="flex items-center justify-between px-6 py-3">        
+        {/* Lado esquerdo - Botão de Ajuda */}
         <div className="flex items-center">
           <button
             onClick={onShowHelp}
@@ -52,7 +54,8 @@ const GameFooter = ({
           >
             Ajuda
           </button>
-        </div>        {/* Centro - Indicador de Fase Atual/Total + Debug */}
+        </div>        
+        {/* Centro - Indicador de Fase Atual/Total + Debug */}
         <div className="flex items-center space-x-4">
           {currentPhase && totalPhases && (
             <div className="phase-indicator">
@@ -74,7 +77,8 @@ const GameFooter = ({
               <span className="text-sm lg:text-base">Debug</span>
             </button>
           )}
-        </div>{/* Lado direito - Botão do Seletor de Fases */}
+        </div>
+        {/* Lado direito - Botão do Seletor de Fases */}
         <div className="flex items-center">
           {showPhaseSelector && (
             <button

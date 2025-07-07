@@ -4,6 +4,7 @@ import GameHeader from './GameHeader';
 import GameInfo from './GameInfo';
 import GameFooter from './GameFooter';
 import PhaseSelector from './PhaseSelector';
+import { useViewportHeight } from '../../hooks/useViewportHeight';
 
 /**
  * Componente base genérico para todos os jogos
@@ -87,8 +88,12 @@ const BaseGame = ({
       onPhaseChange(phase);
     }
     setShowPhaseSelector(false);
-  }; return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden">{/* Header fixo */}
+  };
+
+  useViewportHeight();
+  
+  return (
+    <div className="h-screen-safe mobile-viewport-fix bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col overflow-hidden">{/* Header fixo */}
       <GameHeader
         onGoHome={handleGoHome}
         showHomeButton={showHomeButton}
@@ -184,7 +189,7 @@ const BaseGame = ({
               {children}
             </div>
           </div>
-        </div>      {/* Footer experimental com informações de fase */}
+        </div>
         <GameFooter
           currentPhase={currentPhase}
           totalPhases={totalPhases}

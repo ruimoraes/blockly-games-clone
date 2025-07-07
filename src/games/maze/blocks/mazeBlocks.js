@@ -47,19 +47,19 @@ export const generateDynamicToolbox = (allowedBlocks = []) => {
     contents: [
       {
         kind: 'category',
-        name: 'Movimentos',
+        name: 'movimentos',
         colour: '160',
         contents: []
       },
       {
         kind: 'category',
-        name: 'Lógica',
+        name: 'lógica',
         colour: '210',
         contents: []
       },
       {
         kind: 'category',
-        name: 'Sensores',
+        name: 'sensores',
         colour: '290',
         contents: []
       }

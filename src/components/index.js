@@ -18,7 +18,7 @@ export { default as GameCard } from './games/GameCard';
 export { default as BaseGame } from './common/BaseGame';
 export { default as GameHeader } from './common/GameHeader';
 export { default as GameInfo } from './common/GameInfo';
-export { default as GameControls } from './common/GameControls';
+// export { default as GameControls } from './common/GameControls';
 
 // Hooks
 export { useResponsive, useResponsiveClasses, useResponsiveAnimations } from '../hooks/useResponsive';

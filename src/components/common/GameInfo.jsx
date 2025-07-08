@@ -2,16 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Clock } from 'lucide-react';
 
-/**
- * Componente para exibir informações da fase atual
- * Exibe título e descrição da fase, além do status de execução
- */
 const GameInfo = ({
   phaseData = {},
   currentPhase,
   isExecuting = false
 }) => {
-  // Função para determinar a dificuldade baseada na fase
   const getDifficulty = (phase) => {
     if (!phase) return null;
     if (phase <= 3) return { level: 'Fácil', color: 'bg-green-500', emoji: '😊' };
@@ -44,7 +39,8 @@ const GameInfo = ({
               <p className="text-sm lg:text-xl text-gray-600 leading-tight truncate">
                 {phaseData.description}
               </p>
-            )}</div>          {/* Dificuldade */}
+            )}</div>          
+          {/* Dificuldade */}
           <div className="flex-shrink-0">
             {difficulty && (
               <div className={`flex items-center space-x-1 text-xs lg:text-sm text-white px-2 py-1 lg:px-3 lg:py-1.5 rounded-full font-medium ${difficulty.color}`}>

@@ -2,10 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-/**
- * Componente de navegação simples entre fases adjacentes
- * Para seleção de fases específicas, use PhaseSelector
- */
 export function PhaseNavigation({
   onPrevious,
   onNext,

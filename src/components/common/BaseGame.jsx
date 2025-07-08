@@ -101,21 +101,25 @@ const BaseGame = ({
         gameIcon={gameIcon}
       >
         {customHeaderContent}
-      </GameHeader>{/* Área de conteúdo principal - ocupa o restante da tela */}
-      <div className="flex-1 flex flex-col overflow-hidden">        {/* GameInfo compacto */}
+      </GameHeader>
+      {/* Área de conteúdo principal - ocupa o restante da tela */}
+      <div className="flex-1 flex flex-col overflow-hidden">        
+        {/* GameInfo compacto */}
         <div className="flex-shrink-0 px-1 py-1 lg:px-3 lg:py-3">
           <GameInfo
             phaseData={currentPhaseData}
             currentPhase={currentPhase}
             isExecuting={isExecuting}
           />
-        </div>{/* Área do jogo - ocupa todo espaço restante */}
+        </div>
+        {/* Área do jogo - ocupa todo espaço restante */}
         <div className="flex-1 px-1 pb-1 overflow-hidden">
           <div className="h-full flex flex-col">
             {/* Layout do jogo */}
             <div className="flex-1 overflow-hidden">
               {isMobile && enableMobileTabs ?
-                (              // Layout Mobile com Abas Integradas
+                (              
+                  // Layout Mobile com Abas Integradas
                   <div className="glass-panel h-full flex flex-col overflow-hidden">
                     {/* Abas integradas no topo do painel */}
                     <nav className="flex space-x-2 p-1 rounded-lg flex-shrink-0 m-4 mb-0">                  
@@ -150,7 +154,8 @@ const BaseGame = ({
                           🎮 Game
                         </a>
                       </div>
-                    </nav>                {/* Conteúdo das abas */}
+                    </nav>                
+                    {/* Conteúdo das abas */}
                     <div className="flex-1 p-2 pt-1 overflow-hidden">
                       <div className={`h-full ${activeTab === 'editor' ? 'block' : 'hidden'}`}>
                         {editorComponent}

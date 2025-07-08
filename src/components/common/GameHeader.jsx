@@ -1,11 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Home, List } from 'lucide-react';
 import logo from '../../assets/logont.svg';
 
-/**
- * Header simplificado para jogos - navegação básica e informações de jogo
- */
 const GameHeader = ({
   onGoHome,
   showHomeButton = true,
@@ -31,10 +27,12 @@ const GameHeader = ({
               <span className="header-logo-text">Blockly NT</span>
             </div>
           )}
-        </div>        {/* Centro - Conteúdo customizado (se necessário) */}
+        </div>        
+        {/* Centro - Conteúdo customizado (se necessário) */}
         <div className="flex-1 flex justify-center">
           {children}
-        </div>        {/* Lado direito - Título do jogo */}
+        </div>        
+        {/* Lado direito - Título do jogo */}
         <div className="flex items-center space-x-4">
           {gameTitle && (
             <div className="flex items-center space-x-2">

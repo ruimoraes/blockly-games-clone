@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Settings } from 'lucide-react';
-import './GameFooter.mobile.css'; // Importar estilos específicos para o footer
+import './GameFooter.mobile.css';
 
-/**
- * Footer experimental para jogos - informações de fase movidas do header
- */
+
 const GameFooter = ({
   currentPhase = null,
   totalPhases = null,
@@ -13,21 +11,15 @@ const GameFooter = ({
   showPhaseSelector = false,
   isExecuting = false,
   onShowHelp,
-  onShowDebugPanel // Nova prop para ativar debug panel
+  onShowDebugPanel
 }) => {
   const [showDebugButton, setShowDebugButton] = useState(false);
 
-  // Verificar se modo debug está ativo
   useEffect(() => {
     const checkDebugMode = () => {
-      // Verificar URL parameter
       const urlParams = new URLSearchParams(window.location.search);
       const debugParam = urlParams.get('debug');
-      
-      // Verificar localStorage
       const debugStorage = localStorage.getItem('blockly-games-debug');
-      
-      // Verificar variável global
       const debugGlobal = window.BLOCKLY_GAMES_DEBUG;
       
       return debugParam === 'true' || debugStorage === 'true' || debugGlobal === true;
@@ -35,7 +27,6 @@ const GameFooter = ({
 
     setShowDebugButton(checkDebugMode());
     
-    // Escutar mudanças na variável global
     const handleDebugToggle = () => {
       setShowDebugButton(checkDebugMode());
     };

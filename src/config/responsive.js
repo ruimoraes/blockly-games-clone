@@ -1,8 +1,3 @@
-/**
- * Breakpoints Configuration
- * Sistema de breakpoints responsivos baseado no Bootstrap 5
- */
-
 export const BREAKPOINTS = {
   xs: 0,      // Extra small devices (portrait phones)
   sm: 576,    // Small devices (landscape phones)  

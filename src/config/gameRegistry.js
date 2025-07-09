@@ -13,8 +13,8 @@ const enhanceGameConfig = (baseConfig, metadata) => ({
 export const GAMES_REGISTRY = {
   // Maze Game Registration
   maze: enhanceGameConfig(MAZE_GAME_CONFIG, {
-    name: 'Jogo do Labirinto',
-    icon: '🧩',
+    name: 'Jogo do Autômato',
+    icon: '🤖',
     description: 'Aprenda programação navegando por labirintos com blocos Blockly',
     category: 'Lógica',
     difficulty: 'Iniciante',
@@ -30,7 +30,6 @@ export const GAMES_REGISTRY = {
     isActive: true,
     enabled: true,
     featured: true,
-    ageRange: '8+',
     objectives: [
       'Entender sequências de comandos',
       'Usar loops para otimizar código',
@@ -38,7 +37,7 @@ export const GAMES_REGISTRY = {
       'Resolver problemas de navegação'
     ],
     metadata: {
-      totalPhases: 10,
+      totalPhases: 15,
       hasProgressTracking: true,
       supportsMultipleUsers: false,
       lastUpdated: '2025-06-18',
@@ -65,7 +64,6 @@ export const GAMES_REGISTRY = {
     isActive: true,
     enabled: true,
     featured: true,
-    ageRange: '8+',
     objectives: [
       'Entender movimento baseado em ângulos',
       'Coletar recursos de forma eficiente',
@@ -80,42 +78,6 @@ export const GAMES_REGISTRY = {
       version: '1.0.0'
     }
   }),
-
-  // Automato Game Registration (placeholder for future implementation)
-  automato: {
-    id: 'automato',
-    name: 'Jogo do Autômato',
-    icon: '🤖',
-    description: 'Aprenda programação visual guiando um autômato através de labirintos',
-    category: 'Lógica',
-    difficulty: 'Iniciante',
-    estimatedTime: '15-30 min',
-    concepts: [
-      'Sequências',
-      'Loops/Repetição', 
-      'Condicionais',
-      'Estruturas de controle'
-    ],
-    route: '/games/automato',
-    component: 'AutomatoPage',
-    isActive: false,
-    enabled: false,
-    featured: false,
-    ageRange: '8+',
-    objectives: [
-      'Entender sequências de comandos',
-      'Usar loops para otimizar código',
-      'Aplicar condicionais para tomada de decisão',
-      'Resolver problemas de navegação com autômato'
-    ],
-    metadata: {
-      totalPhases: 10,
-      hasProgressTracking: true,
-      supportsMultipleUsers: false,
-      lastUpdated: '2025-06-19',
-      version: '1.0.0'
-    }
-  }
 };
 
 // Game categories for organization
@@ -168,38 +130,31 @@ export const DIFFICULTY_LEVELS = {
   }
 };
 
-// Helper functions for registry manipulation
 export const gameRegistryUtils = {
-  // Get all active games
   getActiveGames() {
     return Object.values(GAMES_REGISTRY).filter(game => game.isActive);
   },
 
-  // Get featured games
   getFeaturedGames() {
     return Object.values(GAMES_REGISTRY).filter(game => game.featured && game.isActive);
   },
 
-  // Get games by category
   getGamesByCategory(category) {
     return Object.values(GAMES_REGISTRY).filter(game => 
       game.category === category && game.isActive
     );
   },
 
-  // Get games by difficulty
   getGamesByDifficulty(difficulty) {
     return Object.values(GAMES_REGISTRY).filter(game => 
       game.difficulty === difficulty && game.isActive
     );
   },
 
-  // Get game by ID
   getGameById(id) {
     return GAMES_REGISTRY[id];
   },
 
-  // Search games by name or description
   searchGames(query) {
     const searchTerm = query.toLowerCase();
     return Object.values(GAMES_REGISTRY).filter(game =>
@@ -211,7 +166,6 @@ export const gameRegistryUtils = {
     );
   },
 
-  // Get all categories with game counts
   getCategoriesWithCounts() {
     const categories = {};
     Object.values(GAMES_REGISTRY).forEach(game => {
@@ -228,7 +182,6 @@ export const gameRegistryUtils = {
     return categories;
   },
 
-  // Register a new game (for extensibility)
   registerGame(gameConfig) {
     if (!gameConfig.id) {
       throw new Error('Game must have an ID');
@@ -236,12 +189,10 @@ export const gameRegistryUtils = {
     GAMES_REGISTRY[gameConfig.id] = gameConfig;
   },
 
-  // Unregister a game
   unregisterGame(gameId) {
     delete GAMES_REGISTRY[gameId];
   },
 
-  // Update game metadata
   updateGame(gameId, updates) {
     if (GAMES_REGISTRY[gameId]) {
       GAMES_REGISTRY[gameId] = { ...GAMES_REGISTRY[gameId], ...updates };
@@ -249,7 +200,6 @@ export const gameRegistryUtils = {
   }
 };
 
-// Legacy compatibility functions
 export const getGameConfig = (gameId) => {
   const config = GAMES_REGISTRY[gameId];
   if (!config) {
@@ -272,7 +222,6 @@ export const registerGame = (gameConfig) => {
   return gameConfig;
 };
 
-// Backward compatibility
 export const GAME_REGISTRY = GAMES_REGISTRY;
 
 export default GAMES_REGISTRY;

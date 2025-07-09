@@ -118,26 +118,30 @@
   }
 
   /* ===== MOBILE VIEWPORT FIX ===== */
-  .mobile-viewport-fix .blockly-editor-container {
-    height: 100%;
-    max-height: 100%;
-  }
-  .blocklyDiv {
-    height: 100% !important;
-    max-height: 100% !important;
-  }
-  input, select, textarea {
-    font-size: 16px !important;
-  }
-  body {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: var(--full-height);
-  }
-  .mobile-viewport-fix {
-    position: relative;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+@media (max-width: 480px) {  
+    .is-game-page .mobile-viewport-fix .blockly-editor-container {
+      height: 100%;
+      max-height: 100%;
+    }
+    .is-game-page .blocklyDiv {
+      height: 100% !important;
+      max-height: 100% !important;
+    }
+    .is-game-page input, 
+    .is-game-page select, 
+    .is-game-page textarea {
+      font-size: 16px !important;
+    }
+    .is-game-page body {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: var(--full-height);
+    }
+    .is-game-page .mobile-viewport-fix {
+      position: relative;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 }

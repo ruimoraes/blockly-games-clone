@@ -210,7 +210,7 @@ const HomePage = () => {
                       >
                         <div className="carousel-card-content">
                           <div className="text-center">
-                            <div className="text-8xl mb-6 transform group-hover:scale-110 transition-transform duration-300">
+                            <div className="text-8xl mb-6 carousel-card-icon transform group-hover:scale-110 transition-transform duration-300">
                               {game.icon}
                             </div>
                             

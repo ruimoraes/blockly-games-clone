@@ -1,4 +1,4 @@
-export const MAZE_GAME_CONFIG = {
+export const AUTOMATO_GAME_CONFIG = {
   gameId: 'automato',
   gameName: 'Autômato',
   maxLevel: 10,

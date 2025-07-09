@@ -335,13 +335,42 @@
     font-size: 2rem;
   }
   .carousel-card {
-    height: 18rem;
+    height: 14.4rem; /* 18rem * 0.8 */
+    transform: scale(0.8);
+    margin: 0 -0.5rem; /* compensa o scale para centralizar */
+  }
+  .carousel-card-content {
+    padding: 1.2rem;
   }
 
   /* 3) Games section: smaller filter title */
   .games-filters-card h2,
   .games-filters-card .filter-title {
     font-size: 1.125rem;
+  }
+
+  .carousel-card-icon {
+    font-size: 2.5rem !important; /* 6rem (text-8xl) * 0.75 = 4.5rem */
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Hero section: reduz tamanho da fonte do título e da descrição */
+  .hero-title {
+    font-size: 2.4rem;
+  }
+  .hero-description {
+    font-size: 1.2rem;
+  }
+
+  .hero-button-primary,
+  .hero-button-secondary {
+    font-size: 0.84rem;
+    padding: 0.94rem 1.5rem;
+  }
+
+  .hero-section {
+    padding-top: 1.2rem;
+    padding-bottom: 2rem;
   }
 }
 

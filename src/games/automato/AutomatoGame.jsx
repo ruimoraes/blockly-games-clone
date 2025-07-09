@@ -3,9 +3,9 @@ import BaseGame from '../../components/common/BaseGame';
 import BlocklyEditor from '../../components/common/BlocklyEditor';
 import GameArea from '../../components/common/GameArea';
 import DebugPanel from '../../components/common/DebugPanel';
-import { defineBlocks, defineGenerators, generateDynamicToolbox } from './blocks/mazeBlocks';
-import { useMazeGame } from './hooks/useMazeGame';
-import MazeRenderer from './components/MazeRenderer';
+import { defineBlocks, defineGenerators, generateDynamicToolbox } from './blocks/automatoBlocks';
+import { useAutomatoGame } from './hooks/useAutomatoGame';
+import AutomatoRenderer from './components/AutomatoRenderer';
 
 defineBlocks();
 defineGenerators();
@@ -23,7 +23,7 @@ function clearGameWorkspacesFromStorage(gameName) {
     keysToRemove.forEach(key => localStorage.removeItem(key));
 }
 
-function MazeGame() {
+function AutomatoGame() {
     const [isMobile, setIsMobile] = useState(false);
     const [generatedCode, setGeneratedCode] = useState('');
     const [debugPanelOpen, setDebugPanelOpen] = useState(false);
@@ -56,11 +56,11 @@ function MazeGame() {
         debugCompleteAllPhases,
         debugResetProgress,
         debugGoToPhase
-    } = useMazeGame();
+    } = useAutomatoGame();
 
     const handleResetProgress = useCallback(() => {
         debugResetProgress();
-        clearGameWorkspacesFromStorage('maze');
+        clearGameWorkspacesFromStorage('automato');
     }, []);
 
     const handleCodeChange = useCallback((code) => {
@@ -117,7 +117,7 @@ function MazeGame() {
             phaseKey={currentPhase}
             isExecuting={isExecuting}
             title="Editor de Blocos - Autômato"
-            gameName="maze"
+            gameName="automato"
             onRunCode={handleRunCode}
             onResetGame={handleResetGame}
             gameState={gameState}
@@ -136,7 +136,7 @@ function MazeGame() {
             onNextPhase={handleNextPhase}
             currentPhase={currentPhase}
             totalPhases={totalPhases}
-        >      <MazeRenderer
+        >      <AutomatoRenderer
                 mazeData={mazeData}
                 playerPosition={playerPosition}
                 playerVisible={playerVisible}
@@ -200,4 +200,4 @@ function MazeGame() {
     );
 };
 
-export default MazeGame;
+export default AutomatoGame;

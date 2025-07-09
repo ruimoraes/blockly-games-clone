@@ -1,19 +1,14 @@
-// Central registry for all games in the Blockly NT application
-// This registry enables dynamic discovery and loading of games
-
-import { MAZE_GAME_CONFIG } from '../games/maze/config/mazeConfig';
+import { AUTOMATO_GAME_CONFIG } from '../games/automato/config/automatoConfig';
 import { BEE_GAME_CONFIG } from '../games/bee/config/beeConfig';
 
-// Enhanced game configurations with metadata for the registry
 const enhanceGameConfig = (baseConfig, metadata) => ({
   ...baseConfig,
   ...metadata
 });
 
 export const GAMES_REGISTRY = {
-  // Maze Game Registration
-  maze: enhanceGameConfig(MAZE_GAME_CONFIG, {
-    name: 'Jogo do Autômato',
+  maze: enhanceGameConfig(AUTOMATO_GAME_CONFIG, {
+    name: 'Autômato',
     icon: '🤖',
     description: 'Aprenda programação navegando por labirintos com blocos Blockly',
     category: 'Lógica',
@@ -25,8 +20,8 @@ export const GAMES_REGISTRY = {
       'Condicionais',
       'Estruturas de controle'
     ],
-    route: '/games/maze',
-    component: 'MazePage',
+    route: '/games/automato',
+    component: 'AutomatoPage',
     isActive: true,
     enabled: true,
     featured: true,
@@ -45,9 +40,8 @@ export const GAMES_REGISTRY = {
     }
   }),
 
-  // Bee Game Registration
   bee: enhanceGameConfig(BEE_GAME_CONFIG, {
-    name: 'Jogo da Abelha',
+    name: 'Abelha',
     icon: '🐝',
     description: 'Aprenda programação visual guiando uma abelha para coletar néctar',
     category: 'Lógica',
@@ -80,7 +74,6 @@ export const GAMES_REGISTRY = {
   }),
 };
 
-// Game categories for organization
 export const GAME_CATEGORIES = {
   'Lógica': {
     name: 'Lógica e Algoritmos',
@@ -108,7 +101,6 @@ export const GAME_CATEGORIES = {
   }
 };
 
-// Difficulty levels
 export const DIFFICULTY_LEVELS = {
   'Iniciante': {
     name: 'Iniciante',

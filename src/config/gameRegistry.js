@@ -2,8 +2,7 @@
 // This registry enables dynamic discovery and loading of games
 
 import { MAZE_GAME_CONFIG } from '../games/maze/config/mazeConfig';
-import { PUZZLE_GAME_CONFIG } from '../games/puzzle/config/puzzleGameConfig';
-import { AUTOMATO_GAME_CONFIG } from '../games/automato/config/automatoConfig';
+import { BEE_GAME_CONFIG } from '../games/bee/config/beeConfig';
 
 // Enhanced game configurations with metadata for the registry
 const enhanceGameConfig = (baseConfig, metadata) => ({
@@ -29,7 +28,7 @@ export const GAMES_REGISTRY = {
     route: '/games/maze',
     component: 'MazePage',
     isActive: true,
-    enabled: true, // Adicionado para compatibilidade com HomePage
+    enabled: true,
     featured: true,
     ageRange: '8+',
     objectives: [
@@ -47,43 +46,44 @@ export const GAMES_REGISTRY = {
     }
   }),
 
-  // Puzzle Game Registration  
-  puzzle: enhanceGameConfig(PUZZLE_GAME_CONFIG, {
-    name: 'Quebra-Cabeça dos Animais',
-    icon: '🧩',
-    description: 'Aprenda sobre variáveis e propriedades configurando animais com blocos Blockly',
-    category: 'Variáveis',
+  // Bee Game Registration
+  bee: enhanceGameConfig(BEE_GAME_CONFIG, {
+    name: 'Jogo da Abelha',
+    icon: '🐝',
+    description: 'Aprenda programação visual guiando uma abelha para coletar néctar',
+    category: 'Lógica',
     difficulty: 'Iniciante',
-    estimatedTime: '20-40 min',
+    estimatedTime: '15-30 min',
     concepts: [
-      'Variáveis',
-      'Propriedades de objetos',
-      'Tipos de dados',
-      'Estruturas de dados'
+      'Movimento baseado em ângulos',
+      'Coleta de recursos',
+      'Condicionais',
+      'Loops básicos'
     ],
-    route: '/games/puzzle',
-    component: 'PuzzlePage',
+    route: '/games/bee',
+    component: 'BeePage',
     isActive: true,
-    enabled: true, // Adicionado para compatibilidade com HomePage
+    enabled: true,
     featured: true,
-    ageRange: '7+',
+    ageRange: '8+',
     objectives: [
-      'Compreender conceito de variáveis',
-      'Trabalhar com propriedades de objetos',
-      'Conectar dados relacionados',
-      'Resolver problemas lógicos'
+      'Entender movimento baseado em ângulos',
+      'Coletar recursos de forma eficiente',
+      'Usar condicionais para tomada de decisão',
+      'Resolver problemas de navegação'
     ],
     metadata: {
-      totalPhases: 5,
+      totalPhases: 10,
       hasProgressTracking: true,
       supportsMultipleUsers: false,
-      lastUpdated: '2025-06-18',
-      version: '2.0.0'
+      lastUpdated: '2025-07-08',
+      version: '1.0.0'
     }
   }),
 
-  // Automato Game Registration
-  automato: enhanceGameConfig(AUTOMATO_GAME_CONFIG, {
+  // Automato Game Registration (placeholder for future implementation)
+  automato: {
+    id: 'automato',
     name: 'Jogo do Autômato',
     icon: '🤖',
     description: 'Aprenda programação visual guiando um autômato através de labirintos',
@@ -98,9 +98,9 @@ export const GAMES_REGISTRY = {
     ],
     route: '/games/automato',
     component: 'AutomatoPage',
-    isActive: true,
-    enabled: true,
-    featured: true,
+    isActive: false,
+    enabled: false,
+    featured: false,
     ageRange: '8+',
     objectives: [
       'Entender sequências de comandos',
@@ -115,7 +115,7 @@ export const GAMES_REGISTRY = {
       lastUpdated: '2025-06-19',
       version: '1.0.0'
     }
-  })
+  }
 };
 
 // Game categories for organization

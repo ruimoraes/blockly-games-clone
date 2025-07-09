@@ -19,12 +19,12 @@ const GameHeader = ({
               title="Ir para Home"
               className="header-logo group"
             >              
-            <img 
-                src={logo} 
-                alt="Blockly NT Logo" 
-                className="header-logo-icon group-hover:scale-110 w-12 h-12 lg:w-10 lg:h-10" 
+              <img 
+                src='/home/logo_nav.png'
+                alt="Blockly NT"
+                onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'inline'; }}
               />
-              <span className="header-logo-text">Blockly NT</span>
+              <span className="header-logo-text" style={{ display: 'none' }}>Blockly NT</span>
             </div>
           )}
         </div>        

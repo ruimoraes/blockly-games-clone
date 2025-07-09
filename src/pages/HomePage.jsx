@@ -151,27 +151,27 @@ const HomePage = () => {
         <div className="absolute inset-0 pointer-events-none z-0">
           <div className="floating-element floating-element-1">
             <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <img src="/home/puzzle_red.svg" alt="Float 1" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
+              <img src="/home/puzzle_red.png" alt="Float 1" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
             </div>
           </div>
           <div className="floating-element floating-element-2">
             <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <img src="/home/code.svg" alt="Float 2" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
+              <img src="/home/code.png" alt="Float 2" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
             </div>
           </div>
           <div className="floating-element floating-element-3">
             <div className="w-24 h-24 bg-pink-500/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <img src="/home/starship.svg" alt="Float 3" style={{ width: '60%', height: '60%', background: 'transparent', opacity: 0.7 }} />
+              <img src="/home/starship.png" alt="Float 3" style={{ width: '60%', height: '60%', background: 'transparent', opacity: 0.7 }} />
             </div>
           </div>
           <div className="floating-element floating-element-4">
             <div className="w-20 h-20 bg-yellow-400/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <img src="/home/puzzle_blue.svg" alt="Float 4" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
+              <img src="/home/puzzle_blue.png" alt="Float 4" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
             </div>
           </div>
           <div className="floating-element floating-element-5">
             <div className="w-16 h-16 bg-green-400/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <img src="/home/idea.svg" alt="Float 5" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
+              <img src="/home/idea.png" alt="Float 5" style={{ width: '70%', height: '70%', background: 'transparent', opacity: 0.7 }} />
             </div>
           </div>
         </div>
@@ -188,9 +188,9 @@ const HomePage = () => {
                 Comece sua jornada com nossos jogos mais populares e educativos
               </p>
             </div>
-            <div className="relative">
+            <div className="relative flex flex-col items-center">
               {/* Carrossel Container */}
-              <div className="carousel-container">
+              <div className="carousel-container flex justify-center">
                 <div 
                   className="carousel-track"
                   style={{ 
@@ -299,7 +299,7 @@ const HomePage = () => {
                       }, 400);
                     }
                   }}
-                  className="btn-gradient py-4 px-10 shadow-lg text-xl"
+                  className="hero-button-primary shadow-lg text-xl"
                 >
                   Explorar mais jogos
                 </button>
@@ -507,20 +507,14 @@ const HomePage = () => {
             <div>
               <h4 className="text-lg font-bold mb-4">Recursos</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Jogos Educativos</a></li>
                 <li><a href="#" className="hover:text-white transition-colors duration-300">Tutoriais</a></li>
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Documentação</a></li>
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Comunidade</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="text-lg font-bold mb-4">Suporte</h4>
               <ul className="space-y-2 text-gray-300">
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Central de Ajuda</a></li>
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Contato</a></li>
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Feedback</a></li>
-                <li><a href="#" className="hover:text-white transition-colors duration-300">Relatório de Bugs</a></li>
+                <li><a href="#" className="hover:text-white transition-colors duration-300">Quem Somos</a></li>              
               </ul>
             </div>
           </div>

@@ -22,7 +22,7 @@ export function detectInitialDirection(maze, startX, startY) {
     return 4;
 }
 
-export function MazeRenderer({ mazeData, playerPosition, playerVisible = true}) {
+export function AutomatoRenderer({ mazeData, playerPosition, playerVisible = true}) {
     const svgRef = useRef(null);
     const [isInitialized, setIsInitialized] = useState(false);
     const animationTimeouts = useRef([]);
@@ -537,4 +537,4 @@ export function MazeRenderer({ mazeData, playerPosition, playerVisible = true}) 
     );
 }
 
-export default MazeRenderer;
+export default AutomatoRenderer;

@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useBaseGame } from '../../../hooks/useBaseGame';
-import { MAZE_GAME_CONFIG } from '../config/mazeConfig';
-import { detectInitialDirection } from '../components/MazeRenderer';
+import { AUTOMATO_GAME_CONFIG } from '../config/automatoConfig';
+import { detectInitialDirection } from '../components/AutomatoRenderer';
 
-export const useMazeGame = () => {
+export const useAutomatoGame = () => {
     const [gameState, setGameState] = useState('idle');
     const gameStateRef = useRef(gameState);
     const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0, direction: 0 });
@@ -12,7 +12,7 @@ export const useMazeGame = () => {
     const [playerVisible, setPlayerVisible] = useState(true);
     const [executionSpeed] = useState(500);
 
-    const baseGameHook = useBaseGame(MAZE_GAME_CONFIG);
+    const baseGameHook = useBaseGame(AUTOMATO_GAME_CONFIG);
 
     const {
         currentPhase,

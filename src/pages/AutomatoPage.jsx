@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import MazeGame from '../games/maze/MazeGame';
+import AutomatoGame from '../games/automato/AutomatoGame';
 
-const MazePage = () => {
+const AutomatoPage = () => {
   useEffect(() => {
     document.body.classList.add('is-game-page');
     return () => {
@@ -9,7 +9,7 @@ const MazePage = () => {
     };
   }, []);
 
-  return <MazeGame />;
+  return <AutomatoGame />;
 };
 
-export default MazePage;
+export default AutomatoPage;

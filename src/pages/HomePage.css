@@ -337,7 +337,7 @@
   .carousel-card {
     height: 14.4rem; /* 18rem * 0.8 */
     transform: scale(0.8);
-    margin: 0 -0.5rem; /* compensa o scale para centralizar */
+    margin: 0 -0.5rem;
   }
   .carousel-card-content {
     padding: 1.2rem;
